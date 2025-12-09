@@ -1,0 +1,13 @@
+{
+    "appID": "com.SINEM.RegistroPagos",
+    "files": [
+        "dist/electron",
+        "dist/react"
+    ],
+    "win": {
+        "target": [
+            "portable",
+            "msi"
+        ]
+    }
+}
