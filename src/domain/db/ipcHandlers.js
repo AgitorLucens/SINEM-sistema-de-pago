@@ -13,8 +13,11 @@ export default function setUpHandlers(dbInstance) {
         return dbInstance.deletePayment(id);
     });
 
-    ipcMain.handle('get-payment-concepts', async ( _ , id) => {
-        return dbInstance.getPaymentsConcepts(id);
+    ipcMain.handle('get-payment-concepts', async ( ) => {
+        return dbInstance.getPaymentsConcepts();
     });
 
+    ipcMain.handle('get-payment-divisions', async ( ) => {
+        return dbInstance.getPaymentsDivisions();
+    });
 }

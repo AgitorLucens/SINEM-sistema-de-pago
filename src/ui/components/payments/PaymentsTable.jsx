@@ -130,12 +130,13 @@ const PaymentsTable = ({ payments, minTableWidth = '800px' , onDeletePayment}) =
                 }}>
                     <thead style={{ backgroundColor: '#eef2ff' }}> {/* bg-indigo-50 */}
                         <tr>
-                            <th style={{ padding: '0.75rem', textAlign: 'left', fontWeight: '700', color: '#4f46e5', minWidth: '60px' }}>ID</th>
-                            <th style={{ padding: '0.75rem', textAlign: 'left', fontWeight: '700', color: '#4f46e5', minWidth: '150px' }}>Estudiante</th>
-                            <th style={{ padding: '0.75rem', textAlign: 'left', fontWeight: '700', color: '#4f46e5', minWidth: '90px' }}>Monto</th>
+                            <th style={{ padding: '0.75rem', textAlign: 'left', fontWeight: '700', color: '#4f46e5', minWidth: '60px' }}># Factura</th>
                             <th style={{ padding: '0.75rem', textAlign: 'left', fontWeight: '700', color: '#4f46e5', minWidth: '100px' }}>Fecha</th>
-                            <th style={{ padding: '0.75rem', textAlign: 'left', fontWeight: '700', color: '#4f46e5', minWidth: '100px' }}>Concepto</th>
-                            <th style={{ padding: '0.75rem', textAlign: 'left', fontWeight: '700', color: '#4f46e5', minWidth: '100px' }}>Método</th>
+                            <th style={{ padding: '0.75rem', textAlign: 'left', fontWeight: '700', color: '#4f46e5', minWidth: '150px' }}>Estudiante</th>
+                            <th style={{ padding: '0.75rem', textAlign: 'left', fontWeight: '700', color: '#4f46e5', minWidth: '100px' }}>Modo Pago</th>
+                            <th style={{ padding: '0.75rem', textAlign: 'left', fontWeight: '700', color: '#4f46e5', minWidth: '100px' }}>Curso</th>
+                            <th style={{ padding: '0.75rem', textAlign: 'left', fontWeight: '700', color: '#4f46e5', minWidth: '100px' }}>Tipo Pago</th>
+                            <th style={{ padding: '0.75rem', textAlign: 'left', fontWeight: '700', color: '#4f46e5', minWidth: '90px' }}>Monto</th> 
                         </tr>
                     </thead>
                     <tbody>
@@ -146,13 +147,16 @@ const PaymentsTable = ({ payments, minTableWidth = '800px' , onDeletePayment}) =
                                     {/* FIX: Convertimos p.id a String explícitamente antes de usar substring() */}
                                     {p.id ? String(p.id).substring(0, 6) : 'N/A'}
                                 </td>
+                                <td style={{ padding: '0.75rem', color: '#6b7280' }}>{formatDate(p.date)}</td>
                                 <td style={{ padding: '0.75rem', fontWeight: '500', color: '#1f2937' }}>{p.studentName}</td>
+                                <td style={{ padding: '0.75rem', color: '#6b7280', textTransform: 'capitalize' }}>{p.payment_method}</td>
+                                <td style={{ padding: '0.75rem', color: '#6b7280', textTransform: 'capitalize' }}>{p.division_name}</td>
+                                <td style={{ padding: '0.75rem', color: '#6b7280', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', maxWidth: '250px' }}>{p.concept_type}</td>
+                                
                                 {/* Mostrar monto con dos decimales */}
                                 <td style={{ padding: '0.75rem', fontWeight: '600', color: '#065f46' }}>₡{p.amount.toFixed(2)}</td>
-                                <td style={{ padding: '0.75rem', color: '#6b7280' }}>{formatDate(p.date)}</td>
-                                <td style={{ padding: '0.75rem', color: '#6b7280', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', maxWidth: '250px' }}>{p.concept_type}</td>
                                 {/* capitalizar la primera letra del método */}
-                                <td style={{ padding: '0.75rem', color: '#6b7280', textTransform: 'capitalize' }}>{p.payment_method}</td>
+                                
                             </tr>
                         ))}
                         {payments.length === 0 && (

@@ -11,6 +11,10 @@ class AppDB {
     }
 
     setUpDatabase() {
+
+        /*
+            Tabla Estudiantes
+        */
         const createStudentsTable = `
             CREATE TABLE IF NOT EXISTS students (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -22,6 +26,10 @@ class AppDB {
             );
         `;
         this.db.exec(createStudentsTable);
+
+        /*
+            Tabla Concepto de Pagos
+        */
         const createPaymentConceptsTable = `
             CREATE TABLE IF NOT EXISTS payment_concepts (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -30,6 +38,22 @@ class AppDB {
             );
         `;
         this.db.exec(createPaymentConceptsTable);
+
+        /*
+            Tabla Curso / División
+        */
+        const createDivisionsTable = `
+            CREATE TABLE IF NOT EXISTS divisions (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                name TEXT NOT NULL, -- Corresponde a DivisionType (SINEM, Taller, etc.)
+                description TEXT
+            );
+        `;
+        this.db.exec(createDivisionsTable);
+
+        /*
+            Tabla ----
+        */
         const createInvoicesTable = `
             CREATE TABLE IF NOT EXISTS invoices (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -44,6 +68,10 @@ class AppDB {
             );
         `;
         this.db.exec(createInvoicesTable);
+
+        /*
+            Tabla Pagos
+        */
         const createPaymentsTable = `
             CREATE TABLE IF NOT EXISTS payments (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -51,6 +79,7 @@ class AppDB {
                 amount REAL NOT NULL,
                 payment_method TEXT NOT NULL, -- Corresponde a PaymentMethod (EFECTIVO, TRANSFERENCIA)
                 concept_id INTEGER,
+                division_id INTEGER,
                 student_id INTEGER,
                 invoice_id INTEGER,
                 created_by INTEGER, -- Asumiendo un ID de usuario (UUID simulado por INTEGER)
@@ -60,9 +89,14 @@ class AppDB {
                 FOREIGN KEY (concept_id) REFERENCES payment_concepts(id) ON DELETE SET NULL,
                 FOREIGN KEY (student_id) REFERENCES students(id) ON DELETE SET NULL,
                 FOREIGN KEY (invoice_id) REFERENCES invoices(id) ON DELETE CASCADE
+                FOREIGN KEY (division_id) REFERENCES divisions(id) ON DELETE SET NULL
             );
         `;
         this.db.exec(createPaymentsTable);
+
+        /*
+            Tabla Gastos
+        */
         const createExpensesTable = `
             CREATE TABLE IF NOT EXISTS expenses (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -76,6 +110,10 @@ class AppDB {
             );
         `;
         this.db.exec(createExpensesTable);
+
+        /*
+            Tabla Caja
+        */
         const createCashRegisterTable = `
             CREATE TABLE IF NOT EXISTS cash_register (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -92,6 +130,10 @@ class AppDB {
             );
         `;
         this.db.exec(createCashRegisterTable);
+
+        /*
+            Tabla Estudiantes
+        */
         const createIncomeCategoriesTable = `
             CREATE TABLE IF NOT EXISTS income_categories (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -114,16 +156,15 @@ class AppDB {
      */
     addPayment(paymentData) {
             const sql = this.db.prepare(`
-                INSERT INTO payments (date, amount, payment_method, concept_id, student_id, invoice_id, created_by, status, timestamp)
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+                INSERT INTO payments (date, amount, payment_method, concept_id, student_id, division_id, status, timestamp)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?)
             `);
             const data = sql.run(paymentData.date, 
                                 paymentData.amount, 
                                 paymentData.payment_method, 
                                 paymentData.concept_id, 
                                 paymentData.student_id, 
-                                paymentData.invoice_id, 
-                                paymentData.created_by, 
+                                paymentData.division_id, 
                                 paymentData.status, 
                                 paymentData.timestamp);
             return data.lastInsertRowid;
@@ -139,19 +180,21 @@ class AppDB {
         const sql = this.db.prepare(`SELECT
                                         p.id,
                                         p.date,
-                                        p.amount,
+                                        p.student_id,
                                         p.payment_method,
+                                        d.name AS division_name,
                                         c.type AS concept_type,
-                                        p.student_id
+                                        p.amount                    
                                      FROM
                                         payments p
                                      INNER JOIN
-                                        payment_concepts c ON p.concept_id = c.id 
+                                        payment_concepts c ON p.concept_id = c.id
+                                     INNER JOIN  
+                                        divisions d ON p.division_id = d.id
                                      ORDER BY
                                         p.id DESC;`
                                     );
         const payments = sql.all();
-        console.log("Pagos obtenidos:", payments);
         return payments;
     }
 
@@ -164,11 +207,16 @@ class AppDB {
     }
 
     getPaymentsConcepts() {
-        const sql = this.db.prepare('SELECT id, type AS name FROM payment_concepts ORDER BY id DESC');
+        const sql = this.db.prepare('SELECT id, type AS name FROM payment_concepts ORDER BY id ASC');
         const result =  sql.all(); 
         return result; 
     }
 
+    getPaymentsDivisions() {
+        const sql = this.db.prepare('SELECT id, name AS name FROM divisions ORDER BY id ASC');
+        const result =  sql.all(); 
+        return result; 
+    }
 
     close () {
         this.db.close();

@@ -8,6 +8,7 @@ const api = {
     getAllPayments: () => ipcRenderer.invoke('get-all-payments'),
     deletePayment: (id) => ipcRenderer.invoke('delete-payment', id),
     getPaymentConcepts: () => ipcRenderer.invoke('get-payment-concepts'),
+    getPaymentDivisions: () => ipcRenderer.invoke('get-payment-divisions'),
 }
 
 contextBridge.exposeInMainWorld('api', api);

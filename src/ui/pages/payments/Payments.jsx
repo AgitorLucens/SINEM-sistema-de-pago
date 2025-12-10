@@ -2,7 +2,7 @@ import PaymentsTable from '../../components/payments/PaymentsTable.jsx';
 import PaymentsForm from '../../components/payments/PaymentsForm.jsx'; 
 import PaymentsModal from '../../components/payments/PaymentsModal.jsx';
 
-import getPaymentConcepts from "../../constant/PaymentConcepts"
+import {getPaymentConcepts, getPaymentDivisions }from "../../constant/PaymentConstant.jsx"
 
 import { useState, useEffect, useCallback } from 'react';
 
@@ -22,8 +22,9 @@ const Payments = () => {
 
 
     const [concepts, setConcepts] = useState([]);
+    const [divisions, setDivisions] = useState([]);
     const [isConceptsLoading, setIsConceptsLoading] = useState(false);
-
+    const [isDivsionsLoading, setIsDivisionsLoading] = useState(false);
 
     const fetchPayments = useCallback(async () => {
         setIsLoading(true);
@@ -66,6 +67,26 @@ const Payments = () => {
                 setIsConceptsLoading(false);
             }
         };
+
+        const loadDivisions = async () => {
+            setIsDivisionsLoading(true);
+            try {
+                const fetchedDivisions = await getPaymentDivisions();
+                setDivisions(Array.isArray(fetchedDivisions) ? fetchedDivisions : []);
+                
+                // Opcional: Si solo hay un concepto, seleccionarlo por defecto
+                if (fetchedDivisions.length === 1) {
+                    setFormData(prev => ({ ...prev, division: fetchedDivisions[0].id }));
+                }
+
+            } catch (err) {
+                console.error("Error al cargar cursos:", err);
+                setError("No se pudieron cargar los cursos de pago.");
+            } finally {
+                setIsDivisionsLoading(false);
+            }
+        };
+        loadDivisions();
         loadConcepts();
     }, []); // Se ejecuta solo una vez al montar
 
@@ -101,6 +122,7 @@ const Payments = () => {
             amount: amountNumber,
             payment_method: formData.method,
             concept_id: formData.concept,
+            division_id: formData.division,
             student_id: null,
             invoice_id: null,
             created_by: 1, // Simulación de usuario
@@ -198,6 +220,7 @@ const Payments = () => {
                     onSubmit={handleSubmit}
                     isLoading={isLoading}
                     concepts={concepts}
+                    divisions={divisions}
                 />
             </PaymentsModal>
         </div>
