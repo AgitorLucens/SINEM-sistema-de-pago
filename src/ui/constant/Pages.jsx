@@ -2,5 +2,6 @@ export const Page = {
   DASHBOARD: 'dashboard',
   SYSTEM: 'system',
   STORAGE: 'storage',
-  SETTINGS: 'settings'
+  SETTINGS: 'settings',
+  PAYMENT_REGISTRY: 'payment_registry', 
 };

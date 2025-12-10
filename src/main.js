@@ -1,6 +1,10 @@
-import { app, BrowserWindow } from 'electron';
+import { app, BrowserWindow, ipcMain } from 'electron';
 import path from 'node:path';
 import started from 'electron-squirrel-startup';
+import AppDB from './domain/db/db.js';
+import setUpHandlers from './domain/db/ipcHandlers';
+
+let db;
 
 // Handle creating/removing shortcuts on Windows when installing/uninstalling.
 if (started) {
@@ -10,8 +14,9 @@ if (started) {
 const createWindow = () => {
   // Create the browser window.
   const mainWindow = new BrowserWindow({
-    width: 800,
-    height: 600,
+    width: 1400,
+    height: 1000,
+    alwaysOnTop: false,
     webPreferences: {
       preload: path.join(__dirname, 'preload.js'),
     },
@@ -32,8 +37,10 @@ const createWindow = () => {
 // initialization and is ready to create browser windows.
 // Some APIs can only be used after this event occurs.
 app.whenReady().then(() => {
+  db = new AppDB();
+  setUpHandlers(db);
   createWindow();
-
+  
   // On OS X it's common to re-create a window in the app when the
   // dock icon is clicked and there are no other windows open.
   app.on('activate', () => {
@@ -47,6 +54,9 @@ app.whenReady().then(() => {
 // for applications and their menu bar to stay active until the user quits
 // explicitly with Cmd + Q.
 app.on('window-all-closed', () => {
+  if (db) {
+    db.close();  
+  }
   if (process.platform !== 'darwin') {
     app.quit();
   }
