@@ -1,4 +1,5 @@
 import { Page } from '../../../constant/Pages.jsx'; 
+import Payments from '../../../pages/payments/Payments.jsx';
 
 const Content = ({ page }) => {
   let title, description;
@@ -20,6 +21,13 @@ const Content = ({ page }) => {
       title = "Configuración Local";
       description = "Ajustes de la aplicación, incluyendo preferencias de idioma, tema (si estuviera implementado) y configuración de la base de datos local.";
       break;
+    case Page.PAYMENT_REGISTRY:
+        // Renderiza el componente completo de gestión de pagos
+        return (
+          <div className="p-8 w-full max-w-7xl mx-auto">
+            <Payments />
+          </div>
+        );
     default:
       title = "Página No Encontrada";
       description = "Error de navegación. Por favor, selecciona un enlace del menú lateral.";

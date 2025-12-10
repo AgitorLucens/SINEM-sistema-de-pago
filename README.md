@@ -20,6 +20,10 @@ run project with
 
 npm start
 
+base de datos
+
+npm install sqlite3
+
 use this to generate .exe in windows
 
 npm i --save-dev electron-builder
