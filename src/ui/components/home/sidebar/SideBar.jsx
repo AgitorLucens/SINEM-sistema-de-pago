@@ -28,8 +28,8 @@ const Sidebar = ({ currentPage, setCurrentPage }) => {
 
             <NavLink 
                 icon={CPUIcon} 
-                title="Sistema" 
-                page={Page.SYSTEM} 
+                title="Egresos" 
+                page={Page.EXPENSES_REGISTRY} 
                 currentPage={currentPage} 
                 onClick={setCurrentPage} 
             />

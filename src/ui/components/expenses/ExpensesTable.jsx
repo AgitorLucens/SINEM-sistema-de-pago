@@ -1,7 +1,5 @@
-// src/components/PaymentsTable.jsx
 import { useState, useEffect, useRef } from 'react';
 
-// Helper para formatear la fecha a dd/mm/yyyy
 const formatDate = (dateString) => {
     if (!dateString) return '';
     try {
@@ -14,21 +12,13 @@ const formatDate = (dateString) => {
     }
 };
 
-// Componente para visualizar el historial de pagos con redimensionamiento manual
-const PaymentsTable = ({ payments, minTableWidth = '800px' , onDeletePayment}) => {
-    // Convertir el prop de cadena a número para cálculos
+const ExpensesTable = ({expenses, minTableWidth = '800px'}) => {
+
     const minWidthValue = parseInt(minTableWidth, 10) || 600;
-
-    const [tableWidth, setTableWidth] = useState(minWidthValue);
     
-    // Ref para almacenar temporalmente el estado del arrastre (posición inicial, ancho inicial)
+    const [tableWidth, setTableWidth] = useState(minWidthValue);
+
     const dragState = useRef(null);
-
-    // ====================================================================
-    // Lógica de Redimensionamiento
-    // ====================================================================
-
-    // Inicia el proceso de redimensionamiento
     const handleMouseDown = (e) => {
         e.preventDefault(); 
         
@@ -86,23 +76,6 @@ const PaymentsTable = ({ payments, minTableWidth = '800px' , onDeletePayment}) =
         };
     }, []); 
 
-    // ====================================================================
-    // Renderizado
-    // ====================================================================
-    const handleActionClick = (paymentId) => {
-        if (confirmingId === paymentId) {
-            if (onDeletePayment) {
-                onDeletePayment(paymentId);
-            }
-            setConfirmingId(null); 
-        } else {
-            setConfirmingId(paymentId);
-            setTimeout(() => {
-                setConfirmingId(null);
-            }, 3000); 
-        }
-    };
-    
     return (
         <div 
             style={{ 
@@ -129,38 +102,26 @@ const PaymentsTable = ({ payments, minTableWidth = '800px' , onDeletePayment}) =
                 }}>
                     <thead style={{ backgroundColor: '#eef2ff' }}> {/* bg-indigo-50 */}
                         <tr>
-                            <th style={{ padding: '0.75rem', textAlign: 'left', fontWeight: '700', color: '#4f46e5', minWidth: '60px' }}># Factura</th>
                             <th style={{ padding: '0.75rem', textAlign: 'left', fontWeight: '700', color: '#4f46e5', minWidth: '100px' }}>Fecha</th>
-                            <th style={{ padding: '0.75rem', textAlign: 'left', fontWeight: '700', color: '#4f46e5', minWidth: '150px' }}>Estudiante</th>
-                            <th style={{ padding: '0.75rem', textAlign: 'left', fontWeight: '700', color: '#4f46e5', minWidth: '100px' }}>Modo Pago</th>
-                            <th style={{ padding: '0.75rem', textAlign: 'left', fontWeight: '700', color: '#4f46e5', minWidth: '100px' }}>Curso</th>
-                            <th style={{ padding: '0.75rem', textAlign: 'left', fontWeight: '700', color: '#4f46e5', minWidth: '100px' }}>Tipo Pago</th>
+                            <th style={{ padding: '0.75rem', textAlign: 'left', fontWeight: '700', color: '#4f46e5', minWidth: '150px' }}>Detalle</th>
+                            <th style={{ padding: '0.75rem', textAlign: 'left', fontWeight: '700', color: '#4f46e5', minWidth: '100px' }}>Referencia</th>
                             <th style={{ padding: '0.75rem', textAlign: 'left', fontWeight: '700', color: '#4f46e5', minWidth: '90px' }}>Monto</th> 
                         </tr>
                     </thead>
                     <tbody>
-                        {payments.map((p, index) => (
+                        {expenses.map((e, index) => (
                             // Asegura que el ID sea único
-                            <tr key={p.id} style={{ borderBottom: '1px solid #f3f4f6', backgroundColor: index % 2 === 0 ? 'white' : '#f9fafb' }}>
-                                <td style={{ padding: '0.75rem', color: '#6b7280', fontSize: '0.75rem' }}>
-                                    {/* FIX: Convertimos p.id a String explícitamente antes de usar substring() */}
-                                    {p.id ? String(p.id).substring(0, 6) : 'N/A'}
-                                </td>
-                                <td style={{ padding: '0.75rem', color: '#6b7280' }}>{formatDate(p.date)}</td>
-                                <td style={{ padding: '0.75rem', fontWeight: '500', color: '#1f2937' }}>{p.studentName}</td>
-                                <td style={{ padding: '0.75rem', color: '#6b7280', textTransform: 'capitalize' }}>{p.payment_method}</td>
-                                <td style={{ padding: '0.75rem', color: '#6b7280', textTransform: 'capitalize' }}>{p.division_name}</td>
-                                <td style={{ padding: '0.75rem', color: '#6b7280', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', maxWidth: '250px' }}>{p.concept_type}</td>
-                                
+                            <tr key={e.id} style={{ borderBottom: '1px solid #f3f4f6', backgroundColor: index % 2 === 0 ? 'white' : '#f9fafb' }}>
+                                <td style={{ padding: '0.75rem', color: '#6b7280' }}>{formatDate(e.date)}</td>
+                                <td style={{ padding: '0.75rem', fontWeight: '500', color: '#1f2937' }}>{e.description}</td>
+                                <td style={{ padding: '0.75rem', color: '#6b7280', textTransform: 'capitalize' }}>{e.reference}</td>
                                 {/* Mostrar monto con dos decimales */}
-                                <td style={{ padding: '0.75rem', fontWeight: '600', color: '#065f46' }}>₡{p.amount.toFixed(2)}</td>
-                                {/* capitalizar la primera letra del método */}
-                                
+                                <td style={{ padding: '0.75rem', fontWeight: '600', color: '#065f46' }}>₡{e.amount.toFixed(2)}</td>         
                             </tr>
                         ))}
-                        {payments.length === 0 && (
+                        {expenses.length === 0 && (
                             <tr>
-                                <td colSpan="6" style={{ padding: '1rem', textAlign: 'center', color: '#9ca3af' }}>No hay pagos registrados.</td>
+                                <td colSpan="6" style={{ padding: '1rem', textAlign: 'center', color: '#9ca3af' }}>No hay gastos registrados.</td>
                             </tr>
                         )}
                     </tbody>
@@ -186,6 +147,6 @@ const PaymentsTable = ({ payments, minTableWidth = '800px' , onDeletePayment}) =
             />
         </div>
     );
-};
+}
 
-export default PaymentsTable;
+export default ExpensesTable;

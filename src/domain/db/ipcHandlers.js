@@ -1,6 +1,9 @@
 import {ipcMain} from 'electron';
 
 export default function setUpHandlers(dbInstance) {
+    /*
+        Pagina Pagos
+    */
     ipcMain.handle('add-payment', async ( _ , paymentData) => {
         return dbInstance.addPayment(paymentData);
     });
@@ -20,4 +23,12 @@ export default function setUpHandlers(dbInstance) {
     ipcMain.handle('get-payment-divisions', async ( ) => {
         return dbInstance.getPaymentsDivisions();
     });
+
+    /*
+        Pagina Egresos
+    */
+    ipcMain.handle('get-all-expenses', async ( ) => {
+        return dbInstance.getAllExpenses();
+    });
+    
 }
