@@ -1,5 +1,3 @@
-import getPaymentConcepts from "../../constant/PaymentConstant"
-
 const PaymentsForm = ({ formData, handleChange, onSubmit, isLoading, concepts, divisions }) => {
    
     return (

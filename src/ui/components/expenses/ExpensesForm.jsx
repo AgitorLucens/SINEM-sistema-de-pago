@@ -1,27 +1,40 @@
-
-const ExpensesForm = () => {
+const ExpensesForm = ({ formData, handleChange, onSubmit, isLoading }) => {
     return (
         <div style={{ padding: '0.5rem' }}>
-            <p className="card-text" style={{ marginBottom: '1.5rem', color: '#4b5563' }}>Ingrese los detalles del pago recibido.</p>
+            <p className="card-text" style={{ marginBottom: '1.5rem', color: '#4b5563' }}>Ingrese los detalles del egreso.</p>
 
-            <form onSubmit={onSubmit} style={{ display: 'grid', gap: '1rem' }}>
+            <form onSubmit={onSubmit} noValidate style={{ display: 'grid', gap: '1rem' }}>
                 {/* Campo Nombre del Estudiante/Participante */}
                 <div>
-                    <label htmlFor="studentName" style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '500', fontSize: '0.875rem' }}>
-                        Nombre del Estudiante/Participante
+                    <label htmlFor="description" style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '500', fontSize: '0.875rem' }}>
+                        Detalle
                     </label>
                     <input
                         type="text"
-                        id="studentName"
-                        name="studentName"
-                        value={formData.studentName}
+                        id="description"
+                        name="description"
+                        value={formData.description}
                         onChange={handleChange}
                         required
                         style={{ width: '100%', padding: '0.75rem', border: '1px solid #d1d5db', borderRadius: '0.5rem', boxSizing: 'border-box' }}
-                        placeholder="Ej: Juan Pérez"
+                        placeholder="Detalle"
                     />
                 </div>
-
+                <div>
+                    <label htmlFor="reference" style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '500', fontSize: '0.875rem' }}>
+                        Referencia
+                    </label>
+                    <input
+                        type="text"
+                        id="reference"
+                        name="reference"
+                        value={formData.reference}
+                        onChange={handleChange}
+                        required
+                        style={{ width: '100%', padding: '0.75rem', border: '1px solid #d1d5db', borderRadius: '0.5rem', boxSizing: 'border-box' }}
+                        placeholder="Referencia"
+                    />
+                </div>
                 {/* Campo Monto y Fecha (en una fila) */}
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
                     <div>
@@ -58,90 +71,6 @@ const ExpensesForm = () => {
                 </div>
 
                 {/* Campo Concepto y Método de Pago (en una fila) */}
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
-                    <div>
-                        <label htmlFor="concept" style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '500', fontSize: '0.875rem' }}>
-                            Tipo de Pago
-                        </label>
-                        <select
-                            id="concept"
-                            name="concept"
-                            value={formData.concept}
-                            onChange={handleChange}
-                            required
-                            disabled={isLoading}
-                            style={{ width: '100%', padding: '0.75rem', border: '1px solid #d1d5db', borderRadius: '0.5rem', boxSizing: 'border-box' }}
-                        >
-                            <option value="" selected>
-                                {isLoading ? 'Cargando conceptos...' : '--- Seleccione un concepto ---'}
-                            </option>
-
-                            {concepts.length === 0 ? (
-                                    <option value="" disabled>{isLoading ? 'Cargando conceptos...' : 'No hay conceptos disponibles'}</option>
-                                ) : (
-                                    concepts.map((concept) => (
-                                        <option 
-                                            key={concept.id}      // Clave única para React (obligatoria)
-                                            value={concept.id}    // El valor que se guarda en formData (el ID de Firestore)
-                                        >
-                                            {concept.name}        {/* El texto visible en el dropdown */}
-                                        </option>
-                                    ))
-                            )}
-                        </select>
-                    </div>
-                
-                    {/* Campo Método de Pago */}
-                    <div>
-                        <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '500', fontSize: '0.875rem' }}>
-                            Método de Pago
-                        </label>
-                        <select
-                            id="method"
-                            name="method"
-                            value={formData.method}
-                            onChange={handleChange}
-                            style={{ width: '100%', padding: '0.75rem', border: '1px solid #d1d5db', borderRadius: '0.5rem', boxSizing: 'border-box' }}
-                        >
-                            <option value="" selected>
-                                {'--- Seleccione un Metodo de Pago ---'}
-                            </option>
-                            <option value="cash">Efectivo</option>
-                            <option value="transfer">Transferencia</option>
-                        </select>
-                    </div>
-                </div>
-
-                <div>
-                        <label htmlFor="division" style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '500', fontSize: '0.875rem' }}>
-                            Curso
-                        </label>
-                        <select
-                            id="division"
-                            name="division"
-                            value={formData.division}
-                            onChange={handleChange}
-                            required
-                            disabled={isLoading}
-                            style={{ width: '100%', padding: '0.75rem', border: '1px solid #d1d5db', borderRadius: '0.5rem', boxSizing: 'border-box' }}
-                        >
-                            <option value="" selected>
-                                {isLoading ? 'Cargando cursos...' : '--- Seleccione un curso ---'}
-                            </option>
-                            {concepts.length === 0 ? (
-                                    <option value="" disabled>{isLoading ? 'Cargando cursos...' : 'No hay curso disponibles'}</option>
-                                ) : (
-                                    divisions.map((division) => (
-                                        <option 
-                                            key={division.id}      // Clave única para React (obligatoria)
-                                            value={division.id}    // El valor que se guarda en formData (el ID de Firestore)
-                                        >
-                                            {division.name}        {/* El texto visible en el dropdown */}
-                                        </option>
-                                ))
-                            )}
-                        </select>
-                    </div>
 
                 <button
                     type="submit"

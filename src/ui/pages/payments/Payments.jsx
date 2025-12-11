@@ -2,7 +2,7 @@ import PaymentsTable from '../../components/payments/PaymentsTable.jsx';
 import PaymentsForm from '../../components/payments/PaymentsForm.jsx'; 
 import PaymentsModal from '../../components/payments/PaymentsModal.jsx';
 
-import {getPaymentConcepts, getPaymentDivisions }from "../../constant/PaymentConstant.jsx"
+import {getPaymentConcepts, getPaymentDivisions } from "../../constant/PaymentConstant.jsx"
 
 import { useState, useEffect, useCallback } from 'react';
 
@@ -169,7 +169,7 @@ const Payments = () => {
         <div style={{ padding: '0.5rem' }}>
             {/* Encabezado y botón de registro */}
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
-                <h2 className="card-title" style={{ color: '#4f46e5', margin: 0 }}>Historial de Pagos </h2>
+                <h2 className="card-title" style={{ color: '#4f46e5', margin: 0 }}>Historial de Ingresos </h2>
                 <button
                     onClick={() => setIsModalOpen(true)} // Abre el modal
                     style={{

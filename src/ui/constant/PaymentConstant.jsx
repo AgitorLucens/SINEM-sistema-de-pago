@@ -24,9 +24,18 @@ export async function getAllExpenses() {
         return []; 
     }
 }
+export async function addExpense(expenseData) {
+    try {
+        return await window.api.addExpense(expenseData);
+    } catch (error) {
+        console.error('Error al agregar egreso:', error.message);
+        throw error; 
+    }
+}
 
 export default {
     getPaymentConcepts,
     getPaymentDivisions,
-    getAllExpenses
+    getAllExpenses,
+    addExpense
 };

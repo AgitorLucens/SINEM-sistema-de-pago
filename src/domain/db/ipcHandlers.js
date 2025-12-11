@@ -31,4 +31,8 @@ export default function setUpHandlers(dbInstance) {
         return dbInstance.getAllExpenses();
     });
     
+    ipcMain.handle('add-expense', async ( _ , expenseData) => {
+        return dbInstance.addExpense(expenseData);
+    });
+    
 }
