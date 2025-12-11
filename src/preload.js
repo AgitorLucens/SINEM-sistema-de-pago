@@ -11,6 +11,7 @@ const api = {
     getPaymentDivisions: () => ipcRenderer.invoke('get-payment-divisions'),
     // Pagina Egresos
     getAllExpenses: () => ipcRenderer.invoke('get-all-expenses'),
+    addExpense: (expenseData) => ipcRenderer.invoke('add-expense', expenseData)
 }
 
 contextBridge.exposeInMainWorld('api', api);

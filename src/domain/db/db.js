@@ -235,6 +235,18 @@ class AppDB {
     }
 
 
+    addExpense(expenseData) {
+            const sql = this.db.prepare(`
+                INSERT INTO expenses (date, description, reference, total_amount)
+                VALUES (?, ?, ?, ?)
+            `);
+            const data = sql.run(expenseData.date, 
+                                expenseData.description,    
+                                expenseData.reference,
+                                expenseData.amount);
+            return data.lastInsertRowid;
+    }
+
     close () {
         this.db.close();
     }
