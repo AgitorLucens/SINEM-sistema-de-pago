@@ -218,6 +218,23 @@ class AppDB {
         return result; 
     }
 
+    getAllExpenses() {
+        const sql = this.db.prepare(`SELECT
+                                        e.id,
+                                        e.date,
+                                        e.description,
+                                        e.reference,
+                                        e.total_amount AS amount
+                                     FROM
+                                        expenses e
+                                     ORDER BY
+                                        e.id DESC;`
+                                    );
+        const expenses = sql.all();
+        return expenses;
+    }
+
+
     close () {
         this.db.close();
     }

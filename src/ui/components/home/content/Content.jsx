@@ -1,5 +1,6 @@
 import { Page } from '../../../constant/Pages.jsx'; 
 import Payments from '../../../pages/payments/Payments.jsx';
+import Expenses from '../../../pages/expenses/Expenses.jsx';
 
 const Content = ({ page }) => {
   let title, description;
@@ -22,10 +23,15 @@ const Content = ({ page }) => {
       description = "Ajustes de la aplicación, incluyendo preferencias de idioma, tema (si estuviera implementado) y configuración de la base de datos local.";
       break;
     case Page.PAYMENT_REGISTRY:
-        // Renderiza el componente completo de gestión de pagos
         return (
           <div className="p-8 w-full max-w-7xl mx-auto">
             <Payments />
+          </div>
+        );
+    case Page.EXPENSES_REGISTRY:
+        return (
+          <div className="p-8 w-full max-w-7xl mx-auto">
+            <Expenses />
           </div>
         );
     default:

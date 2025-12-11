@@ -4,4 +4,5 @@ export const Page = {
   STORAGE: 'storage',
   SETTINGS: 'settings',
   PAYMENT_REGISTRY: 'payment_registry', 
+  EXPENSES_REGISTRY: 'expenses_registry',
 };
