@@ -11,7 +11,11 @@ const api = {
     getPaymentDivisions: () => ipcRenderer.invoke('get-payment-divisions'),
     // Pagina Egresos
     getAllExpenses: () => ipcRenderer.invoke('get-all-expenses'),
-    addExpense: (expenseData) => ipcRenderer.invoke('add-expense', expenseData)
+    addExpense: (expenseData) => ipcRenderer.invoke('add-expense', expenseData),
+
+
+    //Pagina Estudiantes
+    getAllStudents: () => ipcRenderer.invoke('get-all-students'),
 }
 
 contextBridge.exposeInMainWorld('api', api);

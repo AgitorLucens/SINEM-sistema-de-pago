@@ -35,8 +35,8 @@ const Sidebar = ({ currentPage, setCurrentPage }) => {
             />
             <NavLink 
                 icon={HardDriveIcon} 
-                title="Almacenamiento" 
-                page={Page.STORAGE} 
+                title="Estudiantes" 
+                page={Page.STUDENTS_REGISTRY} 
                 currentPage={currentPage} 
                 onClick={setCurrentPage} 
             />

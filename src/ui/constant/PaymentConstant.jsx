@@ -1,3 +1,6 @@
+/*
+    Pagos
+*/
 export async function getAllPayments() {
     try {
         return await window.api.getAllPayments();
@@ -25,6 +28,9 @@ export async function getPaymentDivisions() {
     }
 }
 
+/*
+    Gastos
+*/
 export async function getAllExpenses() {
     try {
         return await window.api.getAllExpenses();
@@ -42,9 +48,23 @@ export async function addExpense(expenseData) {
     }
 }
 
+/*
+    Estudiantes
+*/
+export async function getAllStudents() {
+    try {
+        return await window.api.getAllStudents();
+    } catch (error) {
+        console.error('Error al obtener egresos:', error.message);
+        return []; 
+    }
+}
+
+
 export default {
     getPaymentConcepts,
     getPaymentDivisions,
     getAllExpenses,
-    addExpense
+    addExpense,
+    getAllStudents
 };
