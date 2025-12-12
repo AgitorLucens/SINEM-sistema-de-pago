@@ -1,3 +1,12 @@
+export async function getAllPayments() {
+    try {
+        return await window.api.getAllPayments();
+    } catch (error) {
+        console.error('Error al obtener pagos:', error.message);
+        return []; 
+    }
+}
+
 export async function getPaymentConcepts() {
     try {
         return await window.api.getPaymentConcepts();
