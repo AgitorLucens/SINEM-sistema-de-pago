@@ -1,6 +1,6 @@
 import NavLink from "../navlink/NavLink.jsx";
 import { Page } from '../../../constant/Pages.jsx';
-import { HomeIcon, CPUIcon, HardDriveIcon, SettingsIcon } from "../../icons/Icons.jsx";
+import { HomeIcon, CPUIcon, HardDriveIcon, SettingsIcon, IconArrowDownLeft } from "../../icons/Icons.jsx";
 
 const Sidebar = ({ currentPage, setCurrentPage }) => {
 
@@ -27,7 +27,7 @@ const Sidebar = ({ currentPage, setCurrentPage }) => {
             />
 
             <NavLink 
-                icon={CPUIcon} 
+                icon={IconArrowDownLeft} 
                 title="Egresos" 
                 page={Page.EXPENSES_REGISTRY} 
                 currentPage={currentPage} 

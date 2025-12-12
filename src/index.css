@@ -6,6 +6,23 @@
 /* Estilos base (similar al reset y layout principal) */
 body { margin: 0; padding: 0; font-family: 'Inter', sans-serif; }
 
+:root{
+    --color-indigo-600: #4f46e5;
+    --color-indigo-700: #4338ca;
+    --color-indigo-50: #eef2ff;
+    --color-green-600: #10b981;
+    --color-red-600: #ef4444;
+    --color-yellow-600: #f59e0b;
+    --color-gray-100: #f3f4f6;
+    --color-gray-500: #6b7280;
+    --color-gray-700: #374151;
+    --color-gray-900: #111827;
+    --color-white: #ffffff;
+    --sidebar-width: 16rem; /* 256px */
+    --color-indigo-500: #6366f1;
+}
+
+
 #root, .app-container {
     height: 100vh; 
     display: flex; 
@@ -98,4 +115,36 @@ body { margin: 0; padding: 0; font-family: 'Inter', sans-serif; }
     color: #9ca3af; /* text-gray-400 */
     margin-top: auto; /* Empuja el pie de página hacia abajo */
     padding-top: 1rem;
+}
+
+.btn {
+    display: flex;
+    align-items: center;
+    padding: 0.75rem 1.5rem;
+    font-weight: 600;
+    border-radius: 0.75rem;
+    transition: background-color 0.3s, box-shadow 0.3s;
+    border: 1px solid transparent;
+    cursor: pointer;
+}
+
+.btn-primary {
+    background-color: var(--color-indigo-600);
+    color: var(--color-white);
+    box-shadow: 0 4px 6px -1px rgba(79, 70, 229, 0.4);
+}
+
+.btn-primary:hover {
+    background-color: var(--color-indigo-700);
+}
+
+.btn-secondary {
+    background-color: var(--color-white);
+    color: var(--color-gray-700);
+    border-color: #d1d5db; /* border-gray-300 */
+    box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+}
+
+.btn-secondary:hover {
+    background-color: #f9fafb; /* bg-gray-50 */
 }

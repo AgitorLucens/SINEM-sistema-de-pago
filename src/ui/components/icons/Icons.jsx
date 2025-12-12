@@ -9,6 +9,13 @@ export const HomeIcon = (props) => (
   </IconBase>
 );
 
+export const IconArrowDownLeft = (props) => (
+  <IconBase {...props}>
+      <line x1="10" y1="14" x2="4" y2="20" />
+      <polyline points="20 4 14 4 14 10" />
+  </IconBase>
+);
+
 export const HardDriveIcon = (props) => (
   <IconBase {...props}>
     <line x1="22" y1="12" x2="2" y2="12"></line>
