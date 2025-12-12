@@ -19,7 +19,7 @@ class AppDB {
             CREATE TABLE IF NOT EXISTS students (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
                 name TEXT NOT NULL,
-                birth_date TEXT,
+                reference TEXT,
                 phone TEXT,
                 email TEXT,
                 active INTEGER NOT NULL -- 1 para true, 0 para false
@@ -218,6 +218,9 @@ class AppDB {
         return result; 
     }
 
+    /*
+        Gastos
+    */
     getAllExpenses() {
         const sql = this.db.prepare(`SELECT
                                         e.id,
@@ -228,8 +231,8 @@ class AppDB {
                                      FROM
                                         expenses e
                                      ORDER BY
-                                        e.id DESC;`
-                                    );
+                                        e.id DESC;
+                                        `);
         const expenses = sql.all();
         return expenses;
     }
@@ -246,6 +249,34 @@ class AppDB {
                                 expenseData.amount);
             return data.lastInsertRowid;
     }
+
+
+    /*
+        Estudiantes
+    */
+    getAllStudents(){
+        const sql = this.db.prepare(`SELECT
+                                        s.id,
+                                        s.name,
+                                        s.phone,
+                                        s.email,
+                                        s.reference,
+                                        s.active
+                                     FROM
+                                        students s
+                                     ORDER BY
+                                        s.id DESC;
+                                    `);
+        const students = sql.all();
+        return students;    
+    }
+
+
+    addStudent(studentData){
+
+    }
+
+
 
     close () {
         this.db.close();

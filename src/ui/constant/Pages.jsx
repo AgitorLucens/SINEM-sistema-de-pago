@@ -5,4 +5,5 @@ export const Page = {
   SETTINGS: 'settings',
   PAYMENT_REGISTRY: 'payment_registry', 
   EXPENSES_REGISTRY: 'expenses_registry',
+  STUDENTS_REGISTRY: 'students_registry',
 };

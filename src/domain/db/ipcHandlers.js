@@ -34,5 +34,13 @@ export default function setUpHandlers(dbInstance) {
     ipcMain.handle('add-expense', async ( _ , expenseData) => {
         return dbInstance.addExpense(expenseData);
     });
+
+    /*
+        Pagina Estudiantes
+    */
+    ipcMain.handle('get-all-students', async ( ) => {
+        return dbInstance.getAllStudents();
+    });
     
+
 }
