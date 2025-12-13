@@ -9,13 +9,14 @@ const api = {
     deletePayment: (id) => ipcRenderer.invoke('delete-payment', id),
     getPaymentConcepts: () => ipcRenderer.invoke('get-payment-concepts'),
     getPaymentDivisions: () => ipcRenderer.invoke('get-payment-divisions'),
+
     // Pagina Egresos
     getAllExpenses: () => ipcRenderer.invoke('get-all-expenses'),
     addExpense: (expenseData) => ipcRenderer.invoke('add-expense', expenseData),
 
-
     //Pagina Estudiantes
     getAllStudents: () => ipcRenderer.invoke('get-all-students'),
+    addStudent: (studentData) => ipcRenderer.invoke('add-student', studentData),
 }
 
 contextBridge.exposeInMainWorld('api', api);

@@ -1,16 +1,18 @@
-import StudentsTable from '../../components/students/StudentsTable'
-import StudentsModal from '../../components/students/StudentsModal'
-import { getAllStudents } from '../../constant/PaymentConstant'; 
+import StudentsTable from '../../components/students/StudentsTable';
+import StudentsModal from '../../components/students/StudentsModal';
+import StudentForm from '../../components/students/StudentsForm';
+import { getAllStudents, addStudent } from '../../constant/PaymentConstant'; 
 
 import { useState, useEffect, useCallback } from 'react';
 
 const Students = () => {
 
     const initialFormState = {
-        amount: '',
-        date: new Date().toISOString().substring(0, 10),
-        description: '',
+        name: '',
         reference: '',
+        phone: '',
+        email: '',
+        active: 0,
     };
         
     const [formData, setFormData] = useState(initialFormState);
@@ -42,11 +44,50 @@ const Students = () => {
         fetchStudents();
     }, [fetchStudents]);
 
+
+    const handleChange = (e) => {
+        const { name, value } = e.target;
+        // La lógica de manejo de entrada se mantiene aquí
+        const val = name === 'amount' ? value : value;
+        setFormData(prev => ({ ...prev, [name]: val }));
+    };
+
+
+    const handleSubmit = async (e) => {
+            e.preventDefault();
+    
+    
+            const studentDataToSend = {
+                name: formData.name,
+                reference: formData.reference,
+                phone: formData.phone,
+                email: formData.email,
+                active: formData.active,
+            };
+
+            setIsLoading(true);
+            try {
+                await addStudent(studentDataToSend);
+      
+                setFormData(initialFormState);
+                setError(null);
+                await fetchStudents(); 
+            } catch (e) {
+                console.error("Error al guardar el pago vía IPC:", e);
+                setError("Error al guardar el pago: " + (e.message || 'Error desconocido. Verifique la consola.'));
+            } finally {
+                setIsLoading(false);
+            }
+            setIsModalOpen(false); // Cierra el modal al guardar
+            setTimeout(() => setMessage(''), 5000);
+    
+    };
+
     return (
         <div style={{ padding: '0.5rem' }}>
             {/* Encabezado y botón de registro */}
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
-                <h2 className="card-title" style={{ color: '#4f46e5', margin: 0 }}>Historial de Egresos</h2>
+                <h2 className="card-title" style={{ color: '#4f46e5', margin: 0 }}>Estudiantes</h2>
                 <button
                     onClick={() => setIsModalOpen(true)} // Abre el modal
                     style={{
@@ -62,7 +103,7 @@ const Students = () => {
                     onMouseOver={(e) => e.currentTarget.style.backgroundColor = '#4338ca'}
                     onMouseOut={(e) => e.currentTarget.style.backgroundColor = '#4f46e5'}
                 >
-                    ➕ Registrar Nuevo Egreso
+                    ➕ Registrar Nuevo Estudiante
                 </button>
             </div>
 
@@ -90,16 +131,16 @@ const Students = () => {
             <StudentsModal 
                 isOpen={isModalOpen} 
                 onClose={() => setIsModalOpen(false)} // Permite cerrar el modal con la X
-                title="Registrar Nuevo Gasto (Egreso)"
+                title="Registrar Nuevo Estudiante"
             >
-                {/*
-                <ExpensesForm 
+                
+                <StudentForm 
                     formData={formData}
                     handleChange={handleChange}
                     onSubmit={handleSubmit}
                     isLoading={isLoading}
                 />
-                */}
+                
             </StudentsModal>
             
         </div>

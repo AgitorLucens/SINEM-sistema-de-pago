@@ -273,9 +273,17 @@ class AppDB {
 
 
     addStudent(studentData){
-
+        const sql = this.db.prepare(`
+                INSERT INTO students (name, phone, email, reference, active)
+                VALUES (?, ?, ?, ?, ?)
+            `);
+            const data = sql.run(studentData.name, 
+                                studentData.phone,    
+                                studentData.email,
+                                studentData.reference,
+                                studentData.active);
+            return data.lastInsertRowid;
     }
-
 
 
     close () {
