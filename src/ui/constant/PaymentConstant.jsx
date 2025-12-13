@@ -55,11 +55,19 @@ export async function getAllStudents() {
     try {
         return await window.api.getAllStudents();
     } catch (error) {
-        console.error('Error al obtener egresos:', error.message);
+        console.error('Error al obtener estudiantes:', error.message);
         return []; 
     }
 }
 
+export async function addStudent(studentData) {
+    try {
+        return await window.api.addStudent(studentData);
+    } catch (error) {
+        console.error('Error al agregar estudiante:', error.message);
+        return []; 
+    }
+}
 
 export default {
     getPaymentConcepts,

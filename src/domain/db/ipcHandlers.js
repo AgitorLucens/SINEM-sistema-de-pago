@@ -42,5 +42,8 @@ export default function setUpHandlers(dbInstance) {
         return dbInstance.getAllStudents();
     });
     
+    ipcMain.handle('add-student', async ( _ , studentsData) => {
+        return dbInstance.addStudent(studentsData);
+    });
 
 }
