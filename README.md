@@ -1,41 +1,281 @@
- SINEM-sistema-de-pago
+# SINEM — Sistema de Pago
 
-Use this command isnide the folder you want to be the project
+Desktop application for managing student payments and expenses.
 
+---
+
+## Project
+**SINEM (Sistema de Pago)**
+
+## Short Description
+SINEM is a cross-platform desktop application designed to simplify the management of student payments and institutional expenses. Built with **Electron** and **React (Vite)**, it combines a modern, responsive user interface with a secure local database accessed through IPC. The project is optimized for offline-first usage, making it suitable for educational institutions with limited or intermittent internet access.
+
+The application is packaged for distribution on desktop environments and focuses on reliability, usability, and maintainability.
+
+---
+
+## Table of Contents
+- Project Overview
+- Goals and Scope
+- Features
+- Non-Functional Characteristics
+- Tech Stack
+- Architecture Overview
+- Quick Start
+- Development Workflow
+- Database
+- Build & Packaging
+- UI Libraries & Extras
+- Project Structure
+- Contributing
+- Roadmap
+- License & Contact
+
+---
+
+## Project Overview
+
+**Purpose**  
+To provide a simple, efficient, and reliable way to track student payments and expenses in small to medium-sized educational institutions.
+
+**Target Audience**  
+- Administrative staff
+- Finance and accounting personnel
+- School administrators
+
+**Problems Addressed**  
+- Manual or spreadsheet-based payment tracking
+- Lack of centralized local records
+- Difficulty auditing payments and expenses
+
+---
+
+## Goals and Scope
+
+### In Scope
+- Local management of students, payments, and expenses
+- Desktop-first experience with offline capability
+- Simple reporting through searchable tables
+
+### Out of Scope (for now)
+- Cloud synchronization
+- Multi-tenant user management
+- Online payment gateways
+
+---
+
+## Features
+
+### Student Management
+- Create, edit, and delete student records
+- List and search students
+- Maintain basic identification and enrollment data
+
+### Payment Management
+- Register student payments
+- Filter and search payments by date, student, or concept
+- Display payments in structured tables
+
+### Expense Tracking
+- Register institutional expenses
+- Categorize expenses
+- View expenses in a dedicated table for auditing
+
+### Desktop & System Features
+- Local SQLite database
+- IPC-based communication between Electron main and renderer processes
+- Secure access to database operations
+- Packaged desktop application for Windows (and extensible to macOS/Linux)
+
+---
+
+## Non-Functional Characteristics
+
+- **Performance**: Optimized for local database operations
+- **Usability**: Clean UI with accessible components
+- **Maintainability**: Modular structure and clear separation of concerns
+- **Security**: No direct DB access from the renderer process
+
+---
+
+## Tech Stack
+
+### Frontend
+- React
+- Vite
+
+### Desktop Shell
+- Electron
+
+### Database & IPC
+- SQLite (via `better-sqlite3`)
+- IPC communication through Electron preload scripts
+
+### Tooling & Packaging
+- Electron Forge
+- electron-builder
+- Node.js
+
+---
+
+## Architecture Overview
+
+The application follows Electron best practices:
+
+- **Main Process**: Handles application lifecycle and database access
+- **Preload Script**: Exposes a controlled API via IPC
+- **Renderer Process**: React-based UI consuming IPC APIs
+
+This design ensures that sensitive operations remain isolated from the UI layer.
+
+---
+
+## Quick Start
+
+### Prerequisites
+- Node.js (25+ recommended)
+- npm or yarn
+
+### Install Dependencies
+
+```bash
+npm install
+# or
+yarn install
+```
+
+### Create the Project (Optional)
+
+If you need a fresh Electron + Vite template:
+
+```bash
 npx create-electron-app --template=vite
+```
 
-use this to isntall react to the project
+### Add React Support
 
+```bash
 npm install react react-dom
+npm install @vitejs/plugin-react
+```
 
-so the project recognize react files use this
+### Run in Development Mode
 
-npm i @vitejs/plugin-react
-
-And change the file "vite.renderer.config.mjs" and adding as described in this link:
-
-https://www.npmjs.com/package/@vitejs/plugin-react
-
-run project with
-
+```bash
+npm run dev
+# or
 npm start
+```
 
-base de datos
+---
 
-npm install sqlite3
+## Development Workflow
 
-use this to generate .exe in windows
+- Run the application in development mode
+- Make UI changes in the renderer process
+- Update IPC handlers and database logic in the main process
+- Restart Electron when modifying preload or main scripts
 
-npm i --save-dev electron-builder
+---
 
+## Database
+
+SINEM uses a **local SQLite database** for persistence.
+
+### Install SQLite Driver
+
+```bash
+npm install better-sqlite3
+```
+
+### Database Location
+- Stored locally on the user’s machine
+- Accessed only through IPC handlers in `src/domain/db`
+
+---
+
+## Build & Packaging
+
+### Install electron-builder
+
+```bash
+npm install --save-dev electron-builder
+```
+
+### Build the Application
+
+```bash
+npm run build
+```
+
+### Package the Application
+
+```bash
+npm run package
+# or
 npm run make
+```
 
-component radix select
+### Configuration Files
+- `electron-builder.json`
+- `forge.config.js`
 
-npm install @radix-ui/react-select
+These files control installer formats, icons, and platform-specific settings.
 
-npm install @radix-ui/colors
+---
 
-for the certificate create an selft certificate with:
+## UI Libraries & Extras
 
-New-SelfSignedCertificate -Type CodeSigning -Subject "CN=MyAppCert"
+The UI is built using modern, accessible component libraries:
+
+```bash
+npm install @radix-ui/react-select \
+            @radix-ui/colors \
+            @radix-ui/react-icons \
+            @radix-ui/react-popover \
+            react-day-picker
+```
+
+These libraries provide consistent styling and accessible interactions.
+
+---
+
+## Project Structure
+
+```text
+src/
+├── main.js          # Electron main process
+├── preload.js       # IPC bridge
+├── renderer.jsx     # React entry point
+├── App.jsx          # Main React component
+├── domain/
+│   └── db/          # Database and IPC handlers
+└── ui/              # Pages, components, and UI assets
+```
+
+---
+
+## Contributing
+
+Contributions are welcome.
+
+- Follow existing code conventions
+- Keep commits small and focused
+- Test changes in both development and packaged builds
+- Open an issue before submitting major changes
+
+---
+
+## Roadmap
+
+- Basic reporting and summaries
+- Export data to CSV/PDF
+- Role-based access control
+- Optional cloud sync
+
+---
+
+## License & Contact
+
+- Add license details in a `LICENSE` file
+- For questions, feature requests, or bug reports, open an issue or contact the maintainer
