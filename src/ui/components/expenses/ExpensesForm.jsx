@@ -1,3 +1,6 @@
+import DatePicker from "../generic/datepicker/DatePicker.jsx";
+import {handleFieldChange} from "../generic/function/Function.jsx"
+
 const ExpensesForm = ({ formData, handleChange, onSubmit, isLoading }) => {
     return (
         <div style={{ padding: '0.5rem' }}>
@@ -58,19 +61,17 @@ const ExpensesForm = ({ formData, handleChange, onSubmit, isLoading }) => {
                         <label htmlFor="date" style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '500', fontSize: '0.875rem' }}>
                             Fecha del Pago
                         </label>
-                        <input
-                            type="date"
-                            id="date"
-                            name="date"
-                            value={formData.date}
-                            onChange={handleChange}
-                            required
-                            style={{ width: '100%', padding: '0.75rem', border: '1px solid #d1d5db', borderRadius: '0.5rem', boxSizing: 'border-box' }}
+                        <DatePicker
+                             value={formData.date}
+                             onChange={handleFieldChange(handleChange,"date")}
                         />
                     </div>
+                    
+                    <div>
+                        
+                    </div>
+                    
                 </div>
-
-                {/* Campo Concepto y Método de Pago (en una fila) */}
 
                 <button
                     type="submit"

@@ -12,7 +12,7 @@ const Students = () => {
         reference: '',
         phone: '',
         email: '',
-        active: 0,
+        active: '',
     };
         
     const [formData, setFormData] = useState(initialFormState);
@@ -55,8 +55,7 @@ const Students = () => {
 
     const handleSubmit = async (e) => {
             e.preventDefault();
-    
-    
+
             const studentDataToSend = {
                 name: formData.name,
                 reference: formData.reference,

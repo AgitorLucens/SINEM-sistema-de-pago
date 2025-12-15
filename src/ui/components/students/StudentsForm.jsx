@@ -1,9 +1,12 @@
+import SelectRadix from "../generic/select/SelectRadix.jsx"
+import {onRadixChange} from "../generic/function/Function.jsx"
+
 const ExpensesForm = ({ formData, handleChange, onSubmit, isLoading }) => {
     return (
         <div style={{ padding: '0.5rem' }}>
             <p className="card-text" style={{ marginBottom: '1.5rem', color: '#4b5563' }}>Ingrese los detalles del estudiante.</p>
 
-            <form onSubmit={onSubmit} noValidate style={{ display: 'grid', gap: '1rem' }}>
+            <form onSubmit={onSubmit} style={{ display: 'grid', gap: '1rem' }}>
                 {/* Campo Nombre del Estudiante/Participante */}
                 <div>
                     <label htmlFor="name" style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '500', fontSize: '0.875rem' }}>
@@ -36,22 +39,18 @@ const ExpensesForm = ({ formData, handleChange, onSubmit, isLoading }) => {
                     />
                 </div>
                 <div>
-                    <label htmlFor="active" style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '500', fontSize: '0.875rem' }}>
-                        Activo
-                    </label>
-                    <select
-                            id="active"
-                            name="active"
-                            value={formData.active}
-                            onChange={handleChange}
-                            style={{ width: '100%', padding: '0.75rem', border: '1px solid #d1d5db', borderRadius: '0.5rem', boxSizing: 'border-box' }}
-                        >
-                            <option value="" selected>
-                                {'--- Seleccione un Metodo de Pago ---'}
-                            </option>
-                            <option value="1">Activo</option>
-                            <option value="0">No Activo</option>
-                    </select>
+                    <SelectRadix label="Activo"
+                                 name="active"
+                                 placeholder="Seleccione estado de estudiante"
+                                 value={formData.active}
+                                 onChange={onRadixChange(handleChange,"active")}
+                                 valueKey="value"
+                                 labelKey="label"
+                                 options={[
+                                    { value: "1", label: "Activo" },
+                                    { value: "0", label: "No Activo" },
+                                 ]}/>
+
                 </div>
                 {/* Campo Monto y Fecha (en una fila) */}
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
@@ -66,9 +65,9 @@ const ExpensesForm = ({ formData, handleChange, onSubmit, isLoading }) => {
                             value={formData.amount}
                             onChange={handleChange}
                             required
-                            pattern="[0-9]{3}-[0-9]{2}-[0-9]{3}"
+                            pattern="[0-9]{4}-[0-9]{4}"
                             style={{ width: '100%', padding: '0.75rem', border: '1px solid #d1d5db', borderRadius: '0.5rem', boxSizing: 'border-box' }}
-                            placeholder="Ej: 888-8888"
+                            placeholder="Ej: 8888-8888"
                         />
                     </div>
                     <div>

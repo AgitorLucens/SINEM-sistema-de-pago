@@ -30,6 +30,12 @@ npm i --save-dev electron-builder
 
 npm run make
 
+component radix select
+
+npm install @radix-ui/react-select
+
+npm install @radix-ui/colors
+
 for the certificate create an selft certificate with:
 
 New-SelfSignedCertificate -Type CodeSigning -Subject "CN=MyAppCert"

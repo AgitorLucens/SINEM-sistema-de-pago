@@ -54,7 +54,7 @@ const Expenses = () => {
     // Lógica para registrar y añadir un nuevo pago
     const handleSubmit = async (e) => {
         e.preventDefault();
-
+        console.log(JSON.stringify(formData));
         const amountNumber = parseFloat(formData.amount);
         if (isNaN(amountNumber) || amountNumber <= 0) {
             setError("Por favor, introduce un monto válido y positivo.");

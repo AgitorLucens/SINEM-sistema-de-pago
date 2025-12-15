@@ -81,7 +81,7 @@ const Payments = () => {
 
                 setConcepts(Array.isArray(fetchedConcepts) ? fetchedConcepts : []);
                 setDivisions(Array.isArray(fetchedDivisions) ? fetchedDivisions : []);
-                //console.log(fetchedConcepts);
+                console.log(fetchedConcepts);
                 //console.log("\n"+fetchedDivisions);
             } catch (err) {
                 console.error("Error al cargar metadata:", err);
@@ -102,8 +102,8 @@ const Payments = () => {
         if (payments.length === 0) return [];
         
         return payments.filter(payment => {
-            console.log("filtro"+JSON.stringify(filterState)+"\n");
-            console.log(JSON.stringify(payments));
+            //console.log("filtro"+JSON.stringify(filterState)+"\n");
+            //console.log(JSON.stringify(payments));
 
             const { concept, division, method, startDate, endDate } = filterState;
 
