@@ -1,16 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-
-const formatDate = (dateString) => {
-    if (!dateString) return '';
-    try {
-        const date = new Date(dateString);
-        // Utiliza 'es-ES' para formato día/mes/año
-        return date.toLocaleDateString('es-ES'); 
-    } catch (e) {
-        // En caso de error, devuelve la cadena original
-        return dateString;
-    }
-};
+import { formatDate } from "../generic/function/Function.jsx"
 
 const ExpensesTable = ({expenses, minTableWidth = '800px'}) => {
 

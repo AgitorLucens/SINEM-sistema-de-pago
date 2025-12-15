@@ -1,3 +1,6 @@
+import SelectRadix from "../generic/select/SelectRadix.jsx"
+import {onRadixChange} from "../generic/function/Function.jsx"
+
 const PaymentsForm = ({ formData, handleChange, onSubmit, isLoading, concepts, divisions }) => {
    
     return (
@@ -63,32 +66,17 @@ const PaymentsForm = ({ formData, handleChange, onSubmit, isLoading, concepts, d
                         <label htmlFor="concept" style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '500', fontSize: '0.875rem' }}>
                             Tipo de Pago
                         </label>
-                        <select
-                            id="concept"
-                            name="concept"
-                            value={formData.concept}
-                            onChange={handleChange}
-                            required
-                            disabled={isLoading}
-                            style={{ width: '100%', padding: '0.75rem', border: '1px solid #d1d5db', borderRadius: '0.5rem', boxSizing: 'border-box' }}
-                        >
-                            <option value="" selected>
-                                {isLoading ? 'Cargando conceptos...' : '--- Seleccione un concepto ---'}
-                            </option>
-
-                            {concepts.length === 0 ? (
-                                    <option value="" disabled>{isLoading ? 'Cargando conceptos...' : 'No hay conceptos disponibles'}</option>
-                                ) : (
-                                    concepts.map((concept) => (
-                                        <option 
-                                            key={concept.id}      // Clave única para React (obligatoria)
-                                            value={concept.id}    // El valor que se guarda en formData (el ID de Firestore)
-                                        >
-                                            {concept.name}        {/* El texto visible en el dropdown */}
-                                        </option>
-                                    ))
-                            )}
-                        </select>
+                        
+                        <SelectRadix
+                                 label=""
+                                 name="concept"
+                                 placeholder="Seleccione concepto de pago"
+                                 value={formData.concept}
+                                 valueKey="id"
+                                 labelKey="name"
+                                 onChange={onRadixChange(handleChange,"concept")}
+                                 options={concepts}
+                        />   
                     </div>
                 
                     {/* Campo Método de Pago */}
@@ -96,19 +84,20 @@ const PaymentsForm = ({ formData, handleChange, onSubmit, isLoading, concepts, d
                         <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '500', fontSize: '0.875rem' }}>
                             Método de Pago
                         </label>
-                        <select
-                            id="method"
-                            name="method"
-                            value={formData.method}
-                            onChange={handleChange}
-                            style={{ width: '100%', padding: '0.75rem', border: '1px solid #d1d5db', borderRadius: '0.5rem', boxSizing: 'border-box' }}
-                        >
-                            <option value="" selected>
-                                {'--- Seleccione un Metodo de Pago ---'}
-                            </option>
-                            <option value="cash">Efectivo</option>
-                            <option value="transfer">Transferencia</option>
-                        </select>
+
+                        <SelectRadix
+                                 label=""
+                                 name="method"
+                                 placeholder="Seleccione metodo de pago"
+                                 value={formData.method}
+                                 valueKey="value"
+                                 labelKey="label"
+                                 onChange={onRadixChange(handleChange,"method")}
+                                 options={[
+                                    { value: "cash", label: "Efectivo" },
+                                    { value: "transfer", label: "Transferencia" },
+                                 ]}
+                        />
                     </div>
                 </div>
 
@@ -116,31 +105,17 @@ const PaymentsForm = ({ formData, handleChange, onSubmit, isLoading, concepts, d
                         <label htmlFor="division" style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '500', fontSize: '0.875rem' }}>
                             Curso
                         </label>
-                        <select
-                            id="division"
-                            name="division"
-                            value={formData.division}
-                            onChange={handleChange}
-                            required
-                            disabled={isLoading}
-                            style={{ width: '100%', padding: '0.75rem', border: '1px solid #d1d5db', borderRadius: '0.5rem', boxSizing: 'border-box' }}
-                        >
-                            <option value="" selected>
-                                {isLoading ? 'Cargando cursos...' : '--- Seleccione un curso ---'}
-                            </option>
-                            {concepts.length === 0 ? (
-                                    <option value="" disabled>{isLoading ? 'Cargando cursos...' : 'No hay curso disponibles'}</option>
-                                ) : (
-                                    divisions.map((division) => (
-                                        <option 
-                                            key={division.id}      // Clave única para React (obligatoria)
-                                            value={division.id}    // El valor que se guarda en formData (el ID de Firestore)
-                                        >
-                                            {division.name}        {/* El texto visible en el dropdown */}
-                                        </option>
-                                ))
-                            )}
-                        </select>
+                        <SelectRadix
+                                 label=""
+                                 name="division"
+                                 placeholder="Seleccione curso"
+                                 value={formData.division}
+                                 valueKey="id"
+                                 labelKey="name"
+                                 onChange={onRadixChange(handleChange,"division")}
+                                 options={divisions}
+                        />  
+                        
                     </div>
 
                 <button
