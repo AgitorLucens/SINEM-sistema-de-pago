@@ -6,7 +6,7 @@ const ExpensesForm = ({ formData, handleChange, onSubmit, isLoading }) => {
         <div style={{ padding: '0.5rem' }}>
             <p className="card-text" style={{ marginBottom: '1.5rem', color: '#4b5563' }}>Ingrese los detalles del egreso.</p>
 
-            <form onSubmit={onSubmit} noValidate style={{ display: 'grid', gap: '1rem' }}>
+            <form onSubmit={onSubmit} style={{ display: 'grid', gap: '1rem' }}>
                 {/* Campo Nombre del Estudiante/Participante */}
                 <div>
                     <label htmlFor="description" style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '500', fontSize: '0.875rem' }}>
