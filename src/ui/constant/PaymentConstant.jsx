@@ -10,6 +10,16 @@ export async function getAllPayments() {
     }
 }
 
+export async function getPaymentById(paymentId) {
+    try {
+        return await window.api.getPaymentById(paymentId);
+    }
+    catch (error) {
+        console.error('Error al obtener pago por ID:', error.message);
+        return null; 
+    }
+}
+
 export async function getPaymentConcepts() {
     try {
         return await window.api.getPaymentConcepts();
@@ -69,10 +79,24 @@ export async function addStudent(studentData) {
     }
 }
 
+/*
+    Excel
+*/
+export async function exportPaymentsToExcel(paymentData) {
+    try {
+        return await window.api.exportPaymentsToExcel(paymentData);
+    } catch (error) {
+        console.error('Error al exportar pago a excel:', error.message);
+        return []; 
+    }
+}
+
 export default {
     getPaymentConcepts,
     getPaymentDivisions,
+    getPaymentById,
     getAllExpenses,
     addExpense,
-    getAllStudents
+    getAllStudents,
+    exportPaymentsToExcel
 };

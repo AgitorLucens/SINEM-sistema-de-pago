@@ -14,9 +14,13 @@ const api = {
     getAllExpenses: () => ipcRenderer.invoke('get-all-expenses'),
     addExpense: (expenseData) => ipcRenderer.invoke('add-expense', expenseData),
 
-    //Pagina Estudiantes
+    // Pagina Estudiantes
     getAllStudents: () => ipcRenderer.invoke('get-all-students'),
     addStudent: (studentData) => ipcRenderer.invoke('add-student', studentData),
+    getPaymentById: (paymentId) => ipcRenderer.invoke('get-payment-by-id', paymentId),
+
+    // Excel
+    exportPaymentsToExcel: (paymentData) => ipcRenderer.invoke('export-payment-excel', paymentData),
 }
 
 contextBridge.exposeInMainWorld('api', api);
