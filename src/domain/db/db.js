@@ -180,7 +180,7 @@ class AppDB {
         const sql = this.db.prepare(`SELECT
                                         p.id,
                                         p.date,
-                                        p.student_id,
+                                        s.name AS student_name,
                                         p.payment_method,
                                         d.name AS division_name,
                                         c.type AS concept_type,
@@ -191,11 +191,19 @@ class AppDB {
                                         payment_concepts c ON p.concept_id = c.id
                                      INNER JOIN  
                                         divisions d ON p.division_id = d.id
+                                     INNER JOIN
+                                        students s ON p.student_id = s.id
                                      ORDER BY
                                         p.id DESC;`
                                     );
         const payments = sql.all();
         return payments;
+    }
+
+    getPaymentById(id) {
+        const sql = this.db.prepare(`SELECT * FROM payments WHERE id = ?`);
+        const payment = sql.run(id)
+        return payment;
     }
 
     /**

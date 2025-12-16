@@ -1,7 +1,8 @@
 import SelectRadix from "../generic/select/SelectRadix.jsx"
-import {onRadixChange} from "../generic/function/Function.jsx"
+import DatePicker from "../generic/datepicker/DatePicker.jsx";
+import {onRadixChange,handleFieldChange} from "../generic/function/Function.jsx"
 
-const PaymentsForm = ({ formData, handleChange, onSubmit, isLoading, concepts, divisions }) => {
+const PaymentsForm = ({ formData, handleChange, onSubmit, isLoading, concepts, divisions, students }) => {
    
     return (
         <div style={{ padding: '0.5rem' }}>
@@ -13,16 +14,16 @@ const PaymentsForm = ({ formData, handleChange, onSubmit, isLoading, concepts, d
                     <label htmlFor="studentName" style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '500', fontSize: '0.875rem' }}>
                         Nombre del Estudiante/Participante
                     </label>
-                    <input
-                        type="text"
-                        id="studentName"
-                        name="studentName"
-                        value={formData.studentName}
-                        onChange={handleChange}
-                        required
-                        style={{ width: '100%', padding: '0.75rem', border: '1px solid #d1d5db', borderRadius: '0.5rem', boxSizing: 'border-box' }}
-                        placeholder="Ej: Juan Pérez"
-                    />
+                    <SelectRadix
+                                 label=""
+                                 name="student"
+                                 placeholder="Seleccione un estudiante"
+                                 value={formData.student_id}
+                                 valueKey="id"
+                                 labelKey="name"
+                                 onChange={onRadixChange(handleChange,"student_id")}
+                                 options={students}
+                        /> 
                 </div>
 
                 {/* Campo Monto y Fecha (en una fila) */}
@@ -48,14 +49,9 @@ const PaymentsForm = ({ formData, handleChange, onSubmit, isLoading, concepts, d
                         <label htmlFor="date" style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '500', fontSize: '0.875rem' }}>
                             Fecha del Pago
                         </label>
-                        <input
-                            type="date"
-                            id="date"
-                            name="date"
-                            value={formData.date}
-                            onChange={handleChange}
-                            required
-                            style={{ width: '100%', padding: '0.75rem', border: '1px solid #d1d5db', borderRadius: '0.5rem', boxSizing: 'border-box' }}
+                        <DatePicker
+                             value={formData.date}
+                             onChange={handleFieldChange(handleChange,"date")}
                         />
                     </div>
                 </div>

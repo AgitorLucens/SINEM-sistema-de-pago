@@ -15,7 +15,7 @@ const formatDate = (dateString) => {
 };
 
 // Componente para visualizar el historial de pagos con redimensionamiento manual
-const PaymentsTable = ({ payments, minTableWidth = '800px' , onDeletePayment}) => {
+const PaymentsTable = ({ payments, minTableWidth = '800px' , onDeletePayment, onRowClick}) => {
     // Convertir el prop de cadena a número para cálculos
     const minWidthValue = parseInt(minTableWidth, 10) || 600;
 
@@ -142,12 +142,13 @@ const PaymentsTable = ({ payments, minTableWidth = '800px' , onDeletePayment}) =
                         {payments.map((p, index) => (
                             // Asegura que el ID sea único
                             <tr key={p.id} style={{ borderBottom: '1px solid #f3f4f6', backgroundColor: index % 2 === 0 ? 'white' : '#f9fafb' }}>
-                                <td style={{ padding: '0.75rem', color: '#6b7280', fontSize: '0.75rem' }}>
+                                <td onClick={() => onRowClick?.(p)}
+                                    style={{ padding: '0.75rem', color: '#6b7280', fontSize: '0.75rem' }}>
                                     {/* FIX: Convertimos p.id a String explícitamente antes de usar substring() */}
                                     {p.id ? String(p.id).substring(0, 6) : 'N/A'}
                                 </td>
                                 <td style={{ padding: '0.75rem', color: '#6b7280' }}>{formatDate(p.date)}</td>
-                                <td style={{ padding: '0.75rem', fontWeight: '500', color: '#1f2937' }}>{p.studentName}</td>
+                                <td style={{ padding: '0.75rem', fontWeight: '500', color: '#1f2937' }}>{p.student_name}</td>
                                 <td style={{ padding: '0.75rem', color: '#6b7280', textTransform: 'capitalize' }}>{p.payment_method}</td>
                                 <td style={{ padding: '0.75rem', color: '#6b7280', textTransform: 'capitalize' }}>{p.division_name}</td>
                                 <td style={{ padding: '0.75rem', color: '#6b7280', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', maxWidth: '250px' }}>{p.concept_type}</td>

@@ -2,8 +2,9 @@ import PaymentsTable from '../../components/payments/PaymentsTable.jsx';
 import PaymentsForm from '../../components/payments/PaymentsForm.jsx'; 
 import PaymentsModal from '../../components/payments/PaymentsModal.jsx';
 import PaymentFilters from '../../components/payments/PaymentsFilter.jsx';
-
-import {getPaymentConcepts, getPaymentDivisions, getAllPayments } from "../../constant/PaymentConstant.jsx"
+import PaymentsDetail from '../../components/payments/PaymentsDetail.jsx';
+import Modal from '../../components/generic/modal/Modal.jsx';
+import {getPaymentConcepts, getPaymentDivisions, getAllPayments, getAllStudents } from "../../constant/PaymentConstant.jsx"
 
 import { useState, useEffect, useCallback, useMemo } from 'react';
 
@@ -11,6 +12,7 @@ const Payments = () => {
     
     // --- Estados de Datos y UI ---
     const initialFormState = {
+        student_id: '',
         amount: '',
         date: new Date().toISOString().substring(0, 10),
         method: 'TRANSFERENCIA',
@@ -26,18 +28,38 @@ const Payments = () => {
         endDate: '',
     };
     
+    // datos del formulario
     const [formData, setFormData] = useState(initialFormState);
-    const [payments, setPayments] = useState([]); // Pagos sin filtrar
+    
+    // pagos para tabla
+    const [payments, setPayments] = useState([]);
     const [filterState, setFilterState] = useState(initialFilterState); // Estado de los filtros
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState(null);
     const [message, setMessage] = useState('');
+
+    // agregar pago
     const [isModalOpen, setIsModalOpen] = useState(false); 
 
+    // datos de los filtros
     const [concepts, setConcepts] = useState([]);
     const [divisions, setDivisions] = useState([]);
     const [isConceptsLoading, setIsConceptsLoading] = useState(false);
     const [isDivisionsLoading, setIsDivisionsLoading] = useState(false); // Estado corregido
+
+    // estudiantes
+    const [students, setStudents] = useState([]);
+
+
+    // ver detalles pago
+    const [selectedPayment, setSelectedPayment] = useState(null);
+    const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
+
+    const handleRowClick = (payment) => {
+        setSelectedPayment(payment);
+        setIsDetailModalOpen(true);
+    };
+
 
     // --- Handlers de Filtros ---
     const handleFilterChange = useCallback((e) => {
@@ -58,7 +80,7 @@ const Payments = () => {
             
             // Ordenar por timestamp descendente
             loadedData.sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime()); 
-
+            //console.log(JSON.stringify(loadedData));
             setPayments(loadedData);
         } catch (e) {
             console.error("Error al cargar pagos:", e);
@@ -74,15 +96,16 @@ const Payments = () => {
             setIsConceptsLoading(true);
             setIsDivisionsLoading(true); // CORREGIDO: De setIsDivsionsLoading a setIsDivisionsLoading
             try {
-                const [fetchedConcepts, fetchedDivisions] = await Promise.all([
+                const [fetchedConcepts, fetchedDivisions, fetchedStudents] = await Promise.all([
                     getPaymentConcepts(),
-                    getPaymentDivisions()
+                    getPaymentDivisions(),
+                    getAllStudents()
                 ]);
 
                 setConcepts(Array.isArray(fetchedConcepts) ? fetchedConcepts : []);
                 setDivisions(Array.isArray(fetchedDivisions) ? fetchedDivisions : []);
-                console.log(fetchedConcepts);
-                //console.log("\n"+fetchedDivisions);
+                setStudents(Array.isArray(fetchedStudents) ? fetchedStudents : []);
+                //console.log(JSON.stringify(fetchedStudents));
             } catch (err) {
                 console.error("Error al cargar metadata:", err);
                 setError("No se pudieron cargar los conceptos/cursos de pago.");
@@ -159,7 +182,7 @@ const Payments = () => {
             payment_method: formData.method,
             concept_id: parseInt(formData.concept, 10),
             division_id: parseInt(formData.division, 10),
-            student_id: null, 
+            student_id: parseInt(formData.student_id,10), 
             invoice_id: null,
             created_by: 1, 
             status: 'ACTIVE',
@@ -258,12 +281,21 @@ const Payments = () => {
                 <PaymentsTable 
                     payments={filteredPayments} 
                     onDeletePayment={deletePayment}
-                    concepts={concepts} 
-                    divisions={divisions} 
+                    onRowClick={handleRowClick}
                 />
             )}
-
-            {/* Renderiza el Modal que contiene el formulario */}
+            {/* modal detalles pago */}
+            <Modal
+                isOpen={isDetailModalOpen}
+                onClose={() => setIsDetailModalOpen(false)}
+                title="Detalles del pago"
+            >
+                <PaymentsDetail
+                    detail={selectedPayment}
+                    isLoading={isLoading}
+                />
+            </Modal>
+            {/* modal formulario */}
             <PaymentsModal 
                 isOpen={isModalOpen} 
                 onClose={() => setIsModalOpen(false)}
@@ -276,6 +308,7 @@ const Payments = () => {
                     isLoading={isLoading}
                     concepts={concepts}
                     divisions={divisions}
+                    students={students}
                     formError={error}
                 />
             </PaymentsModal>

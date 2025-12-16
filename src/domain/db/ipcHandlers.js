@@ -1,4 +1,5 @@
 import {ipcMain} from 'electron';
+import exportPaymentsToExcel from "../excel/excel.js"
 
 export default function setUpHandlers(dbInstance) {
     /*
@@ -10,6 +11,10 @@ export default function setUpHandlers(dbInstance) {
 
     ipcMain.handle('get-all-payments', async () => {
         return dbInstance.getAllPayments();
+    });
+
+    ipcMain.handle('get-payment-by-id', async ( _ , id) => {
+        return dbInstance.getPaymentById(id);
     });
 
     ipcMain.handle('delete-payment', async ( _ , id) => {
@@ -32,7 +37,7 @@ export default function setUpHandlers(dbInstance) {
     });
     
     ipcMain.handle('add-expense', async ( _ , expenseData) => {
-        return dbInstance.addExpense(expenseData);
+        return exportPaymentsToExcel(expenseData);
     });
 
     /*
@@ -46,4 +51,10 @@ export default function setUpHandlers(dbInstance) {
         return dbInstance.addStudent(studentsData);
     });
 
+    /*
+        Excel
+    */
+   ipcMain.handle('export-payment-excel', async ( _ , paymentData) => {
+        return exportPaymentsToExcel(paymentData);
+    });
 }
