@@ -52,6 +52,13 @@ export default function setUpHandlers(dbInstance) {
     });
 
     /*
+        Pagina Precios
+    */
+    ipcMain.handle('update-price-concept', async ( _ , concept) => {
+        return dbInstance.updatePriceConcept(concept);
+    });
+
+    /*
         Excel
     */
    ipcMain.handle('export-payment-excel', async ( _ , paymentData) => {

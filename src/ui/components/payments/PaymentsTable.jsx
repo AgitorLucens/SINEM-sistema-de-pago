@@ -1,5 +1,5 @@
-// src/components/PaymentsTable.jsx
 import { useState, useEffect, useRef } from 'react';
+import EditableCell from '../generic/table/EditableCell';
 
 // Helper para formatear la fecha a dd/mm/yyyy
 const formatDate = (dateString) => {
@@ -149,7 +149,16 @@ const PaymentsTable = ({ payments, minTableWidth = '800px' , onDeletePayment, on
                                 </td>
                                 <td style={{ padding: '0.75rem', color: '#6b7280' }}>{formatDate(p.date)}</td>
                                 <td style={{ padding: '0.75rem', fontWeight: '500', color: '#1f2937' }}>{p.student_name}</td>
-                                <td style={{ padding: '0.75rem', color: '#6b7280', textTransform: 'capitalize' }}>{p.payment_method}</td>
+                                <td style={{ padding: '0.75rem', color: '#6b7280', textTransform: 'capitalize' }}>
+                                    <EditableCell
+                                        options={[
+                                            { value: "transfer", label: "Transferencia" },
+                                            { value: "cash", label: "Efectivo" },
+                                        ]}
+                                        value={p.payment_method}
+                                        onSave={(val) => handleCellSave(p.id, "division_name", val)}
+                                    />
+                                </td>
                                 <td style={{ padding: '0.75rem', color: '#6b7280', textTransform: 'capitalize' }}>{p.division_name}</td>
                                 <td style={{ padding: '0.75rem', color: '#6b7280', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', maxWidth: '250px' }}>{p.concept_type}</td>
                                 

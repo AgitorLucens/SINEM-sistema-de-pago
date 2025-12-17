@@ -34,6 +34,7 @@ class AppDB {
             CREATE TABLE IF NOT EXISTS payment_concepts (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
                 type TEXT NOT NULL, -- Corresponde a ConceptType (MATRICULA, MENSUALIDAD, etc.)
+                amount REAL,
                 description TEXT
             );
         `;
@@ -215,7 +216,7 @@ class AppDB {
     }
 
     getPaymentsConcepts() {
-        const sql = this.db.prepare('SELECT id, type AS name FROM payment_concepts ORDER BY id ASC');
+        const sql = this.db.prepare('SELECT id, type AS name, amount  FROM payment_concepts ORDER BY id ASC');
         const result =  sql.all(); 
         return result; 
     }
@@ -286,13 +287,28 @@ class AppDB {
                 VALUES (?, ?, ?, ?, ?)
             `);
             const data = sql.run(studentData.name, 
-                                studentData.phone,    
-                                studentData.email,
-                                studentData.reference,
-                                studentData.active);
+                                 studentData.phone,    
+                                 stuentData.email,
+                                 studentData.reference,
+                                 studentData.active);
             return data.lastInsertRowid;
     }
 
+    /*
+        Concepto de Pago
+    */
+    updatePriceConcept(concept){
+        const sql = this.db.prepare(`
+                UPDATE payment_concepts
+                SET
+                    amount = ?
+                WHERE 
+                    id = ?;
+            `);
+        const data = sql.run(concept.amount,
+                             concept.id);
+        return data.lastInsertRowid;
+    }
 
     close () {
         this.db.close();

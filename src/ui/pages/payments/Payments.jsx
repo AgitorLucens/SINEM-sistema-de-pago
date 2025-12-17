@@ -5,6 +5,7 @@ import PaymentFilters from '../../components/payments/PaymentsFilter.jsx';
 import PaymentsDetail from '../../components/payments/PaymentsDetail.jsx';
 import Modal from '../../components/generic/modal/Modal.jsx';
 import {getPaymentConcepts, getPaymentDivisions, getAllPayments, getAllStudents } from "../../constant/PaymentConstant.jsx"
+import { PlusCircledIcon } from "@radix-ui/react-icons";
 
 import { useState, useEffect, useCallback, useMemo } from 'react';
 
@@ -245,8 +246,11 @@ const Payments = () => {
                     disabled={isTotalLoading}
                     className="btn btn-primary"
                 >
-                    <span >➕ </span> Registrar Nuevo Pago
+                    <span ><PlusCircledIcon/>
+                    Registrar Nuevo Pago
+                    </span> 
                 </button>
+                    
             </div>
 
             {/* Mensaje de confirmación/error */}

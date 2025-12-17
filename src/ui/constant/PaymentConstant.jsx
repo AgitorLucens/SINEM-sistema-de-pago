@@ -80,6 +80,18 @@ export async function addStudent(studentData) {
 }
 
 /*
+    Concepto de Pago
+*/
+export async function updatePriceConcept(paymentData) {
+    try {
+        return await window.api.updatePriceConcept(paymentData);
+    } catch (error) {
+        console.error('Error al exportar pago a excel:', error.message);
+        return []; 
+    }
+}
+
+/*
     Excel
 */
 export async function exportPaymentsToExcel(paymentData) {
@@ -98,5 +110,6 @@ export default {
     getAllExpenses,
     addExpense,
     getAllStudents,
+    updatePriceConcept,
     exportPaymentsToExcel
 };
