@@ -19,6 +19,9 @@ const api = {
     addStudent: (studentData) => ipcRenderer.invoke('add-student', studentData),
     getPaymentById: (paymentId) => ipcRenderer.invoke('get-payment-by-id', paymentId),
 
+    // Pagina Precios
+    updatePriceConcept: (concept) => ipcRenderer.invoke('update-price-concept', concept),
+
     // Excel
     exportPaymentsToExcel: (paymentData) => ipcRenderer.invoke('export-payment-excel', paymentData),
 }

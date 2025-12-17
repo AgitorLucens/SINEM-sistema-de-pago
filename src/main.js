@@ -2,7 +2,7 @@ import { app, BrowserWindow, ipcMain } from 'electron';
 import path from 'node:path';
 import started from 'electron-squirrel-startup';
 import AppDB from './domain/db/db.js';
-import setUpHandlers from './domain/db/ipcHandlers';
+import setUpHandlers from './domain/ipchandler/ipcHandlers';
 
 let db;
 

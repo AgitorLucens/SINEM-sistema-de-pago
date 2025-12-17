@@ -67,10 +67,6 @@ const ExpensesForm = ({ formData, handleChange, onSubmit, isLoading }) => {
                         />
                     </div>
                     
-                    <div>
-                        
-                    </div>
-                    
                 </div>
 
                 <button
