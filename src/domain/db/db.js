@@ -201,18 +201,92 @@ class AppDB {
         return payments;
     }
 
+    getAllPaymentsByYear(year) {
+        
+        const sql = this.db.prepare(`SELECT
+                                        p.id,
+                                        p.date,
+                                        s.name AS student_name,
+                                        p.payment_method,
+                                        d.name AS division_name,
+                                        c.type AS concept_type,
+                                        p.amount                    
+                                     FROM
+                                        payments p
+                                     INNER JOIN
+                                        payment_concepts c ON p.concept_id = c.id
+                                     INNER JOIN  
+                                        divisions d ON p.division_id = d.id
+                                     INNER JOIN
+                                        students s ON p.student_id = s.id
+                                     ORDER BY
+                                        p.id DESC;`
+                                    );
+        const payments = sql.all();
+        return payments;
+    }
+
+    getPaymentsByYear(year) {
+        let sql = ``;
+        let payments = [];
+        if (year) {
+            sql = this.db.prepare(`SELECT
+                                    p.id,
+                                    p.date,
+                                    s.name AS student_name,
+                                    p.payment_method,
+                                    d.name AS division_name,
+                                    c.type AS concept_type,
+                                    p.amount 
+                                   FROM 
+                                    payments p
+                                   INNER JOIN
+                                    payment_concepts c ON p.concept_id = c.id
+                                   INNER JOIN  
+                                    divisions d ON p.division_id = d.id
+                                   INNER JOIN
+                                    students s ON p.student_id = s.id
+                                   WHERE 
+                                    strftime('%Y', date) = ?
+                                   ORDER BY 
+                                    date ASC;`
+                                    );
+            payments = sql.all(year);
+        } else {
+            sql = this.db.prepare(`SELECT *
+                                   FROM 
+                                    payments
+                                   ORDER BY 
+                                    date ASC;`
+                                    );
+           payments = sql.all();                         
+        }
+        return payments;
+    }
+
+    getYearsOfPayments(){
+        const sql = this.db.prepare(`SELECT DISTINCT 
+                                        strftime('%Y', date) 
+                                     AS 
+                                        year
+                                     FROM 
+                                        payments
+                                     ORDER BY 
+                                        year;`
+                                    );
+        const years = sql.all();
+        return years;
+    }
+
     getPaymentById(id) {
         const sql = this.db.prepare(`SELECT * FROM payments WHERE id = ?`);
         const payment = sql.run(id)
         return payment;
     }
 
-    /**
-     * Elimina un pago por su ID. (No cambia).
-     */
     deletePayment(id) {
             const sql = this.db.prepare(`DELETE FROM payments WHERE id = ?`);
-            const stmt = this.db.prepare(sql);
+            const stmt = sql.run(id);
     }
 
     getPaymentsConcepts() {
@@ -246,6 +320,54 @@ class AppDB {
         return expenses;
     }
 
+    getExpensesByYear(year) {
+        let sql = ``;
+        let expenses = [];
+        if (year) {
+            sql = this.db.prepare(`SELECT
+                                    e.id,
+                                    e.date,
+                                    e.description,
+                                    e.reference,
+                                    e.total_amount AS amount
+                                   FROM 
+                                    expenses e
+                                   WHERE 
+                                    strftime('%Y', date) = ?
+                                   ORDER BY 
+                                    date ASC;`
+                                    );
+            expenses = sql.all(year);
+        } else {
+            sql = this.db.prepare(`SELECT
+                                    e.id,
+                                    e.date,
+                                    e.description,
+                                    e.reference,
+                                    e.total_amount AS amount
+                                   FROM 
+                                    expenses
+                                   ORDER BY 
+                                    date ASC;`
+                                    );
+           expenses = sql.all();                         
+        }
+        return expenses;   
+    }
+
+    getYearsOfExpenses(){
+        const sql = this.db.prepare(`SELECT DISTINCT 
+                                        strftime('%Y', date) 
+                                     AS 
+                                        year
+                                     FROM 
+                                        expenses
+                                     ORDER BY 
+                                        year;`
+                                    );
+        const years = sql.all();
+        return years;
+    }
 
     addExpense(expenseData) {
             const sql = this.db.prepare(`
@@ -276,6 +398,49 @@ class AppDB {
                                      ORDER BY
                                         s.id DESC;
                                     `);
+        const students = sql.all();
+        return students;    
+    }
+
+    getStudentsByActive(active){
+        let sql = ``;
+        let students = [];
+        if(active){
+            sql = this.db.prepare(`SELECT 
+                                    s.id,
+                                    s.name,
+                                    s.phone,
+                                    s.email,
+                                    s.reference,
+                                    s.active
+                                   FROM  
+                                    students s
+                                   WHERE
+                                    active = ?;`
+                                    );
+            students = sql.all(active);
+        } else {
+            sql = this.db.prepare(`SELECT
+                                    s.id,
+                                    s.name,
+                                    s.phone,
+                                    s.email,
+                                    s.reference,
+                                    s.active
+                                   FROM  
+                                    students s;`
+                                    );
+            students = sql.all();
+        }
+        return students;    
+    }
+
+    getStudentsActive(){
+        const sql = this.db.prepare(`SELECT DISTINCT 
+                                        active
+                                     FROM  
+                                        students;`
+                                    );
         const students = sql.all();
         return students;    
     }

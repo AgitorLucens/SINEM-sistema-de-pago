@@ -1,8 +1,6 @@
 import {formatDate} from "../generic/function/Function.jsx"
 import {exportPaymentsToExcel} from "../../constant/PaymentConstant.jsx";
 
-import { useEffect, useState } from "react";
-
 const PaymentsDetail = ({ detail, onClick, isLoading}) => {
     
     return (
