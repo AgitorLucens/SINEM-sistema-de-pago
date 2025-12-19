@@ -62,7 +62,7 @@ const Expenses = () => {
         }
 
         const expensesDataToSend = {
-            date: formData.date,
+            date: new Date(formData.date).toISOString(),
             description: formData.description,
             reference: formData.reference,
             amount: amountNumber,

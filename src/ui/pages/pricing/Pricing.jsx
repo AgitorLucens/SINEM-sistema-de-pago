@@ -7,21 +7,6 @@ import {getPaymentConcepts,updatePriceConcept} from "../../constant/PaymentConst
 
 const Pricing = () => {
 
-    const [prices, setPrices] = useState([
-        {
-            id: "monthly",
-            title: "Mensualidad",
-            description: "Precio mensual por estudiante",
-            amount: 25000,
-        },
-        {
-            id: "enrollment",
-            title: "Matrícula",
-            description: "Pago único de inscripción",
-            amount: 15000,
-        },
-    ]);
-
     const [concepts, setConcepts] = useState([]);
     const [selectedPrice, setSelectedPrice] = useState(null);
     const [isModalOpen, setIsModalOpen] = useState(null);

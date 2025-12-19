@@ -10,13 +10,31 @@ export async function getAllPayments() {
     }
 }
 
+export async function getPaymentsByYear(year) {
+    try {
+        return await window.api.getPaymentsByYear(year);
+    } catch (error) {
+        console.error('Error al obtener pagos por año:', error.message);
+        return []; 
+    }
+}
+
+export async function getYearsOfPayments() {
+    try {
+        return await window.api.getYearsOfPayments();
+    } catch (error) {
+        console.error('Error al obtener año de pagos:', error.message);
+        return []; 
+    }
+}
+
 export async function getPaymentById(paymentId) {
     try {
         return await window.api.getPaymentById(paymentId);
     }
     catch (error) {
         console.error('Error al obtener pago por ID:', error.message);
-        return null; 
+        return []; 
     }
 }
 
@@ -49,6 +67,25 @@ export async function getAllExpenses() {
         return []; 
     }
 }
+
+export async function getExpensesByYear(year) {
+    try {
+        return await window.api.getExpensesByYear(year);
+    } catch (error) {
+        console.error('Error al obtener gastos por año:', error.message);
+        return []; 
+    }
+}
+
+export async function getYearsOfExpenses() {
+    try {
+        return await window.api.getYearsOfExpenses();
+    } catch (error) {
+        console.error('Error al obtener año de gastos:', error.message);
+        return []; 
+    }
+}
+
 export async function addExpense(expenseData) {
     try {
         return await window.api.addExpense(expenseData);
@@ -66,6 +103,24 @@ export async function getAllStudents() {
         return await window.api.getAllStudents();
     } catch (error) {
         console.error('Error al obtener estudiantes:', error.message);
+        return []; 
+    }
+}
+
+export async function getStudentsByActive(active) {
+    try {
+        return await window.api.getStudentsByActive(active);
+    } catch (error) {
+        console.error('Error al obtener estudiantes por estado:', error.message);
+        return []; 
+    }
+}
+
+export async function getStudentsActive() {
+    try {
+        return await window.api.getStudentsActive();
+    } catch (error) {
+        console.error('Error al obtener estado de estudiantes:', error.message);
         return []; 
     }
 }
@@ -103,13 +158,53 @@ export async function exportPaymentsToExcel(paymentData) {
     }
 }
 
+export async function exportPaymentsByYearToExcel(paymentData) {
+    try {
+        return await window.api.exportPaymentsByYearToExcel(paymentData);
+    } catch (error) {
+        console.error('Error al exportar pagos por año a excel:', error.message);
+        return []; 
+    }
+}
+
+export async function exportExpensesByYearToExcel(expenseData) {
+    try {
+        return await window.api.exportExpensesByYearToExcel(expenseData);
+    } catch (error) {
+        console.error('Error al exportar egresos por año a excel:', error.message);
+        return []; 
+    }
+}
+
+export async function exportStudentsByActiveToExcel(studentData) {
+    try {
+        return await window.api.exportStudentsByActiveToExcel(studentData);
+    } catch (error) {
+        console.error('Error al exportar estudiantes por estado a excel:', error.message);
+        return []; 
+    }
+}
+
 export default {
+    //Pagos
+    getYearsOfPayments,
+    getPaymentsByYear,
     getPaymentConcepts,
     getPaymentDivisions,
     getPaymentById,
+    //Gastos
     getAllExpenses,
+    getExpensesByYear,
+    getYearsOfExpenses,
     addExpense,
+    //Estudiantes
     getAllStudents,
+    getStudentsByActive,
+    getStudentsActive,
+    //Precios
     updatePriceConcept,
-    exportPaymentsToExcel
+    //Exportar
+    exportPaymentsToExcel,
+    exportPaymentsByYearToExcel,
+    exportStudentsByActiveToExcel
 };

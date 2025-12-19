@@ -1,7 +1,7 @@
 import NavLink from "../navlink/NavLink.jsx";
 import { Page } from '../../../constant/Pages.jsx';
-import { HomeIcon, CPUIcon, HardDriveIcon, SettingsIcon, IconArrowDownLeft, ColonIcon, StudentIcon } from "../../icons/Icons.jsx";
-import { ClipboardIcon, PersonIcon, ExitIcon } from "@radix-ui/react-icons";
+import { HomeIcon, IconArrowDownLeft, ColonIcon} from "../../icons/Icons.jsx";
+import { ClipboardIcon, PersonIcon, ExitIcon, FileTextIcon } from "@radix-ui/react-icons";
 
 const Sidebar = ({ currentPage, setCurrentPage }) => {
 
@@ -46,6 +46,14 @@ const Sidebar = ({ currentPage, setCurrentPage }) => {
                 icon={PersonIcon} 
                 title="Precios" 
                 page={Page.PRICING_REGISTRY} 
+                currentPage={currentPage} 
+                onClick={setCurrentPage} 
+            />
+
+            <NavLink 
+                icon={FileTextIcon} 
+                title="Exportar" 
+                page={Page.EXPORT_REGISTRY} 
                 currentPage={currentPage} 
                 onClick={setCurrentPage} 
             />

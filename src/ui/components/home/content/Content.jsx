@@ -3,6 +3,7 @@ import Payments from '../../../pages/payments/Payments.jsx';
 import Expenses from '../../../pages/expenses/Expenses.jsx';
 import Students from '../../../pages/students/Students.jsx';
 import Pricing from  '../../../pages/pricing/Pricing.jsx';
+import Export from   '../../../pages/export/Export.jsx';
 
 const Content = ({ page }) => {
   let title, description;
@@ -46,6 +47,12 @@ const Content = ({ page }) => {
         return (
           <div className="p-8 w-full max-w-7xl mx-auto">
             <Pricing />
+          </div>
+        );
+    case Page.EXPORT_REGISTRY:
+        return (
+          <div className="p-8 w-full max-w-7xl mx-auto">
+            <Export />
           </div>
         );
     default:
