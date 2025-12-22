@@ -1,20 +1,17 @@
-const ExportCard = ({ title, onClick }) => {
+import { ChevronRightIcon } from "@radix-ui/react-icons";
+
+import './exportcard.css';
+const ExportCard = ({ title, description, icon: Icon, colorClass, onClick }) => {
   return (
-    <div
-      onClick={onClick}
-      style={{
-        padding: "1rem",
-        borderRadius: "0.75rem",
-        border: "1px solid #e5e7eb",
-        cursor: "pointer",
-        background: "white",
-      }}
-    >
-      
-      <p style={{ color: "#6b7280", fontSize: "0.875rem" }}>
-        Exportar
-      </p>
-        <h3 style={{ fontWeight: 600 }}>{title}</h3>
+    <div className="export-card" onClick={onClick}>
+      <div className={`export-card-icon-box ${colorClass}`}>
+        <Icon />
+      </div>
+      <h3>{title}</h3>
+      <p>{description}</p>
+      <div className={`export-card-footer ${colorClass}`} style={{ backgroundColor: 'transparent' }}>
+        Configurar reporte <ChevronRightIcon />
+      </div>
     </div>
   );
 };

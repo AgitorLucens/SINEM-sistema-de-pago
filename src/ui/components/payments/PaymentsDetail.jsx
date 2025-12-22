@@ -1,5 +1,5 @@
 import {formatDate} from "../generic/function/Function.jsx"
-import {exportPaymentsToExcel} from "../../constant/PaymentConstant.jsx";
+import {exportPaymentsToExcel} from "../../constant/DBFunctions.jsx";
 
 const PaymentsDetail = ({ detail, onClick, isLoading}) => {
     

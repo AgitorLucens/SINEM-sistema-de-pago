@@ -284,9 +284,10 @@ class AppDB {
         return payment;
     }
 
-    deletePayment(id) {
+    deletePaymentById(id) {
             const sql = this.db.prepare(`DELETE FROM payments WHERE id = ?`);
-            const stmt = sql.run(id);
+            const payment = sql.run(id);
+            return payment
     }
 
     getPaymentsConcepts() {
@@ -381,6 +382,11 @@ class AppDB {
             return data.lastInsertRowid;
     }
 
+    deleteExpenseById(id) {
+            const sql = this.db.prepare(`DELETE FROM expenses WHERE id = ?`);
+            const expense = sql.run(id);
+            return expense;
+    }
 
     /*
         Estudiantes
@@ -457,6 +463,12 @@ class AppDB {
                                  studentData.reference,
                                  studentData.active);
             return data.lastInsertRowid;
+    }
+
+    deleteStudentById(id) {
+            const sql = this.db.prepare(`DELETE FROM students WHERE id = ?`);
+            const student = sql.run(id);
+            return student;
     }
 
     /*

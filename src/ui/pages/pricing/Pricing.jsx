@@ -3,15 +3,15 @@ import PricingCard from "../../components/pricing/PricingCard";
 import Modal from "../../components/generic/modal/Modal.jsx"
 import PricingForm from "../../components/pricing/PricingForm";
 
-import {getPaymentConcepts,updatePriceConcept} from "../../constant/PaymentConstant.jsx"
-
+import {getPaymentConcepts,updatePriceConcept} from "../../constant/DBFunctions.jsx"
+import './pricing.css';
 const Pricing = () => {
 
     const [concepts, setConcepts] = useState([]);
     const [selectedPrice, setSelectedPrice] = useState(null);
     const [isModalOpen, setIsModalOpen] = useState(null);
     const [error, setError] = useState(null);
-
+    const [isLoading, setIsLoading] = useState(false);
 
     const handleSave = async (id, newAmount) => {
         try {
@@ -33,7 +33,7 @@ const Pricing = () => {
 
 
     const fetchConcepts = useCallback(async () => {
-            //setIsLoading(true);
+            setIsLoading(true);
             setError(null);
             try {
                 const loadedData = await getPaymentConcepts(); 
@@ -43,7 +43,7 @@ const Pricing = () => {
                 console.error("Error al cargar pagos:", e);
                 setError("Error al cargar datos desde la base de datos local: " + e.message);
             } finally {
-                //setIsLoading(false);
+                setIsLoading(false);
             }
     }, []);
 
@@ -53,28 +53,32 @@ const Pricing = () => {
     
 
     return (
-        <div style={{ padding: "2rem" }}>
-            <h1 style={{ fontSize: "1.5rem", fontWeight: 700 }}>Pricing</h1>
+        <div className="container">
+            <div className="content-wrapper">
+                <div className="header">
+                    <h2 className="title">Precios</h2>
+                    <p className="subtitle">Configuración de costos y conceptos de pago.</p>
+                </div>
+            {isLoading ? (
+                <div style={{ textAlign: 'center', padding: '3rem', color: '#6b7280' }}>Cargando datos...</div>
+            ) : (
+                <div className="grid">
+                {concepts.map(price => (
+                    <PricingCard
+                        key={price.id}
+                        price={price}
+                        onClick={() => {
+                            setIsModalOpen(true)
+                            setSelectedPrice(price)
+                        }}
+                    />
+                ))}
 
-        <div style={{ display: "grid", gap: "1rem", marginTop: "1rem" }}>
-            {concepts.map(price => (
-                <PricingCard
-                    key={price.id}
-                    price={price}
-                    onClick={() => {
-                        setIsModalOpen(true)
-                        setSelectedPrice(price)
-                    }}
-                />
-
-                
-            ))}
-        </div>
-
+            
             <Modal
                 isOpen={isModalOpen}
                 onClose={() => setIsModalOpen(false)}
-                title="Precio a escoger"
+                title="Actualizar Precio"
             >
                 <PricingForm
                     price={selectedPrice}
@@ -82,7 +86,9 @@ const Pricing = () => {
                     onSave={handleSave}
                 />
             </Modal>
-  
+                </div>
+            )}
+            </div>
         </div>
   );
 };

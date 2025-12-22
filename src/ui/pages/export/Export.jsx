@@ -2,11 +2,13 @@ import { useState, useCallback, useEffect } from "react";
 import ExportCard from "../../components/exports/ExportCard.jsx";
 import Modal from "../../components/generic/modal/Modal.jsx";
 import ExportForm from "../../components/exports/ExportForm.jsx";
+import { Users, FileText,  TrendingUp, TrendingDown} from "../../components/icons/Icons.jsx";
 
 import {getYearsOfPayments,getYearsOfExpenses,getStudentsActive,
         getPaymentsByYear,getExpensesByYear,getStudentsByActive,
-        exportPaymentsByYearToExcel,exportExpensesByYearToExcel,exportStudentsByActiveToExcel} from "../../constant/PaymentConstant.jsx"
+        exportPaymentsByYearToExcel,exportExpensesByYearToExcel,exportStudentsByActiveToExcel} from "../../constant/DBFunctions.jsx"
 
+import './export.css';
 const Export = () => {
     const [isModalOpen,setIsModalOpen] = useState(null);
     const [selectedType,setSelectedType] = useState(null);
@@ -81,13 +83,20 @@ const Export = () => {
 
 
     return (
-        <div style={{ padding: "2rem" }}>
-            <h1 style={{ fontSize: "1.5rem", fontWeight: 700 }}>Pricing</h1>
+        <div className="container-export">
+            <div className="content-wrapper-export">
+                <div className="export-header">
+                    <h1>Exportación de Datos</h1>
+                    <p>Selecciona el módulo administrativo para generar el reporte en Excel.</p>
+                </div>
 
-            <div style={{ display: "grid", gap: "1rem", marginTop: "1rem" }}>
+            <div className="grid-export-card">
 
                 <ExportCard
                     title="Ingresos"
+                    description="Pagos, matrículas y mensualidades recibidas."
+                    colorClass={"color-ingresos"}
+                    icon={TrendingUp}
                     onClick={() => {
                         setIsModalOpen(true)
                         setSelectedType("Pagos")
@@ -96,6 +105,9 @@ const Export = () => {
 
                 <ExportCard
                     title="Egresos"
+                    description="Gastos incluidos en el sistema."
+                    colorClass={"color-egresos"}
+                    icon={TrendingDown}
                     onClick={() => {
                         setIsModalOpen(true)
                         setSelectedType("Gastos")
@@ -104,6 +116,9 @@ const Export = () => {
 
                 <ExportCard
                     title="Estudiantes"
+                    description="Listado de alumnos matriculados por año"
+                    colorClass={"color-estudiantes"}
+                    icon={Users}
                     onClick={() => {
                         setIsModalOpen(true)
                         setSelectedType("Estudiantes")
@@ -112,6 +127,9 @@ const Export = () => {
 
                 <ExportCard
                     title="Todo"
+                    description="Archivo que incluye todos los módulos."
+                    colorClass={"color-completo"}
+                    icon={FileText}
                     onClick={() => {
                         setIsModalOpen(true)
                         setSelectedType("")
@@ -132,7 +150,7 @@ const Export = () => {
                     onClose={() => setIsModalOpen(false)}
                 />
             </Modal>
-  
+            </div>
         </div>
   );
 };

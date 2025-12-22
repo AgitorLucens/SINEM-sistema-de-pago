@@ -38,6 +38,16 @@ export async function getPaymentById(paymentId) {
     }
 }
 
+export async function deletePaymentById(paymentId) {
+    try {
+        return await window.api.deletePaymentById(paymentId);
+    }
+    catch (error) {
+        console.error('Error al eliminar pago por ID:', error.message);
+        return []; 
+    }
+}
+
 export async function getPaymentConcepts() {
     try {
         return await window.api.getPaymentConcepts();
@@ -95,6 +105,16 @@ export async function addExpense(expenseData) {
     }
 }
 
+export async function deleteExpenseById(expenseId) {
+    try {
+        return await window.api.deleteExpenseById(expenseId);
+    }
+    catch (error) {
+        console.error('Error al eliminar egreso por ID:', error.message);
+        return []; 
+    }
+}
+
 /*
     Estudiantes
 */
@@ -130,6 +150,16 @@ export async function addStudent(studentData) {
         return await window.api.addStudent(studentData);
     } catch (error) {
         console.error('Error al agregar estudiante:', error.message);
+        return []; 
+    }
+}
+
+export async function deleteStudentById(studentId) {
+    try {
+        return await window.api.deleteStudentById(studentId);
+    }
+    catch (error) {
+        console.error('Error al eliminar estudiante por ID:', error.message);
         return []; 
     }
 }
@@ -192,6 +222,7 @@ export default {
     getPaymentConcepts,
     getPaymentDivisions,
     getPaymentById,
+    deletePaymentById,
     //Gastos
     getAllExpenses,
     getExpensesByYear,

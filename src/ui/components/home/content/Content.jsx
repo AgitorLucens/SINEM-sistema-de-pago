@@ -5,6 +5,7 @@ import Students from '../../../pages/students/Students.jsx';
 import Pricing from  '../../../pages/pricing/Pricing.jsx';
 import Export from   '../../../pages/export/Export.jsx';
 
+import './page.css';
 const Content = ({ page }) => {
   let title, description;
 
@@ -13,45 +14,37 @@ const Content = ({ page }) => {
       title = "Panel Principal";
       description = "Bienvenido a la aplicación de gestion de pagos del SINEM";
       break;
-    case Page.SYSTEM:
-      title = "Estado del Sistema";
-      description = "Monitoreo de los recursos de la máquina local. Todos los datos mostrados provienen de la API de Electron y son accesibles sin conexión a Internet.";
-      break;
-    case Page.STORAGE:
-      title = "Archivos y Almacenamiento";
-      description = "Gestión segura de archivos locales de la institución. Las operaciones de lectura y escritura se realizan directamente en el disco duro.";
-      break;
     case Page.SETTINGS:
       title = "Configuración Local";
       description = "Ajustes de la aplicación, incluyendo preferencias de idioma, tema (si estuviera implementado) y configuración de la base de datos local.";
       break;
     case Page.PAYMENT_REGISTRY:
         return (
-          <div className="p-8 w-full max-w-7xl mx-auto">
+          <div className="payment-page-container">
             <Payments />
           </div>
         );
     case Page.EXPENSES_REGISTRY:
         return (
-          <div className="p-8 w-full max-w-7xl mx-auto">
+          <div className="expense-page-container">
             <Expenses />
           </div>
         );
     case Page.STUDENTS_REGISTRY:
         return (
-          <div className="p-8 w-full max-w-7xl mx-auto">
+          <div className="student-page-container">
             <Students />
           </div>
         );
     case Page.PRICING_REGISTRY:
         return (
-          <div className="p-8 w-full max-w-7xl mx-auto">
+          <div className="pricing-page-containerv">
             <Pricing />
           </div>
         );
     case Page.EXPORT_REGISTRY:
         return (
-          <div className="p-8 w-full max-w-7xl mx-auto">
+          <div className="export-page-container">
             <Export />
           </div>
         );

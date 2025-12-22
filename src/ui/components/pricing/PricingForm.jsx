@@ -1,6 +1,16 @@
 import { useState } from "react";
+import { ColonIcon } from "../icons/Icons";
 
-const PricingForm = ({ price, onClose, onSave }) => {
+import './pricingform.css';
+const PricingForm = ({ price, onClose, onSave,
+                       inputStyles = {
+                          width: "100%",
+                          padding: "0.5rem",
+                          border: "1px solid #d1d5db",
+                          borderRadius: "0.375rem",
+                          marginTop: "0.5rem",
+                       }              
+ }) => {
   const [value, setValue] = useState(price?.amount ?? null);
 
   return (
@@ -12,29 +22,20 @@ const PricingForm = ({ price, onClose, onSave }) => {
       }}
     >
       <div
-        style={{
-          background: "white",
-          padding: "1.5rem",
-          borderRadius: "0.75rem",
-          width: "320px",
-        }}
+        className="input-group"
       >
-        <h2 style={{ fontWeight: 700, marginBottom: "0.5rem" }}>
-          Editar {price.name}
-        </h2>
-
-        <input
-          type="number"
-          value={value}
-          onChange={(e) => setValue(Number(e.target.value))}
-          style={{
-            width: "100%",
-            padding: "0.5rem",
-            border: "1px solid #d1d5db",
-            borderRadius: "0.375rem",
-            marginTop: "0.5rem",
-          }}
-        />
+        <label style={{ display: 'block', fontSize: '0.875rem', fontWeight: 500, marginBottom: '0.5rem' }}>
+            Nuevo Monto (S/.)
+        </label>
+        <div style={{ position: 'relative' }}>
+          <ColonIcon size={16} transform='translateY(-50%)'/>
+          <input 
+            type="number" 
+            value={value} 
+            onChange={(e) => setValue(Number(e.target.value))}
+            className="input-pricing"
+          />
+        </div>
 
         <div
           style={{

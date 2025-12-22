@@ -1,16 +1,17 @@
 import ExpensesTable from '../../components/expenses/ExpensesTable';
-import ExpensesModal from '../../components/expenses/ExpensesModal.jsx';
+import Modal from '../../components/generic/modal/Modal.jsx';
 import ExpensesForm from '../../components/expenses/ExpensesForm.jsx';
 
-import { getAllExpenses, addExpense } from '../../constant/PaymentConstant';
+import { getAllExpenses, addExpense, deleteExpenseById } from '../../constant/DBFunctions.jsx';
 
 import { useState, useEffect, useCallback } from 'react';
+import { PlusCircledIcon } from "@radix-ui/react-icons";
 
 const Expenses = () => {
     // 1. Estado para la lista de pagos
     const initialFormState = {
         amount: '',
-        date: new Date().toISOString().substring(0, 10),
+        date: null,
         description: '',
         reference: '',
     };
@@ -20,6 +21,9 @@ const Expenses = () => {
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState(null);
     const [message, setMessage] = useState('');
+
+    // eliminar pago
+    const [confirmingId, setConfirmingId] = useState(null);
 
     //se usa este callback por cuestiones de rendimiento
     const fetchExpenses = useCallback(async () => {
@@ -86,6 +90,39 @@ const Expenses = () => {
 
     };
 
+
+    const deleteExpense = async (e, expenseId) => {
+            // En el entorno real, usa un modal o componente de confirmación en lugar de window.confirm()
+            e.stopPropagation();
+            if (confirmingId === expenseId) {
+                setIsLoading(true);
+                e.stopPropagation();
+                if (!window.confirm("¿Estás seguro de que quieres eliminar este pago? Esta acción no se puede deshacer.")) {
+                    setIsLoading(false);
+                    setConfirmingId(null);
+                    return;
+                }
+                try {
+                    await deleteExpenseById(expenseId);
+                    setMessage('Gasto eliminado correctamente.');
+                    setError(null);
+                    await fetchExpenses();
+                } catch (e) {
+                    console.error("Error al eliminar el pago:", e);
+                    setError("Error al eliminar el pago: " + e.message);
+                } finally {
+                    setIsLoading(false);
+                    setTimeout(() => { setError(null); setMessage(''); }, 5000); 
+                }
+                
+                setConfirmingId(null);
+            
+            } else {
+                setConfirmingId(expenseId);
+                setTimeout(() => setConfirmingId(null), 4000);
+            }
+        }; 
+
     return (
         <div style={{ padding: '0.5rem' }}>
             {/* Encabezado y botón de registro */}
@@ -106,7 +143,7 @@ const Expenses = () => {
                     onMouseOver={(e) => e.currentTarget.style.backgroundColor = '#4338ca'}
                     onMouseOut={(e) => e.currentTarget.style.backgroundColor = '#4f46e5'}
                 >
-                    ➕ Registrar Nuevo Egreso
+                    <PlusCircledIcon/> Registrar Nuevo Egreso
                 </button>
             </div>
 
@@ -127,13 +164,17 @@ const Expenses = () => {
             )}
 
             {/* Renderiza la Tabla */}
-            <ExpensesTable expenses={expenses} />
+            <ExpensesTable expenses={expenses} 
+                           confirmingId={confirmingId}
+                           onDeleteExpense={deleteExpense}/>
 
             {/* Renderiza el Modal que contiene el formulario */}
             
-            <ExpensesModal 
+            <Modal 
                 isOpen={isModalOpen} 
-                onClose={() => setIsModalOpen(false)} // Permite cerrar el modal con la X
+                onClose={() => {
+                    setFormData(initialFormState);
+                    setIsModalOpen(false)}} // Permite cerrar el modal con la X
                 title="Registrar Nuevo Gasto (Egreso)"
             >
                 <ExpensesForm 
@@ -142,7 +183,7 @@ const Expenses = () => {
                     onSubmit={handleSubmit}
                     isLoading={isLoading}
                 />
-            </ExpensesModal>
+            </Modal>
             
         </div>
     );

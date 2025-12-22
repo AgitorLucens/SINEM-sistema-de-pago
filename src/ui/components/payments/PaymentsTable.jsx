@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import EditableCell from '../generic/table/EditableCell';
 
-// Helper para formatear la fecha a dd/mm/yyyy
+import './paymentstable.css';
 const formatDate = (dateString) => {
     if (!dateString) return '';
     try {
@@ -15,10 +15,10 @@ const formatDate = (dateString) => {
 };
 
 // Componente para visualizar el historial de pagos con redimensionamiento manual
-const PaymentsTable = ({ payments, minTableWidth = '800px' , onDeletePayment, onRowClick}) => {
+const PaymentsTable = ({ payments, minTableWidth = '800px' , onDeletePayment, onRowClick, confirmingId}) => {
     // Convertir el prop de cadena a número para cálculos
     const minWidthValue = parseInt(minTableWidth, 10) || 600;
-
+    const [isDragging, setIsDragging] = useState(false);
     const [tableWidth, setTableWidth] = useState(minWidthValue);
     
     // Ref para almacenar temporalmente el estado del arrastre (posición inicial, ancho inicial)
@@ -88,93 +88,85 @@ const PaymentsTable = ({ payments, minTableWidth = '800px' , onDeletePayment, on
 
     // ====================================================================
     // Renderizado
-    // ====================================================================
-    const handleActionClick = (paymentId) => {
-        if (confirmingId === paymentId) {
-            if (onDeletePayment) {
-                onDeletePayment(paymentId);
-            }
-            setConfirmingId(null); 
-        } else {
-            setConfirmingId(paymentId);
-            setTimeout(() => {
-                setConfirmingId(null);
-            }, 3000); 
-        }
-    };
-    
+    // ==================================================================== 
     return (
         <div 
-            style={{ 
-                display: 'flex', 
-                // Contenedor que establece el ancho redimensionable
-                width: `${tableWidth}px`, 
-                maxWidth: '100%', 
-                minWidth: `${minWidthValue}px`,
-                marginBottom: '2rem',
-                position: 'relative', // Necesario para posicionar el handle
-            }}
+            className="payments-container"
+            style={{ width: `${tableWidth}px` }}
         >
-            {/* Contenedor de la tabla: permite el scroll horizontal si el contenido de la tabla es > tableWidth */}
-            <div style={{ overflowX: 'auto', width: '100%' }}> 
-                <table style={{ 
-                    // Asegura que la tabla interior ocupe el 100% del ancho del contenedor
-                    width: '100%', 
-                    // Mantenemos un minWidth a nivel de tabla para asegurar que las celdas no se colapsen
-                    minWidth: '600px', 
-                    borderCollapse: 'collapse', 
-                    borderRadius: '0.75rem', 
-                    overflow: 'hidden',
-                    boxShadow: '0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06)'
-                }}>
-                    <thead style={{ backgroundColor: '#eef2ff' }}> {/* bg-indigo-50 */}
-                        <tr>
-                            <th style={{ padding: '0.75rem', textAlign: 'left', fontWeight: '700', color: '#4f46e5', minWidth: '60px' }}># Factura</th>
-                            <th style={{ padding: '0.75rem', textAlign: 'left', fontWeight: '700', color: '#4f46e5', minWidth: '100px' }}>Fecha</th>
-                            <th style={{ padding: '0.75rem', textAlign: 'left', fontWeight: '700', color: '#4f46e5', minWidth: '150px' }}>Estudiante</th>
-                            <th style={{ padding: '0.75rem', textAlign: 'left', fontWeight: '700', color: '#4f46e5', minWidth: '100px' }}>Modo Pago</th>
-                            <th style={{ padding: '0.75rem', textAlign: 'left', fontWeight: '700', color: '#4f46e5', minWidth: '100px' }}>Curso</th>
-                            <th style={{ padding: '0.75rem', textAlign: 'left', fontWeight: '700', color: '#4f46e5', minWidth: '100px' }}>Tipo Pago</th>
-                            <th style={{ padding: '0.75rem', textAlign: 'left', fontWeight: '700', color: '#4f46e5', minWidth: '90px' }}>Monto</th> 
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {payments.map((p, index) => (
-                            // Asegura que el ID sea único
-                            <tr key={p.id} style={{ borderBottom: '1px solid #f3f4f6', backgroundColor: index % 2 === 0 ? 'white' : '#f9fafb' }}>
-                                <td onClick={() => onRowClick?.(p)}
-                                    style={{ padding: '0.75rem', color: '#6b7280', fontSize: '0.75rem' }}>
-                                    {/* FIX: Convertimos p.id a String explícitamente antes de usar substring() */}
-                                    {p.id ? String(p.id).substring(0, 6) : 'N/A'}
-                                </td>
-                                <td style={{ padding: '0.75rem', color: '#6b7280' }}>{formatDate(p.date)}</td>
-                                <td style={{ padding: '0.75rem', fontWeight: '500', color: '#1f2937' }}>{p.student_name}</td>
-                                <td style={{ padding: '0.75rem', color: '#6b7280', textTransform: 'capitalize' }}>
-                                    <EditableCell
-                                        options={[
-                                            { value: "transfer", label: "Transferencia" },
-                                            { value: "cash", label: "Efectivo" },
-                                        ]}
-                                        value={p.payment_method}
-                                        onSave={(val) => handleCellSave(p.id, "division_name", val)}
-                                    />
-                                </td>
-                                <td style={{ padding: '0.75rem', color: '#6b7280', textTransform: 'capitalize' }}>{p.division_name}</td>
-                                <td style={{ padding: '0.75rem', color: '#6b7280', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', maxWidth: '250px' }}>{p.concept_type}</td>
-                                
-                                {/* Mostrar monto con dos decimales */}
-                                <td style={{ padding: '0.75rem', fontWeight: '600', color: '#065f46' }}>₡{p.amount.toFixed(2)}</td>
-                                {/* capitalizar la primera letra del método */}
-                                
-                            </tr>
-                        ))}
-                        {payments.length === 0 && (
+            <div className="payments-table-wrapper">
+                <div className="payments-scroll-area"> 
+                    <table className="payments-table">
+                        <thead className="payments-thead">
                             <tr>
-                                <td colSpan="6" style={{ padding: '1rem', textAlign: 'center', color: '#9ca3af' }}>No hay pagos registrados.</td>
+                                <th className='payments-th text-center'># Factura</th>
+                                <th className='payments-th'>Fecha</th>
+                                <th className='payments-th'>Estudiante</th>
+                                <th className='payments-th'>Modo Pago</th>
+                                <th className='payments-th'>Curso</th>
+                                <th className='payments-th text-center'>Tipo Pago</th>
+                                <th className='payments-th text-center'>Monto</th> 
                             </tr>
-                        )}
-                    </tbody>
-                </table>
+                        </thead>
+                        <tbody>
+                            {payments.map((p, index) => (
+                                <tr key={p.id} className="payments-tr"
+                                    style={{ backgroundColor: index % 2 === 0 ? 'white' : '#f9fafb' }}>
+                                    <td onClick={() => onRowClick?.(p)}
+                                        className="payments-td">
+                                            <span className="badge-id">
+                                                {p.id ? String(p.id).replace('pay_', '') : '---'}
+                                            </span>
+                                    </td>
+                                    <td className="payments-td">{formatDate(p.date)}</td>
+                                    <td className="payments-td">{p.student_name}</td>
+                                    <td className="payments-td">
+                                         <span className={`badge-method ${p.payment_method?.toLowerCase().includes('trans') ? 'method-transfer' : 'method-other'}`}>
+                                            <EditableCell
+                                            options={[
+                                                { value: "transfer", label: "Transferencia" },
+                                                { value: "cash", label: "Efectivo" },
+                                            ]}
+                                            value={p.payment_method}
+                                            onSave={(val) => handleCellSave(p.id, "division_name", val)}
+                                        />
+                                        </span>
+                                        
+                                    </td>
+                                    <td className="payments-td">{p.division_name}</td>
+                                    <td className="payments-td">{p.concept_type}</td>
+                                
+                                    {/* Mostrar monto con dos decimales */}
+                                    <td className='payments-td amount-column'>₡{p.amount.toFixed(2)}</td>
+                                    {/* Boton Borrado  */}
+                                    <td className="payments-td" style={{ textAlign: 'center' }}>
+                                        <button 
+                                            onClick={(e) => onDeletePayment(e, p.id)}
+                                            className={`delete-btn ${confirmingId === p.id ? 'confirming' : ''}`}
+                                        >
+                                            {confirmingId === p.id ? (
+                                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                                                    <polyline points="20 6 9 17 4 12"></polyline>
+                                                </svg>
+                                            ) : (
+                                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                                                    <path d="M3 6h18"></path>
+                                                    <path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"></path>
+                                                    <path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"></path>
+                                                </svg>
+                                            )}
+                                        </button>
+                                    </td>             
+                                </tr>
+                            ))}
+                            {payments.length === 0 && (
+                                <tr>
+                                    <td colSpan="6" style={{ padding: '1rem', textAlign: 'center', color: '#9ca3af' }}>No hay pagos registrados.</td>
+                                </tr>
+                            )}
+                        </tbody>
+                    </table>
+                </div>
             </div>
 
             {/* Handle de Redimensionamiento (Barra arrastrable) */}

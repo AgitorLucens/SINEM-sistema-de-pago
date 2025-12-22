@@ -1,7 +1,8 @@
 import StudentsTable from '../../components/students/StudentsTable';
 import StudentsModal from '../../components/students/StudentsModal';
 import StudentForm from '../../components/students/StudentsForm';
-import { getAllStudents, addStudent } from '../../constant/PaymentConstant'; 
+import { getAllStudents, addStudent, deleteStudentById } from '../../constant/DBFunctions.jsx'; 
+import { PlusCircledIcon } from "@radix-ui/react-icons";
 
 import { useState, useEffect, useCallback } from 'react';
 
@@ -22,6 +23,9 @@ const Students = () => {
     const [message, setMessage] = useState('');
 
     const [isModalOpen, setIsModalOpen] = useState(false); 
+
+    // eliminar estudiante
+    const [confirmingId, setConfirmingId] = useState(null);
 
     const fetchStudents = useCallback(async () => {
             setIsLoading(true);
@@ -82,6 +86,38 @@ const Students = () => {
     
     };
 
+    const deleteStudent = async (e, studentId) => {
+            // En el entorno real, usa un modal o componente de confirmación en lugar de window.confirm()
+            e.stopPropagation();
+            if (confirmingId === studentId) {
+                setIsLoading(true);
+                e.stopPropagation();
+                if (!window.confirm("¿Estás seguro de que quieres eliminar este estudiante? Esta acción no se puede deshacer.")) {
+                    setIsLoading(false);
+                    setConfirmingId(null);
+                    return;
+                }
+                try {
+                    await deleteStudentById(studentId);
+                    setMessage('Estudiante eliminado correctamente.');
+                    setError(null);
+                    await fetchStudents();
+                } catch (e) {
+                    console.error("Error al eliminar el estudiante:", e);
+                    setError("Error al eliminar el estudiante: " + e.message);
+                } finally {
+                    setIsLoading(false);
+                    setTimeout(() => { setError(null); setMessage(''); }, 5000); 
+                }
+                
+                setConfirmingId(null);
+            
+            } else {
+                setConfirmingId(studentId);
+                setTimeout(() => setConfirmingId(null), 4000);
+            }
+    }; 
+
     return (
         <div style={{ padding: '0.5rem' }}>
             {/* Encabezado y botón de registro */}
@@ -102,7 +138,7 @@ const Students = () => {
                     onMouseOver={(e) => e.currentTarget.style.backgroundColor = '#4338ca'}
                     onMouseOut={(e) => e.currentTarget.style.backgroundColor = '#4f46e5'}
                 >
-                    ➕ Registrar Nuevo Estudiante
+                    <PlusCircledIcon/> Registrar Nuevo Estudiante
                 </button>
             </div>
 
@@ -123,7 +159,9 @@ const Students = () => {
             )}
 
             {/* Renderiza la Tabla */}
-            <StudentsTable students={students} />
+            <StudentsTable students={students} 
+                           onDeleteStudent={deleteStudent}
+                           confirmingId={confirmingId}/>
 
             {/* Renderiza el Modal que contiene el formulario */}
             

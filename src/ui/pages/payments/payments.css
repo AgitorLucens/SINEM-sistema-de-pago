@@ -1,0 +1,37 @@
+.header-container {
+    display: flex;
+    flex-direction: column; /* Columna en móvil */
+    gap: 1rem;
+    margin-bottom: 2rem;
+}
+
+/* Título de la Sección */
+.section-title {
+    color: var(--primary-text);
+    font-size: 1.5rem;
+    font-weight: 700;
+    margin: 0;
+    letter-spacing: -0.025em;
+}
+
+/* Subtítulo / Descripción */
+.section-description {
+    color: var(--secondary-text);
+    font-size: 0.875rem;
+    margin-top: 0.25rem;
+    margin-bottom: 0;
+}
+
+/* Botón de Acción (Opcional, para el lado derecho) */
+.header-actions {
+    display: flex;
+    align-items: center;
+}
+
+@media (min-width: 768px) {
+    .header-container {
+        flex-direction: row; /* Fila en escritorio */
+        align-items: center;
+        justify-content: space-between;
+    }
+}
