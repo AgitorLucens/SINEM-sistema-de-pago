@@ -26,8 +26,8 @@ export default function setUpHandlers(dbInstance) {
         return dbInstance.getPaymentById(id);
     });
 
-    ipcMain.handle('delete-payment', async ( _ , id) => {
-        return dbInstance.deletePayment(id);
+    ipcMain.handle('delete-payment-by-id', async ( _ , id) => {
+        return dbInstance.deletePaymentById(id);
     });
 
     ipcMain.handle('get-payment-concepts', async ( ) => {
@@ -57,6 +57,10 @@ export default function setUpHandlers(dbInstance) {
         return dbInstance.addExpense(expenseData);
     });
 
+    ipcMain.handle('delete-expense-by-id', async ( _ , id) => {
+        return dbInstance.deleteExpenseById(id);
+    });
+
     /*
         Pagina Estudiantes
     */
@@ -74,6 +78,10 @@ export default function setUpHandlers(dbInstance) {
     
     ipcMain.handle('add-student', async ( _ , studentsData) => {
         return dbInstance.addStudent(studentsData);
+    });
+
+    ipcMain.handle('delete-student-by-id', async ( _ , id) => {
+        return dbInstance.deleteStudentById(id);
     });
 
     /*

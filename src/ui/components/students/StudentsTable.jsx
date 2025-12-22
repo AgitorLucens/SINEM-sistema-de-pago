@@ -1,18 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 
-const formatDate = (dateString) => {
-    if (!dateString) return '';
-    try {
-        const date = new Date(dateString);
-        // Utiliza 'es-ES' para formato día/mes/año
-        return date.toLocaleDateString('es-ES'); 
-    } catch (e) {
-        // En caso de error, devuelve la cadena original
-        return dateString;
-    }
-};
-
-const StudentsTable = ({students, minTableWidth = '800px'}) => {
+import './studentstable.css';
+const StudentsTable = ({ students, minTableWidth = '700px', onDeleteStudent, onRowClick, confirmingId }) => {
 
     const minWidthValue = parseInt(minTableWidth, 10) || 600;
     
@@ -78,58 +67,62 @@ const StudentsTable = ({students, minTableWidth = '800px'}) => {
 
     return (
         <div 
-            style={{ 
-                display: 'flex', 
-                // Contenedor que establece el ancho redimensionable
-                width: `${tableWidth}px`, 
-                maxWidth: '100%', 
-                minWidth: `${minWidthValue}px`,
-                marginBottom: '2rem',
-                position: 'relative', // Necesario para posicionar el handle
-            }}
+            className='students-container'
+            style={{ width: `${tableWidth}px` }}
         >
-            {/* Contenedor de la tabla: permite el scroll horizontal si el contenido de la tabla es > tableWidth */}
-            <div style={{ overflowX: 'auto', width: '100%' }}> 
-                <table style={{ 
-                    // Asegura que la tabla interior ocupe el 100% del ancho del contenedor
-                    width: '100%', 
-                    // Mantenemos un minWidth a nivel de tabla para asegurar que las celdas no se colapsen
-                    minWidth: '600px', 
-                    borderCollapse: 'collapse', 
-                    borderRadius: '0.75rem', 
-                    overflow: 'hidden',
-                    boxShadow: '0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06)'
-                }}>
-                    <thead style={{ backgroundColor: '#eef2ff' }}> {/* bg-indigo-50 */}
-                        <tr>
-                            <th style={{ padding: '0.75rem', textAlign: 'left', fontWeight: '700', color: '#4f46e5', minWidth: '100px' }}>Nombre</th>
-                            <th style={{ padding: '0.75rem', textAlign: 'left', fontWeight: '700', color: '#4f46e5', minWidth: '150px' }}>Referencia</th>
-                            <th style={{ padding: '0.75rem', textAlign: 'left', fontWeight: '700', color: '#4f46e5', minWidth: '100px' }}>Tel.</th>
-                            <th style={{ padding: '0.75rem', textAlign: 'left', fontWeight: '700', color: '#4f46e5', minWidth: '90px' }}>Correo</th>
-                            <th style={{ padding: '0.75rem', textAlign: 'left', fontWeight: '700', color: '#4f46e5', minWidth: '90px' }}>Activo</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {students.map((s, index) => (
-                            // Asegura que el ID sea único
-                            <tr key={s.id} style={{ borderBottom: '1px solid #f3f4f6', backgroundColor: index % 2 === 0 ? 'white' : '#f9fafb' }}>
-                                <td style={{ padding: '0.75rem', color: '#6b7280' }}>{s.name}</td>
-                                <td style={{ padding: '0.75rem', fontWeight: '500', color: '#1f2937' }}>{s.reference}</td>
-                                <td style={{ padding: '0.75rem', color: '#6b7280', textTransform: 'capitalize' }}>{s.phone}</td>
-                                {/* Mostrar monto con dos decimales */}
-                                <td style={{ padding: '0.75rem', fontWeight: '600', color: '#065f46' }}>{s.email}</td>         
-                                <td style={{ padding: '0.75rem', fontWeight: '600', color: '#065f46' }}>{s.active}</td>  
-                            </tr>
-                        ))}
-                        {students.length === 0 && (
+            <div className="students-table-wrapper">
+                {/* Contenedor de la tabla: permite el scroll horizontal si el contenido de la tabla es > tableWidth */}
+                <div className="students-scroll-area"> 
+                    <table className='students-table'>
+                        <thead className='students-thead'>
                             <tr>
-                                <td colSpan="6" style={{ padding: '1rem', textAlign: 'center', color: '#9ca3af' }}>No hay gastos registrados.</td>
+                                <th className='students-th'>Nombre</th>
+                                <th className='students-th'>Referencia</th>
+                                <th className='students-th'>Tel.</th>
+                                <th className='students-th'>Correo</th>
+                                <th className='students-th'>Activo</th>
                             </tr>
-                        )}
-                    </tbody>
-                </table>
+                        </thead>
+                        <tbody>
+                            {students.map((s, index) => (
+                                // Asegura que el ID sea único
+                                <tr key={s.id} className="studentrs-tr"
+                                    style={{ backgroundColor: index % 2 === 0 ? 'white' : '#f9fafb' }}>
+                                    <td className='students-td'>{s.name}</td>
+                                    <td className='students-td'>{s.reference}</td>
+                                    <td className='students-td'>{s.phone}</td>
+                                    <td className='students-td'>{s.email}</td>         
+                                    <td className='students-td'>{s.active}</td>
+                                    {/* Boton Borrado  */}
+                                    <td className="payments-td" style={{ textAlign: 'center' }}>
+                                        <button 
+                                            onClick={(e) => onDeleteStudent(e, s.id)}
+                                            className={`delete-btn ${confirmingId === s.id ? 'confirming' : ''}`}
+                                        >
+                                            {confirmingId === s.id ? (
+                                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                                                    <polyline points="20 6 9 17 4 12"></polyline>
+                                                </svg>
+                                            ) : (
+                                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                                                    <path d="M3 6h18"></path>
+                                                    <path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"></path>
+                                                    <path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"></path>
+                                                </svg>
+                                            )}
+                                        </button>
+                                    </td>
+                                </tr>
+                            ))}
+                            {students.length === 0 && (
+                                <tr>
+                                    <td colSpan="6" style={{ padding: '1rem', textAlign: 'center', color: '#9ca3af' }}>No hay gastos registrados.</td>
+                                </tr>
+                            )}
+                        </tbody>
+                    </table>
+                </div>
             </div>
-
             {/* Handle de Redimensionamiento (Barra arrastrable) */}
             <div
                 onMouseDown={handleMouseDown}

@@ -8,7 +8,7 @@ const api = {
     getAllPayments: () => ipcRenderer.invoke('get-all-payments'),
     getPaymentsByYear: (year) => ipcRenderer.invoke('get-payments-by-year', year),
     getYearsOfPayments: () => ipcRenderer.invoke('get-year-payments'),
-    deletePayment: (id) => ipcRenderer.invoke('delete-payment', id),
+    deletePaymentById: (id) => ipcRenderer.invoke('delete-payment-by-id', id),
     getPaymentConcepts: () => ipcRenderer.invoke('get-payment-concepts'),
     getPaymentDivisions: () => ipcRenderer.invoke('get-payment-divisions'),
 
@@ -17,6 +17,7 @@ const api = {
     getExpensesByYear: (year) => ipcRenderer.invoke('get-expenses-by-year', year),
     getYearsOfExpenses: () => ipcRenderer.invoke('get-year-expenses'),
     addExpense: (expenseData) => ipcRenderer.invoke('add-expense', expenseData),
+    deleteExpenseById: (id) => ipcRenderer.invoke('delete-expense-by-id', id),
 
     // Pagina Estudiantes
     getAllStudents: () => ipcRenderer.invoke('get-all-students'),
@@ -24,6 +25,7 @@ const api = {
     getStudentsActive: () => ipcRenderer.invoke('get-students-active'),
     addStudent: (studentData) => ipcRenderer.invoke('add-student', studentData),
     getPaymentById: (paymentId) => ipcRenderer.invoke('get-payment-by-id', paymentId),
+    deleteStudentById: (id) => ipcRenderer.invoke('delete-student-by-id', id),
 
     // Pagina Precios
     updatePriceConcept: (concept) => ipcRenderer.invoke('update-price-concept', concept),

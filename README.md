@@ -27,7 +27,6 @@ The application is packaged for distribution on desktop environments and focuses
 - Build & Packaging
 - UI Libraries & Extras
 - Project Structure
-- Contributing
 - Roadmap
 - License & Contact
 
@@ -162,8 +161,6 @@ npm install @vitejs/plugin-react
 ### Run in Development Mode
 
 ```bash
-npm run dev
-# or
 npm start
 ```
 
@@ -252,17 +249,6 @@ src/
 │   └── db/          # Database and IPC handlers
 └── ui/              # Pages, components, and UI assets
 ```
-
----
-
-## Contributing
-
-Contributions are welcome.
-
-- Follow existing code conventions
-- Keep commits small and focused
-- Test changes in both development and packaged builds
-- Open an issue before submitting major changes
 
 ---
 

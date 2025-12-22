@@ -1,0 +1,67 @@
+.card {
+    background-color: #ffffff;
+    border: 1px solid #e5e7eb;
+    padding: 1.25rem;
+    border-radius: 0.75rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+}
+.card-icon {
+    width: 3rem;
+    height: 3rem;
+    background-color: #dbeafe;
+    color: #2546eb;
+    border-radius: 0.6rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.card-icon-Matrícula {
+    background-color: #dbeafe;
+    color: #2546eb;
+}
+.card-icon-Matrícula:hover {
+    background-color: #153764;
+    color: #ffffff;
+}
+
+.card-icon-Mensualidad {
+    background-color: #f7da8b;
+    color: #bc9b41;
+}
+.card-icon-Mensualidad:hover {
+    background-color: #f08902;
+    color: #ffffff;
+}
+
+.card-icon-Otros {
+    background-color: #bca0ff;
+    color: #8551fd;
+}
+.card-icon-Otros:hover {
+    background-color: #4815be;
+    color: #ffffff;
+}
+
+.card-title {
+    font-weight: 700;
+    font-size: 1rem;
+    color: #1f2937;
+    margin: 0
+}
+.card-category {
+    font-size: 0.75rem;
+    color: #9ca3af;
+    text-transform: uppercase;
+    font-weight: 600;
+    letter-spacing: 0.05em;
+}
+.amount {
+    font-size: 1.5rem;
+    font-weight: 900;
+    color: #111827;
+}

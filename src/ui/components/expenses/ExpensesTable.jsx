@@ -1,7 +1,8 @@
 import { useState, useEffect, useRef } from 'react';
 import { formatDate } from "../generic/function/Function.jsx"
 
-const ExpensesTable = ({expenses, minTableWidth = '800px'}) => {
+import './expensestable.css';
+const ExpensesTable = ({expenses, minTableWidth = '700px', onDeleteExpense, onRowClick, confirmingId}) => {
 
     const minWidthValue = parseInt(minTableWidth, 10) || 600;
     
@@ -67,56 +68,61 @@ const ExpensesTable = ({expenses, minTableWidth = '800px'}) => {
 
     return (
         <div 
-            style={{ 
-                display: 'flex', 
-                // Contenedor que establece el ancho redimensionable
-                width: `${tableWidth}px`, 
-                maxWidth: '100%', 
-                minWidth: `${minWidthValue}px`,
-                marginBottom: '2rem',
-                position: 'relative', // Necesario para posicionar el handle
-            }}
+            className='expenses-container'
+            style={{width: `${tableWidth}px` }}
         >
-            {/* Contenedor de la tabla: permite el scroll horizontal si el contenido de la tabla es > tableWidth */}
-            <div style={{ overflowX: 'auto', width: '100%' }}> 
-                <table style={{ 
-                    // Asegura que la tabla interior ocupe el 100% del ancho del contenedor
-                    width: '100%', 
-                    // Mantenemos un minWidth a nivel de tabla para asegurar que las celdas no se colapsen
-                    minWidth: '600px', 
-                    borderCollapse: 'collapse', 
-                    borderRadius: '0.75rem', 
-                    overflow: 'hidden',
-                    boxShadow: '0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06)'
-                }}>
-                    <thead style={{ backgroundColor: '#eef2ff' }}> {/* bg-indigo-50 */}
-                        <tr>
-                            <th style={{ padding: '0.75rem', textAlign: 'left', fontWeight: '700', color: '#4f46e5', minWidth: '100px' }}>Fecha</th>
-                            <th style={{ padding: '0.75rem', textAlign: 'left', fontWeight: '700', color: '#4f46e5', minWidth: '150px' }}>Detalle</th>
-                            <th style={{ padding: '0.75rem', textAlign: 'left', fontWeight: '700', color: '#4f46e5', minWidth: '100px' }}>Referencia</th>
-                            <th style={{ padding: '0.75rem', textAlign: 'left', fontWeight: '700', color: '#4f46e5', minWidth: '90px' }}>Monto</th> 
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {expenses.map((e, index) => (
-                            // Asegura que el ID sea único
-                            <tr key={e.id} style={{ borderBottom: '1px solid #f3f4f6', backgroundColor: index % 2 === 0 ? 'white' : '#f9fafb' }}>
-                                <td style={{ padding: '0.75rem', color: '#6b7280' }}>{formatDate(e.date)}</td>
-                                <td style={{ padding: '0.75rem', fontWeight: '500', color: '#1f2937' }}>{e.description}</td>
-                                <td style={{ padding: '0.75rem', color: '#6b7280', textTransform: 'capitalize' }}>{e.reference}</td>
-                                {/* Mostrar monto con dos decimales */}
-                                <td style={{ padding: '0.75rem', fontWeight: '600', color: '#065f46' }}>₡{e.amount.toFixed(2)}</td>         
-                            </tr>
-                        ))}
-                        {expenses.length === 0 && (
+            <div className="expenses-table-wrapper">
+                {/* Contenedor de la tabla: permite el scroll horizontal si el contenido de la tabla es > tableWidth */}
+                <div className='expenses-scroll-area'> 
+                    <table className='expenses-table'>
+                        <thead className='expenses-thead'> {/* bg-indigo-50 */}
                             <tr>
-                                <td colSpan="6" style={{ padding: '1rem', textAlign: 'center', color: '#9ca3af' }}>No hay gastos registrados.</td>
+                                <th className='expenses-th'>Fecha</th>
+                                <th className='expenses-th'>Detalle</th>
+                                <th className='expenses-th'>Referencia</th>
+                                <th className='expenses-th'>Monto</th> 
                             </tr>
-                        )}
-                    </tbody>
-                </table>
-            </div>
-
+                        </thead>
+                        <tbody>
+                            {expenses.map((ex, index) => (
+                                // Asegura que el ID sea único
+                                <tr key={ex.id} className='expenses-tr'
+                                    style={{ backgroundColor: index % 2 === 0 ? 'white' : '#f9fafb' }}>
+                                    <td className='expenses-td'>{formatDate(ex.date)}</td>
+                                    <td className='expenses-td'>{ex.description}</td>
+                                    <td className='expenses-td'>{ex.reference}</td>
+                                    {/* Mostrar monto con dos decimales */}
+                                    <td className='expenses-td amount-column'>₡{ex.amount.toFixed(2)}</td>         
+                                    {/* Boton Borrado  */}
+                                    <td className="expenses-td" style={{ textAlign: 'center' }}>
+                                        <button 
+                                            onClick={(e) => onDeleteExpense(e, ex.id)}
+                                            className={`delete-btn ${confirmingId === ex.id ? 'confirming' : ''}`}
+                                        >
+                                            {confirmingId === ex.id ? (
+                                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                                                    <polyline points="20 6 9 17 4 12"></polyline>
+                                                </svg>
+                                            ) : (
+                                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                                                    <path d="M3 6h18"></path>
+                                                    <path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"></path>
+                                                    <path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"></path>
+                                                </svg>
+                                            )}
+                                        </button>
+                                    </td>   
+                                </tr>
+                            ))}
+                            {expenses.length === 0 && (
+                                <tr>
+                                    <td colSpan="6" style={{ padding: '1rem', textAlign: 'center', color: '#9ca3af' }}>No hay gastos registrados.</td>
+                                </tr>
+                            )}
+                        </tbody>
+                    </table>
+                </div>
+            </div>   
             {/* Handle de Redimensionamiento (Barra arrastrable) */}
             <div
                 onMouseDown={handleMouseDown}
@@ -133,7 +139,7 @@ const ExpensesTable = ({expenses, minTableWidth = '800px'}) => {
                     opacity: 0.7,
                 }}
                 title="Arrastra para ajustar el ancho de la tabla"
-            />
+            />  
         </div>
     );
 }

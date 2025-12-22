@@ -1,7 +1,9 @@
 import { useState } from "react";
 import SelectRadix from "../generic/select/SelectRadix";
 import {onRadixChange,handleFieldChange} from "../generic/function/Function.jsx"
+import { CalendarIcon, DownloadIcon } from "@radix-ui/react-icons";
 
+import './exportform.css';
 const ExportForm = ({ selectData, data, type, onClose, onSave , handleChange}) => {
   const [value, setValue] = useState(null);
   const selectOptions = (() => {
@@ -23,26 +25,14 @@ const ExportForm = ({ selectData, data, type, onClose, onSave , handleChange}) =
   })();
 
   return (
-    <div
-      style={{
-        inset: 0,
-        display: "flex",
+      <div className="form-group">
+        <div className="label-export-form">
+          <CalendarIcon size={16} color="#9ca3af" />
+            Rango de Tiempo
+        </div>
+        <div className="input-grid">
 
-      }}
-    >
-      <div
-        style={{
-          background: "white",
-          padding: "1.5rem",
-          borderRadius: "0.75rem",
-          width: "320px",
-        }}
-      >
-        <h2 style={{ fontWeight: 700, marginBottom: "0.5rem" }}>
-          {type} a exportar
-        </h2>
-
-        <SelectRadix
+          <SelectRadix
           label=""
           name="select"
           placeholder="Seleccione una opcion"
@@ -52,29 +42,22 @@ const ExportForm = ({ selectData, data, type, onClose, onSave , handleChange}) =
           onChange={(val)=>setValue(val)}
           options={selectOptions}
         /> 
-        <div
-          style={{
-            display: "flex",
-            justifyContent: "flex-end",
-            gap: "0.5rem",
-            marginTop: "1rem",
-          }}
-        >
-          <button onClick={onClose}>Cancelar</button>
-          <button
-            onClick={()=>handleChange(value)}
-            style={{
-              background: "#4f46e5",
-              color: "white",
-              padding: "0.5rem 0.75rem",
-              borderRadius: "0.375rem",
-            }}
-          >
-            Exportar
-          </button>
         </div>
+
+        <div className="alert-box">
+          <p>
+            <strong>Nota:</strong> Los datos se procesarán en formato <strong>.xlsx</strong>. Asegúrese de que los filtros sean correctos antes de descargar.
+          </p>
+        </div>
+
+          <button className="btn-primary-export" onClick={()=>handleChange(value)}>
+            <DownloadIcon size={18} />
+            Descargar Excel
+          </button>
+          <button className="btn-ghost-export" onClick={onClose}>
+            Cancelar
+          </button>
       </div>
-    </div>
   );
 };
 

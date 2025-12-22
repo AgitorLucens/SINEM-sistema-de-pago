@@ -1,24 +1,27 @@
-const PricingCard = ({ price, onClick }) => {
+import './pricingcard.css';
+import { BellIcon,Pencil1Icon } from '@radix-ui/react-icons';
+
+const PricingCard = ({ price, onClick}) => {
   return (
     <div
       onClick={onClick}
-      style={{
-        padding: "1rem",
-        borderRadius: "0.75rem",
-        border: "1px solid #e5e7eb",
-        cursor: "pointer",
-        background: "white",
-      }}
+      className="card"
+      onMouseOver={(e) => e.currentTarget.style.borderColor = '#2563eb'}
+      onMouseOut={(e) => e.currentTarget.style.borderColor = '#e5e7eb'}
     >
-      <h3 style={{ fontWeight: 600 }}>{price.title}</h3>
-      <p style={{ color: "#6b7280", fontSize: "0.875rem" }}>
-        {price.name}
-      </p>
-
-      <div style={{ marginTop: "0.5rem", fontWeight: 700 }}>
-        {price.amount != null
-            ? `₡${price.amount.toLocaleString("es-CR")}`
-            : "No hay precio"}
+      <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+        <div className={`card-icon card-icon-${price.name}`}><BellIcon size={20} /></div>
+        <div>
+          <h4 className='card-title'>{price.name}</h4>
+          <span className='card-category'>{price.name}</span>
+        </div>
+      </div>
+      <div style={{ display: 'flex', alignItems: 'center', gap: '1.5rem' }}>
+        <div style={{ textAlign: 'right' }}>
+          <div className='amount'>₡ {price.amount}</div>
+          <div style={{ fontSize: '0.7rem', color: '#9ca3af' }}>MONTO ACTUAL</div>
+        </div>
+        <div style={{ color: '#d1d5db' }}><Pencil1Icon size={16} /></div>
       </div>
     </div>
   );

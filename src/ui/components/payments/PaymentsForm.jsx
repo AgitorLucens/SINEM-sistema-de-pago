@@ -26,36 +26,6 @@ const PaymentsForm = ({ formData, handleChange, onSubmit, isLoading, concepts, d
                         /> 
                 </div>
 
-                {/* Campo Monto y Fecha (en una fila) */}
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
-                    <div>
-                        <label htmlFor="amount" style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '500', fontSize: '0.875rem' }}>
-                            Monto (₡)
-                        </label>
-                        <input
-                            type="number"
-                            id="amount"
-                            name="amount"
-                            value={formData.amount}
-                            onChange={handleChange}
-                            required
-                            min="0.01"
-                            step="0.01"
-                            style={{ width: '100%', padding: '0.75rem', border: '1px solid #d1d5db', borderRadius: '0.5rem', boxSizing: 'border-box' }}
-                            placeholder="Ej: 50.00"
-                        />
-                    </div>
-                    <div>
-                        <label htmlFor="date" style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '500', fontSize: '0.875rem' }}>
-                            Fecha del Pago
-                        </label>
-                        <DatePicker
-                             value={formData.date}
-                             onChange={handleFieldChange(handleChange,"date")}
-                        />
-                    </div>
-                </div>
-
                 {/* Campo Concepto y Método de Pago (en una fila) */}
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
                     <div>
@@ -93,6 +63,36 @@ const PaymentsForm = ({ formData, handleChange, onSubmit, isLoading, concepts, d
                                     { value: "cash", label: "Efectivo" },
                                     { value: "transfer", label: "Transferencia" },
                                  ]}
+                        />
+                    </div>
+                </div>
+
+                {/* Campo Monto y Fecha (en una fila) */}
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
+                    <div>
+                        <label htmlFor="amount" style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '500', fontSize: '0.875rem' }}>
+                            Monto (₡)
+                        </label>
+                        <input
+                            type="number"
+                            id="amount"
+                            name="amount"
+                            value={formData.amount}
+                            onChange={handleChange}
+                            required
+                            min="0.01"
+                            step="0.01"
+                            style={{ width: '100%', padding: '0.75rem', border: '1px solid #d1d5db', borderRadius: '0.5rem', boxSizing: 'border-box' }}
+                            placeholder="Ej: 50.00"
+                        />
+                    </div>
+                    <div>
+                        <label htmlFor="date" style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '500', fontSize: '0.875rem' }}>
+                            Fecha del Pago
+                        </label>
+                        <DatePicker
+                             value={formData.date}
+                             onChange={handleFieldChange(handleChange,"date")}
                         />
                     </div>
                 </div>

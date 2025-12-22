@@ -1,13 +1,15 @@
 import PaymentsTable from '../../components/payments/PaymentsTable.jsx'; 
 import PaymentsForm from '../../components/payments/PaymentsForm.jsx'; 
-import PaymentsModal from '../../components/payments/PaymentsModal.jsx';
 import PaymentFilters from '../../components/payments/PaymentsFilter.jsx';
 import PaymentsDetail from '../../components/payments/PaymentsDetail.jsx';
 import Modal from '../../components/generic/modal/Modal.jsx';
-import {getPaymentConcepts, getPaymentDivisions, getAllPayments, getAllStudents } from "../../constant/PaymentConstant.jsx"
+import {getPaymentConcepts, getPaymentDivisions, getAllPayments, getAllStudents,
+        deletePaymentById
+ } from "../../constant/DBFunctions.jsx";
 import { PlusCircledIcon } from "@radix-ui/react-icons";
 
 import { useState, useEffect, useCallback, useMemo } from 'react';
+import './payments.css';
 
 const Payments = () => {
     
@@ -15,8 +17,8 @@ const Payments = () => {
     const initialFormState = {
         student_id: '',
         amount: '',
-        date: new Date().toISOString().substring(0, 10),
-        method: 'TRANSFERENCIA',
+        date: null,
+        method: '',
         concept: '',
         division: '',
     };
@@ -41,6 +43,9 @@ const Payments = () => {
 
     // agregar pago
     const [isModalOpen, setIsModalOpen] = useState(false); 
+
+    // eliminar pago
+    const [confirmingId, setConfirmingId] = useState(null);
 
     // datos de los filtros
     const [concepts, setConcepts] = useState([]);
@@ -177,8 +182,13 @@ const Payments = () => {
             return;
         }
 
+        if (!formData.date) {
+            setTimeout(() => { setError("Por favor, introduzca una fecha"); setMessage(''); }, 4000);
+            return;
+        }
+
         const paymentDataToSend = {
-            date: formData.date,
+            date: new Date(formData.date).toISOString(),
             amount: amountNumber,
             payment_method: formData.method,
             concept_id: parseInt(formData.concept, 10),
@@ -206,53 +216,65 @@ const Payments = () => {
         }
     }, [formData, fetchPayments, initialFormState]);
 
-    const deletePayment = useCallback(async (paymentId) => {
+    const deletePayment = async (e, paymentId) => {
         // En el entorno real, usa un modal o componente de confirmación en lugar de window.confirm()
-        if (!window.confirm("¿Estás seguro de que quieres eliminar este pago? Esta acción no se puede deshacer.")) {
-            return;
+        e.stopPropagation();
+        if (confirmingId === paymentId) {
+            setIsLoading(true);
+            e.stopPropagation();
+            if (!window.confirm("¿Estás seguro de que quieres eliminar este pago? Esta acción no se puede deshacer.")) {
+                setIsLoading(false);
+                setConfirmingId(null);
+                return;
+            }
+            try {
+                await deletePaymentById(paymentId);
+                setMessage('Pago eliminado correctamente.');
+                setError(null);
+                await fetchPayments();
+            } catch (e) {
+                console.error("Error al eliminar el pago:", e);
+                setError("Error al eliminar el pago: " + e.message);
+            } finally {
+                setIsLoading(false);
+                setTimeout(() => { setError(null); setMessage(''); }, 5000); 
+            }
+            
+            setConfirmingId(null);
+        
+        } else {
+            setConfirmingId(paymentId);
+            setTimeout(() => setConfirmingId(null), 4000);
         }
-        setIsLoading(true);
-        try {
-            await window.api.deletePayment(paymentId);
-            setMessage('Pago eliminado correctamente.');
-            setError(null);
-            await fetchPayments();
-        } catch (e) {
-            console.error("Error al eliminar el pago:", e);
-            setError("Error al eliminar el pago: " + e.message);
-        } finally {
-            setIsLoading(false);
-            setTimeout(() => { setError(null); setMessage(''); }, 5000); 
-        }
-    }, [fetchPayments]); 
+    }; 
 
     const isTotalLoading = isLoading || isConceptsLoading || isDivisionsLoading;
 
-
     return (
         <div className="p-6 bg-gray-50 min-h-screen font-sans">
-            
-            {/* Encabezado y botón de registro */}
-            <div className="flex justify-between items-center mb-6 border-b pb-3">
-                <h2 className="title">
-                    Gestión de Pagos (Ingresos)
-                </h2>
-                <button
-                    onClick={() => {
-                        setFormData(initialFormState);
-                        setError(null);
-                        setIsModalOpen(true);
-                    }} 
-                    disabled={isTotalLoading}
-                    className="btn btn-primary"
-                >
-                    <span ><PlusCircledIcon/>
-                    Registrar Nuevo Pago
-                    </span> 
-                </button>
-                    
+            <div className="header-container">
+                {/* Encabezado y botón de registro */}
+                <div className="header-text-group">
+                    <h2 className="section-title">
+                        Gestión de Pagos
+                    </h2>
+                </div>
+                <div className="header-action">
+                    <button
+                        onClick={() => {
+                            setFormData(initialFormState);
+                            setError(null);
+                            setIsModalOpen(true);
+                        }} 
+                        disabled={isTotalLoading}
+                        className="btn btn-primary"
+                    >
+                        <span ><PlusCircledIcon/>
+                        Registrar Nuevo Pago
+                        </span> 
+                    </button>
+                </div>
             </div>
-
             {/* Mensaje de confirmación/error */}
             {(message || error) && (
                 <div 
@@ -284,14 +306,17 @@ const Payments = () => {
             {!isTotalLoading && (
                 <PaymentsTable 
                     payments={filteredPayments} 
-                    onDeletePayment={deletePayment}
                     onRowClick={handleRowClick}
+                    onDeletePayment={deletePayment}
+                    confirmingId={confirmingId}
                 />
             )}
             {/* modal detalles pago */}
             <Modal
                 isOpen={isDetailModalOpen}
-                onClose={() => setIsDetailModalOpen(false)}
+                onClose={() => {
+                    setFormData(initialFormState);
+                    setIsDetailModalOpen(false)}}
                 title="Detalles del pago"
             >
                 <PaymentsDetail
@@ -300,7 +325,7 @@ const Payments = () => {
                 />
             </Modal>
             {/* modal formulario */}
-            <PaymentsModal 
+            <Modal 
                 isOpen={isModalOpen} 
                 onClose={() => setIsModalOpen(false)}
                 title="Registrar Nuevo Pago (Ingresos)"
@@ -315,7 +340,7 @@ const Payments = () => {
                     students={students}
                     formError={error}
                 />
-            </PaymentsModal>
+            </Modal>
         </div>
     );
 };
