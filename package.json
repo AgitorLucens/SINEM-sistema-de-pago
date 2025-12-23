@@ -1,7 +1,7 @@
 {
   "name": "sinem",
   "productName": "sinem",
-  "version": "1.0.0",
+  "version": "0.5.0",
   "description": "Aplicación de escritorio para gestión de institucion musical",
   "main": ".vite/build/main.js",
   "scripts": {
@@ -29,7 +29,7 @@
     "@electron/fuses": "^1.8.0",
     "electron": "39.2.5",
     "electron-builder": "^26.0.12",
-    "vite": "^5.4.21"
+    "fs-extra": "^11.3.3"
   },
   "dependencies": {
     "@radix-ui/colors": "^3.0.0",
@@ -39,9 +39,11 @@
     "@vitejs/plugin-react": "^5.1.2",
     "better-sqlite3": "^12.5.0",
     "electron-squirrel-startup": "^1.0.1",
+    "exceljs": "^4.4.0",
     "react": "^19.2.1",
-    "react-day-picker": "^9.12.0",
+    "react-day-picker": "^9.13.0",
     "react-dom": "^19.2.1",
+    "vite": "^5.4.21",
     "xlsx": "^0.18.5"
   }
 }

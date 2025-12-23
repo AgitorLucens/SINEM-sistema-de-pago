@@ -92,7 +92,9 @@ const Sidebar = ({ currentPage, setCurrentPage, isOpen: externalIsOpen, setIsOpe
                         title="Salir" 
                         page={Page.SETTINGS} 
                         currentPage={currentPage} 
-                        onClick={setCurrentPage}
+                        onClick={() => {
+                            window.api.quitApp();
+                        }}
                         isOpen={isOpen}
                     />
                 </div>

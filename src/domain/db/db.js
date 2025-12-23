@@ -82,18 +82,25 @@ class AppDB {
                 concept_id INTEGER,
                 division_id INTEGER,
                 student_id INTEGER,
-                invoice_id INTEGER,
-                created_by INTEGER, -- Asumiendo un ID de usuario (UUID simulado por INTEGER)
                 status TEXT NOT NULL, -- Corresponde a PaymentStatus (ACTIVE, CANCELED)
                 timestamp TEXT NOT NULL,
-
+                month INTEGER, -- Corresponde al mes al que se aplica el pago (1-12)
+                -- consecutivo
+                year INTEGER NOT NULL, -- Corresponde al año para el concecutivo
+                sequence INTEGER NOT NULL, -- Número de secuencia para el consecutivo
+                -- FKs
                 FOREIGN KEY (concept_id) REFERENCES payment_concepts(id) ON DELETE SET NULL,
-                FOREIGN KEY (student_id) REFERENCES students(id) ON DELETE SET NULL,
-                FOREIGN KEY (invoice_id) REFERENCES invoices(id) ON DELETE CASCADE
+                FOREIGN KEY (student_id) REFERENCES students(id) ON DELETE CASCADE,
                 FOREIGN KEY (division_id) REFERENCES divisions(id) ON DELETE SET NULL
             );
         `;
         this.db.exec(createPaymentsTable);
+
+        const createIndexConcecutivePaymentsTable = `
+            CREATE UNIQUE INDEX IF NOT EXISTS idx_payments_year_sequence
+            ON payments (year, sequence);
+        `;
+        this.db.exec(createIndexConcecutivePaymentsTable);
 
         /*
             Tabla Gastos
@@ -155,27 +162,55 @@ class AppDB {
      * @param {object} paymentData - Datos del pago.
      * @returns {Promise<number>} El ID del nuevo registro.
      */
-    addPayment(paymentData) {
-            const sql = this.db.prepare(`
-                INSERT INTO payments (date, amount, payment_method, concept_id, student_id, division_id, status, timestamp)
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+    addPayment(payment) {
+        const db = this.db;
+
+        const transaction = db.transaction((payment) => {
+            const year = new Date(payment.date).getFullYear();
+
+            const seqStmt = db.prepare(`
+                SELECT COALESCE(MAX(sequence), 0) + 1 AS nextSeq
+                FROM payments
+                WHERE year = ?
             `);
-            const data = sql.run(paymentData.date, 
-                                paymentData.amount, 
-                                paymentData.payment_method, 
-                                paymentData.concept_id, 
-                                paymentData.student_id, 
-                                paymentData.division_id, 
-                                paymentData.status, 
-                                paymentData.timestamp);
-            return data.lastInsertRowid;
+
+            const { nextSeq } = seqStmt.get(year);
+
+            const insertStmt = db.prepare(`
+                INSERT INTO payments (
+                    date,
+                    amount,
+                    payment_method,
+                    concept_id,
+                    division_id,
+                    student_id,
+                    year,
+                    sequence,
+                    status,
+                    timestamp
+                    )
+                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                `);
+
+            insertStmt.run(
+                payment.date,
+                payment.amount,
+                payment.payment_method,
+                payment.concept_id,
+                payment.division_id,
+                payment.student_id,
+                year,
+                nextSeq,
+                payment.status,
+                payment.timestamp
+            );
+
+            return { year, sequence: nextSeq };
+            });
+
+        return transaction(payment);
     }
 
-    /**
-     * Lee todos los pagos (ADAPTACIÓN CON JOINS).
-     * En un modelo real, usamos JOIN para obtener el nombre del estudiante y el concepto.
-     * @returns {Promise<Array<object>>} Lista de pagos enriquecidos.
-     */
     getAllPayments() {
         
         const sql = this.db.prepare(`SELECT
@@ -185,7 +220,9 @@ class AppDB {
                                         p.payment_method,
                                         d.name AS division_name,
                                         c.type AS concept_type,
-                                        p.amount                    
+                                        p.amount,
+                                        p.year,
+                                        p.sequence
                                      FROM
                                         payments p
                                      INNER JOIN

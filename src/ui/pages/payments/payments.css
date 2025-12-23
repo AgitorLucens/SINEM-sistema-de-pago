@@ -7,9 +7,9 @@
 
 /* Título de la Sección */
 .section-title {
-    color: var(--primary-text);
+    color: #4f46e5;
     font-size: 1.5rem;
-    font-weight: 700;
+    font-weight: 600;
     margin: 0;
     letter-spacing: -0.025em;
 }

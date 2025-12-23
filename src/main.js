@@ -17,6 +17,7 @@ const createWindow = () => {
     width: 1400,
     height: 1000,
     alwaysOnTop: false,
+    icon: './ui/assets/SINEM',
     webPreferences: {
       preload: path.join(__dirname, 'preload.js'),
     },
