@@ -70,7 +70,8 @@
     cursor: pointer;
     box-shadow: 0 2px 4px rgba(0,0,0,0.1);
     z-index: 10;
-}.sidebar {
+}
+.sidebar {
     height: 100vh;
     background-color: white;
     box-shadow: 2px 0 5px rgba(0,0,0,0.1);
@@ -82,7 +83,6 @@
     position: relative;
     box-sizing: border-box;
 }
-
 .nav-link {
     display: flex;
     align-items: center;

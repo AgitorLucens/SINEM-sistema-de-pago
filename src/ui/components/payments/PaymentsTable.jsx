@@ -115,7 +115,7 @@ const PaymentsTable = ({ payments, minTableWidth = '800px' , onDeletePayment, on
                                     <td onClick={() => onRowClick?.(p)}
                                         className="payments-td">
                                             <span className="badge-id">
-                                                {p.id ? String(p.id).replace('pay_', '') : '---'}
+                                                {p.year && p.sequence ? `${p.year}-${String(p.sequence).padStart(5, '0')}` : '---'}
                                             </span>
                                     </td>
                                     <td className="payments-td">{formatDate(p.date)}</td>

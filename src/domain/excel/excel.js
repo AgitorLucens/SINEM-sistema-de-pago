@@ -1,6 +1,7 @@
 import { dialog } from "electron";
 import fs from "fs";
 import * as XLSX from "xlsx";
+import ExcelJS from "exceljs";
 import path from "path";
 
 export async function exportPaymentsToExcel(payments) {
@@ -23,7 +24,7 @@ export async function exportPaymentsToExcel(payments) {
     const workbook = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(workbook, worksheet, "Pagos");
 
-    // 🔹 Pedir ruta al usuario
+    //Pedir ruta al usuario
     const { canceled, filePath } = await dialog.showSaveDialog({
       title: "Guardar pagos",
       defaultPath: path.join("pagos.xlsx"),
@@ -34,13 +35,13 @@ export async function exportPaymentsToExcel(payments) {
       return { success: false };
     }
 
-    // 🔹 Generar buffer
+    //Generar buffer
     const buffer = XLSX.write(workbook, {
       bookType: "xlsx",
       type: "buffer",
     });
 
-    // 🔹 Guardar archivo
+    //Guardar archivo
     fs.writeFileSync(filePath, buffer);
 
     return { success: true, path: filePath };
@@ -172,3 +173,4 @@ export async function exportStudentsByActiveToExcel(students) {
 
     return { success: true, path: filePath };
 }
+    

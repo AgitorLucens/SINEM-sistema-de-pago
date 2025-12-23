@@ -1,4 +1,4 @@
-import {ipcMain} from 'electron';
+import {app,ipcMain} from 'electron';
 import {exportPaymentsToExcel,exportPaymentsByYearToExcel,exportExpensesByYearToExcel,
         exportStudentsByActiveToExcel} from "../excel/excel.js"
 
@@ -108,5 +108,13 @@ export default function setUpHandlers(dbInstance) {
 
     ipcMain.handle('export-students-by-active', async ( _ , studentData) => {
         return exportStudentsByActiveToExcel(studentData);
+    });
+
+    /*
+        App functionality
+    */
+
+    ipcMain.handle('app:quit', async ( ) => {
+        return app.quit();
     });
 }

@@ -1,6 +1,8 @@
 import {formatDate} from "../generic/function/Function.jsx"
 import {exportPaymentsToExcel} from "../../constant/DBFunctions.jsx";
+import { CalendarIcon, DownloadIcon } from "@radix-ui/react-icons";
 
+import './paymentdetail.css';
 const PaymentsDetail = ({ detail, onClick, isLoading}) => {
     
     return (
@@ -58,19 +60,9 @@ const PaymentsDetail = ({ detail, onClick, isLoading}) => {
 
                 <button
                     onClick={() => exportPaymentsToExcel(detail)}
-                    className="btn btn-secondary"
-                    style={{
-                        backgroundColor: '#10b981', // bg-emerald-500
-                        color: 'white',
-                        padding: '0.75rem 1.5rem',
-                        borderRadius: '0.5rem',
-                        fontWeight: '600',
-                        fontSize: '1rem',
-                        border: 'none',
-                        cursor: 'pointer',
-                        transition: 'background-color 0.2s'
-                    }}
+                    className="btn-primary-invoice"
                 >
+                     <DownloadIcon size={18} />
                     Generar Recibo Excel
                 </button>
            
