@@ -31,7 +31,7 @@ const api = {
     updatePriceConcept: (concept) => ipcRenderer.invoke('update-price-concept', concept),
 
     // Excel
-    exportPaymentsToExcel: (paymentData) => ipcRenderer.invoke('export-payment-excel', paymentData),
+    exportPaymentsToExcel: (payment) => ipcRenderer.invoke('export-payment-excel', payment),
     exportPaymentsByYearToExcel: (paymentData) => ipcRenderer.invoke('export-payments-by-year', paymentData),
     exportExpensesByYearToExcel: (expenseData) => ipcRenderer.invoke('export-expenses-by-year', expenseData),
     exportStudentsByActiveToExcel: (studentData) => ipcRenderer.invoke('export-students-by-active', studentData),

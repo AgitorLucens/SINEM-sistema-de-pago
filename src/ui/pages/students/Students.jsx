@@ -1,5 +1,7 @@
 import StudentsTable from '../../components/students/StudentsTable';
 import StudentsModal from '../../components/students/StudentsModal';
+import SuccessMessage from '../../components/generic/message/SuccessMessage.jsx';
+import ErrorMessage from '../../components/generic/message/ErrorMessage.jsx';
 import StudentForm from '../../components/students/StudentsForm';
 import { getAllStudents, addStudent, deleteStudentById } from '../../constant/DBFunctions.jsx'; 
 import { PlusCircledIcon } from "@radix-ui/react-icons";
@@ -144,18 +146,9 @@ const Students = () => {
 
             {/* Mensaje de confirmación/error */}
             {message && (
-                <div 
-                    style={{ 
-                        padding: '0.75rem', 
-                        borderRadius: '0.5rem', 
-                        marginBottom: '1rem',
-                        backgroundColor: message.startsWith('Error') ? '#fee2e2' : '#d1fae5', 
-                        color: message.startsWith('Error') ? '#991b1b' : '#065f46', 
-                        fontWeight: '500' 
-                    }}
-                >
-                    {message}
-                </div>
+                <SuccessMessage
+                    message={message}
+                />
             )}
 
             {/* Renderiza la Tabla */}
@@ -170,7 +163,11 @@ const Students = () => {
                 onClose={() => setIsModalOpen(false)} // Permite cerrar el modal con la X
                 title="Registrar Nuevo Estudiante"
             >
-                
+                {error && (
+                    <ErrorMessage
+                        message={error}
+                    />
+                )}
                 <StudentForm 
                     formData={formData}
                     handleChange={handleChange}

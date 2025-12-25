@@ -50,7 +50,6 @@ const ExpensesForm = ({ formData, handleChange, onSubmit, isLoading }) => {
                             name="amount"
                             value={formData.amount}
                             onChange={handleChange}
-                            required
                             min="0.01"
                             step="0.01"
                             style={{ width: '100%', padding: '0.75rem', border: '1px solid #d1d5db', borderRadius: '0.5rem', boxSizing: 'border-box' }}

@@ -92,7 +92,12 @@ const ExpensesTable = ({expenses, minTableWidth = '700px', onDeleteExpense, onRo
                                     <td className='expenses-td'>{ex.description}</td>
                                     <td className='expenses-td'>{ex.reference}</td>
                                     {/* Mostrar monto con dos decimales */}
-                                    <td className='expenses-td amount-column'>₡{ex.amount.toFixed(2)}</td>         
+                                    <td className='expenses-td amount-column'>{new Intl.NumberFormat("es-CR", {
+                                                                                        style: "currency",
+                                                                                        currency: "CRC",
+                                                                                        minimumFractionDigits: 2,
+                                                                                }).format(ex.amount)}
+                                    </td>         
                                     {/* Boton Borrado  */}
                                     <td className="expenses-td" style={{ textAlign: 'center' }}>
                                         <button 

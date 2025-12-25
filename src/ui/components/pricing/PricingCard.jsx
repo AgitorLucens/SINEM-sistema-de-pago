@@ -18,7 +18,12 @@ const PricingCard = ({ price, onClick}) => {
       </div>
       <div style={{ display: 'flex', alignItems: 'center', gap: '1.5rem' }}>
         <div style={{ textAlign: 'right' }}>
-          <div className='amount'>₡ {price.amount}</div>
+          <div className='amount'>{new Intl.NumberFormat("es-CR", {
+                                                                    style: "currency",
+                                                                    currency: "CRC",
+                                                                    minimumFractionDigits: 2,
+                                                                  }).format(price.amount)}
+            </div>
           <div style={{ fontSize: '0.7rem', color: '#9ca3af' }}>MONTO ACTUAL</div>
         </div>
         <div style={{ color: '#d1d5db' }}><Pencil1Icon size={16} /></div>

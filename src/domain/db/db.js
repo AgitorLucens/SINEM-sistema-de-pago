@@ -208,7 +208,10 @@ class AppDB {
             return { year, sequence: nextSeq };
             });
 
-        return transaction(payment);
+        return {
+            success: true,
+            transaction: transaction(payment)
+        }
     }
 
     getAllPayments() {
@@ -274,7 +277,9 @@ class AppDB {
                                     p.payment_method,
                                     d.name AS division_name,
                                     c.type AS concept_type,
-                                    p.amount 
+                                    p.amount,
+                                    p.year,
+                                    p.sequence
                                    FROM 
                                     payments p
                                    INNER JOIN

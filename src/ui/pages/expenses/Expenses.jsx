@@ -1,11 +1,13 @@
 import ExpensesTable from '../../components/expenses/ExpensesTable';
 import Modal from '../../components/generic/modal/Modal.jsx';
 import ExpensesForm from '../../components/expenses/ExpensesForm.jsx';
-
+import ErrorMessaage from '../../components/generic/message/ErrorMessage.jsx';
+import SuccessMessaage from '../../components/generic/message/SuccessMessage.jsx';
 import { getAllExpenses, addExpense, deleteExpenseById } from '../../constant/DBFunctions.jsx';
 
 import { useState, useEffect, useCallback } from 'react';
 import { PlusCircledIcon } from "@radix-ui/react-icons";
+import ErrorMessage from '../../components/generic/message/ErrorMessage.jsx';
 
 const Expenses = () => {
     // 1. Estado para la lista de pagos
@@ -19,7 +21,7 @@ const Expenses = () => {
     const [formData, setFormData] = useState(initialFormState);
     const [expenses, setExpenses] = useState([]);
     const [isLoading, setIsLoading] = useState(false);
-    const [error, setError] = useState(null);
+    const [error, setError] = useState('');
     const [message, setMessage] = useState('');
 
     // eliminar pago
@@ -77,7 +79,7 @@ const Expenses = () => {
             await addExpense(expensesDataToSend);
   
             setFormData(initialFormState);
-            setError(null);
+            setError("");
             await fetchExpenses(); 
         } catch (e) {
             console.error("Error al guardar el pago vía IPC:", e);
@@ -149,18 +151,9 @@ const Expenses = () => {
 
             {/* Mensaje de confirmación/error */}
             {message && (
-                <div 
-                    style={{ 
-                        padding: '0.75rem', 
-                        borderRadius: '0.5rem', 
-                        marginBottom: '1rem',
-                        backgroundColor: message.startsWith('Error') ? '#fee2e2' : '#d1fae5', 
-                        color: message.startsWith('Error') ? '#991b1b' : '#065f46', 
-                        fontWeight: '500' 
-                    }}
-                >
-                    {message}
-                </div>
+                <SuccessMessaage
+                    message={message}
+                />
             )}
 
             {/* Renderiza la Tabla */}
@@ -177,6 +170,12 @@ const Expenses = () => {
                     setIsModalOpen(false)}} // Permite cerrar el modal con la X
                 title="Registrar Nuevo Gasto (Egreso)"
             >
+                {error &&(
+                    <ErrorMessage
+                        message={error}
+                    />
+                )}
+                
                 <ExpensesForm 
                     formData={formData}
                     handleChange={handleChange}

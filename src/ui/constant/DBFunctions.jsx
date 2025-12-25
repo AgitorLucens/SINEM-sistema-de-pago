@@ -9,6 +9,14 @@ export async function getAllPayments() {
         return []; 
     }
 }
+export async function addPayment(payment) {
+    try {
+        return await window.api.addPayment(payment);;
+    } catch (error) {
+        console.error('Error al obtener pagos:', error.message);
+        return []; 
+    }
+}
 
 export async function getPaymentsByYear(year) {
     try {
@@ -100,8 +108,9 @@ export async function addExpense(expenseData) {
     try {
         return await window.api.addExpense(expenseData);
     } catch (error) {
-        console.error('Error al agregar egreso:', error.message);
-        throw error; 
+        return {
+            error: error.messsage,
+        }
     }
 }
 
@@ -179,12 +188,14 @@ export async function updatePriceConcept(paymentData) {
 /*
     Excel
 */
-export async function exportPaymentsToExcel(paymentData) {
+export async function exportPaymentsToExcel(payment) {
     try {
-        return await window.api.exportPaymentsToExcel(paymentData);
+        return await window.api.exportPaymentsToExcel(payment);
     } catch (error) {
         console.error('Error al exportar pago a excel:', error.message);
-        return []; 
+        return {
+            error: "Error al exportar recivo a excel. Revise que no tengaa el archivo con el mismo nombre abierto.",
+        }; 
     }
 }
 
@@ -193,7 +204,9 @@ export async function exportPaymentsByYearToExcel(paymentData) {
         return await window.api.exportPaymentsByYearToExcel(paymentData);
     } catch (error) {
         console.error('Error al exportar pagos por año a excel:', error.message);
-        return []; 
+        return {
+            error: "Error al exportar pagos por año a excel. Revise que no tengaa el archivo con el mismo nombre abierto.",
+        }; 
     }
 }
 
@@ -202,7 +215,9 @@ export async function exportExpensesByYearToExcel(expenseData) {
         return await window.api.exportExpensesByYearToExcel(expenseData);
     } catch (error) {
         console.error('Error al exportar egresos por año a excel:', error.message);
-        return []; 
+        return {
+            error: "Error al exportar egresos por año a excel.",
+        }; 
     }
 }
 
@@ -211,7 +226,9 @@ export async function exportStudentsByActiveToExcel(studentData) {
         return await window.api.exportStudentsByActiveToExcel(studentData);
     } catch (error) {
         console.error('Error al exportar estudiantes por estado a excel:', error.message);
-        return []; 
+        return {
+            error: "Error al exportar estudiantes por estado a excel.",
+        }; 
     }
 }
 

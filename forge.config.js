@@ -8,7 +8,9 @@ module.exports = {
   packagerConfig: {
     asar: true,
     icon: './src/ui/assets/SINEM',
+    extraResource: ['./src/ui/assets/'],
   },
+  outDir: 'release-builds',
   rebuildConfig: {},
   hooks: {
     /**

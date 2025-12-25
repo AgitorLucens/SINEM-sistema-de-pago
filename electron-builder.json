@@ -1,13 +1,29 @@
 {
-    "appID": "com.SINEM.RegistroPagos",
-    "files": [
-        "dist/electron",
-        "dist/react"
-    ],
-    "win": {
-        "target": [
-            "portable",
-            "msi"
-        ]
+  "appID": "com.SINEM.RegistroPagos",
+
+  "files": [
+    "dist/electron/**",
+    "dist/react/**"
+  ],
+
+  "directories": {
+    "output": "release-builds"
+  },
+
+  "extraResources": [
+    {
+      "from": "/electron/assets/",
+      "to": "/assets", 
+      "filter": [
+        "**/*"
+      ]
     }
+  ],
+
+  "win": {
+    "target": [
+      "portable",
+      "msi"
+    ]
+  }
 }

@@ -137,7 +137,12 @@ const PaymentsTable = ({ payments, minTableWidth = '800px' , onDeletePayment, on
                                     <td className="payments-td">{p.concept_type}</td>
                                 
                                     {/* Mostrar monto con dos decimales */}
-                                    <td className='payments-td amount-column'>₡{p.amount.toFixed(2)}</td>
+                                    <td className='payments-td amount-column'>{new Intl.NumberFormat("es-CR", {
+                                                                                        style: "currency",
+                                                                                        currency: "CRC",
+                                                                                        minimumFractionDigits: 2,
+                                                                                }).format(p.amount)}
+                                    </td>
                                     {/* Boton Borrado  */}
                                     <td className="payments-td" style={{ textAlign: 'center' }}>
                                         <button 

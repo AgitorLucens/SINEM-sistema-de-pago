@@ -3,8 +3,10 @@ import PaymentsForm from '../../components/payments/PaymentsForm.jsx';
 import PaymentFilters from '../../components/payments/PaymentsFilter.jsx';
 import PaymentsDetail from '../../components/payments/PaymentsDetail.jsx';
 import Modal from '../../components/generic/modal/Modal.jsx';
+import SuccessMessage from '../../components/generic/message/SuccessMessage.jsx';
+import ErrorMessage from '../../components/generic/message/ErrorMessage.jsx';
 import {getPaymentConcepts, getPaymentDivisions, getAllPayments, getAllStudents,
-        deletePaymentById
+        deletePaymentById, addPayment
  } from "../../constant/DBFunctions.jsx";
 import { PlusCircledIcon } from "@radix-ui/react-icons";
 
@@ -39,6 +41,7 @@ const Payments = () => {
     const [filterState, setFilterState] = useState(initialFilterState); // Estado de los filtros
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState(null);
+    const [errorInfo, setErrorInfo] = useState('');
     const [message, setMessage] = useState('');
 
     // agregar pago
@@ -80,7 +83,7 @@ const Payments = () => {
     // --- Lógica de Carga de Datos ---
     const fetchPayments = useCallback(async () => {
         setIsLoading(true);
-        setError(null);
+        setError(false);
         try {
             const loadedData = await getAllPayments(); 
             
@@ -90,7 +93,8 @@ const Payments = () => {
             setPayments(loadedData);
         } catch (e) {
             console.error("Error al cargar pagos:", e);
-            setError("Error al cargar datos desde la base de datos local: " + e.message);
+            setError(true);
+            setErrorInfo("Error al cargar datos desde la base de datos local: " + e.message);
         } finally {
             setIsLoading(false);
         }
@@ -178,14 +182,21 @@ const Payments = () => {
         const amountNumber = parseFloat(formData.amount);
         
         if (isNaN(amountNumber) || amountNumber <= 0 || !formData.concept || !formData.division) {
-            setError("Por favor, completa todos los campos obligatorios (Monto, Concepto, División).");
+            setError(true);
+            setErrorInfo("Por favor, completa todos los campos obligatorios (Monto, Concepto, División).");
             return;
         }
 
+        setError(false); setErrorInfo("");
+
         if (!formData.date) {
-            setTimeout(() => { setError("Por favor, introduzca una fecha"); setMessage(''); }, 4000);
+            setError(true);
+            setErrorInfo("Por favor, ingrese una fecha");
+            //setTimeout(() => { setError("Por favor, introduzca una fecha"); setMessage(''); }, 4000);
             return;
         }
+
+        setError(false); setErrorInfo("");
 
         const paymentDataToSend = {
             date: new Date(formData.date).toISOString(),
@@ -201,19 +212,19 @@ const Payments = () => {
         };
 
         setIsLoading(true);
-        try {
-            await window.api.addPayment(paymentDataToSend);
+
+            const err = await addPayment(paymentDataToSend);
+            if (!err.success){
+                setError(true);
+                setErrorInfo(err.error);
+                return
+            }
             setFormData(initialFormState);
-            setMessage('Pago registrado con éxito.');
+            setMessage("Pago creado exitosamente");
+            setTimeout(() => { setMessage(""); setErrorInfo(''); }, 4000);
             await fetchPayments(); 
             setIsModalOpen(false); 
-        } catch (e) {
-            console.error("Error al guardar el pago:", e);
-            setError("Error al guardar el pago: " + (e.message || 'Error desconocido.'));
-        } finally {
             setIsLoading(false);
-            setTimeout(() => { setError(null); setMessage(''); }, 5000);
-        }
     }, [formData, fetchPayments, initialFormState]);
 
     const deletePayment = async (e, paymentId) => {
@@ -276,12 +287,10 @@ const Payments = () => {
                 </div>
             </div>
             {/* Mensaje de confirmación/error */}
-            {(message || error) && (
-                <div 
-                    className={`p-4 mb-6 rounded-lg font-medium ${error ? 'bg-red-100 text-red-700 border-red-400' : 'bg-green-100 text-green-700 border-green-400'} border`}
-                >
-                    {error || message}
-                </div>
+            {(message) && (
+                <SuccessMessage
+                    message={message}
+                />
             )}
             
             {/* Indicador de Carga */}
@@ -330,6 +339,12 @@ const Payments = () => {
                 onClose={() => setIsModalOpen(false)}
                 title="Registrar Nuevo Pago (Ingresos)"
             >
+                {/* Mensaje de Error */}
+                {error && (
+                    <ErrorMessage
+                        message={errorInfo}
+                    />
+                )}
                 <PaymentsForm 
                     formData={formData}
                     handleChange={handleChange}

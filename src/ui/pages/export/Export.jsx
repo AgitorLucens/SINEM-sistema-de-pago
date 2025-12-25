@@ -2,6 +2,7 @@ import { useState, useCallback, useEffect } from "react";
 import ExportCard from "../../components/exports/ExportCard.jsx";
 import Modal from "../../components/generic/modal/Modal.jsx";
 import ExportForm from "../../components/exports/ExportForm.jsx";
+import ErrorMessage from "../../components/generic/message/ErrorMessage.jsx";
 import { Users, FileText,  TrendingUp, TrendingDown} from "../../components/icons/Icons.jsx";
 
 import {getYearsOfPayments,getYearsOfExpenses,getStudentsActive,
@@ -9,11 +10,11 @@ import {getYearsOfPayments,getYearsOfExpenses,getStudentsActive,
         exportPaymentsByYearToExcel,exportExpensesByYearToExcel,exportStudentsByActiveToExcel} from "../../constant/DBFunctions.jsx"
 
 import './export.css';
+import { se } from "react-day-picker/locale";
 const Export = () => {
     const [isModalOpen,setIsModalOpen] = useState(null);
     const [selectedType,setSelectedType] = useState(null);
     const [selectData, setSelectData] = useState(null);
-    
 
     //Años
     const [yearsPayments,setYearsPayments] = useState([]);
@@ -22,7 +23,7 @@ const Export = () => {
     const [studentActive,setStudentActive] = useState([]);
 
     const [error,setError] = useState(null);
-
+    const [errorInfo, setErrorInfo] = useState("");
 
     const exportData =
             selectedType === "Pagos"
@@ -41,16 +42,28 @@ const Export = () => {
 
 
     const handleExport = async (data) => {
-        console.log("Exportando datos de:", selectedType, data);
+        //console.log("Exportando datos de:", selectedType, data);
+        if (!data) {
+            setErrorInfo("Escoga los valores adecuados")
+            setError(true);
+            return
+        }
+        setErrorInfo("");
+        setError(false);
         if (selectedType === "Pagos") {
             const payments = await getPaymentsByYear(data);
-            exportPaymentsByYearToExcel(payments)
+            const err = await exportPaymentsByYearToExcel(payments)
+            if (!err.sucess) {
+                setError(true);
+                setErrorInfo(err.error);
+                return
+            }
         } else if(selectedType === "Gastos") {
             const expenses = await getExpensesByYear(data);
-            exportExpensesByYearToExcel(expenses)
+            const err = await exportExpensesByYearToExcel(expenses)
         } else if(selectedType === "Estudiantes") {
             const students = await getStudentsByActive(data);
-            exportStudentsByActiveToExcel(students);
+            const err = await exportStudentsByActiveToExcel(students);
         }
         setIsModalOpen(false);
     };
@@ -142,6 +155,12 @@ const Export = () => {
                 onClose={() => setIsModalOpen(false)}
                 title="Pagos a exportar"
             >
+                {/* Mensaje de Error */}
+                {error && (
+                    <ErrorMessage
+                        message={errorInfo}
+                    />
+                )}
                 <ExportForm
                     type={selectedType}
                     data={exportData}
