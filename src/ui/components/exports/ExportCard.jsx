@@ -10,7 +10,7 @@ const ExportCard = ({ title, description, icon: Icon, colorClass, onClick }) => 
       <h3>{title}</h3>
       <p>{description}</p>
       <div className={`export-card-footer ${colorClass}`} style={{ backgroundColor: 'transparent' }}>
-        Configurar reporte <ChevronRightIcon />
+        Configurar excel <ChevronRightIcon />
       </div>
     </div>
   );

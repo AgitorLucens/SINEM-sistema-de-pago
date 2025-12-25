@@ -247,7 +247,13 @@ src/
 ├── App.jsx          # Main React component
 ├── domain/
 │   └── db/          # Database and IPC handlers
+│   └── excel/
+│   └── ipchandler/
 └── ui/              # Pages, components, and UI assets
+     └── assets
+     └── components
+     └── constant
+     └── pages  
 ```
 
 ---

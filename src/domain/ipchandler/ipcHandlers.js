@@ -94,8 +94,8 @@ export default function setUpHandlers(dbInstance) {
     /*
         Excel
     */
-   ipcMain.handle('export-payment-excel', async ( _ , paymentData) => {
-        return exportPaymentsToExcel(paymentData);
+   ipcMain.handle('export-payment-excel', async ( _ , payment) => {
+        return exportPaymentsToExcel(payment);
     });
 
     ipcMain.handle('export-payments-by-year', async ( _ , paymentData) => {

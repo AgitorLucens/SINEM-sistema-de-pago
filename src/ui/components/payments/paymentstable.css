@@ -62,6 +62,11 @@
   font-weight: bold;
 }
 
+.badge-id:hover {
+  background-color: #535861;
+  color: #eff5ff;
+}
+
 .badge-method {
   display: inline-block;
   padding: 2px 8px;
