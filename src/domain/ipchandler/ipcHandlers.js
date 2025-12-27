@@ -22,6 +22,10 @@ export default function setUpHandlers(dbInstance) {
         return dbInstance.getYearsOfPayments();
     });
 
+    ipcMain.handle('get-date-payments', async () => {
+        return dbInstance.getDateOfPayments();
+    });
+
     ipcMain.handle('get-payment-by-id', async ( _ , id) => {
         return dbInstance.getPaymentById(id);
     });

@@ -1,0 +1,166 @@
+import ReportFilters from "../../components/report/ReportFilters.jsx";
+import ReportTable from "../../components/report/ReportTable.jsx";
+import { useState, useEffect, useCallback, useMemo } from 'react';
+import { getPaymentConcepts, getPaymentDivisions, getAllPayments,
+        getDateOfPayments, 
+        } from "../../constant/DBFunctions.jsx";
+import { CalendarIcon, DownloadIcon } from "@radix-ui/react-icons";
+import './report.css';
+const Report = () =>{
+    const [error, setError] = useState("");
+    const [payments, setPayments] = useState([]);
+    // Listados para filtros
+    const [dates, setDates] = useState([]);
+    const [divisions, setDivisions] = useState([]);
+    const allMethods = [
+           { label: "Efectivo", value: "cash"} , 
+           { label: "Transferencia", value: "transfer" }        
+        ];
+
+    // Estados
+    const [selectedDate, setSelectedDate] = useState("all");
+    const [selectedCourses, setSelectedCourses] = useState([]);
+    const [selectedMethods, setSelectedMethods] = useState(allMethods);
+
+    // Lógica de filtrado
+    const matrixData = useMemo(() => {
+  const filteredByDate =
+    selectedDate === "all"
+      ? payments
+      : payments.filter(p => p.date === selectedDate);
+
+  const totals = {};
+
+  selectedMethods.forEach(method => {
+    totals[method.value] = {};
+
+    selectedCourses.forEach(course => {
+      totals[method.value][course.id] = filteredByDate
+        .filter(
+          p =>
+            p.payment_method === method.value &&
+            p.division_name === course.name
+        )
+        .reduce((acc, curr) => acc + curr.amount, 0);
+    });
+  });
+
+  return totals;
+}, [payments, selectedDate, selectedCourses, selectedMethods]);
+
+
+    const columnTotals = useMemo(() => {
+  const totals = {};
+  selectedCourses.forEach(course => {
+    totals[course.id] = selectedMethods.reduce(
+      (acc, method) =>
+        acc + (matrixData[method.value]?.[course.id] || 0),
+      0
+    );
+  });
+  return totals;
+}, [matrixData, selectedCourses, selectedMethods]);
+
+    
+    const totalGeneral = Object.values(columnTotals).reduce((a, b) => a + b, 0);
+
+    const toggleItemById = (item, list, setList) => {
+        setList(prev =>
+            prev.some(i => i.id === item.id)
+            ? prev.filter(i => i.id !== item.id)
+            : [...prev, item]
+        );
+    };
+
+    const toggleItem = (item, list, setList) => {
+        if (list.includes(item)) {
+            setList(list.filter(i => i !== item));
+        } else {
+            setList([...list, item]);
+        }
+    };
+
+    const toggleMethod = (method) => {
+        setSelectedMethods(prev =>
+            prev.some(m => m.value === method.value)
+            ? prev.filter(m => m.value !== method.value)
+            : [...prev, method]
+        );
+    };
+
+
+    useEffect(() => {
+            const loadMetadata = async () => {
+                //setIsConceptsLoading(true);
+                //setIsDivisionsLoading(true); 
+                try {
+                    const [fetchedDivisions, fetchedPayments,fetchedDates] = await Promise.all([
+                        getPaymentDivisions(),
+                        getAllPayments(),
+                        getDateOfPayments(),
+                    ]);
+    
+                    setDivisions(Array.isArray(fetchedDivisions) ? fetchedDivisions : []);
+                    setPayments(Array.isArray(fetchedPayments) ? fetchedPayments : []);
+                    setDates(Array.isArray(fetchedDates) ? fetchedDates : []);
+                    //console.log(JSON.stringify(fetchedPayments));
+                    //console.log(JSON.stringify(fetchedDates));
+                } catch (err) {
+                    console.error("Error al cargar metadata:", err);
+                    setError("No se pudieron cargar los conceptos/cursos de pago.");
+                } finally {
+                    //setIsConceptsLoading(false);
+                    //setIsDivisionsLoading(false); 
+                }
+            };
+    
+            loadMetadata();
+            
+            //fetchPayments();
+    }, [] );
+
+    useEffect( () =>{
+        if (divisions.length > 0 && selectedCourses.length === 0) {
+            setSelectedCourses(divisions);
+        }
+    }, [divisions]);
+
+    return(
+        <div>
+            <div className="header-report">
+                <div className="header">
+                    <h1>Reporte de Pagos por Curso</h1>
+                    {/*<p>Visualización matricial de ingresos recaudados.</p>*/}
+                </div>
+                <div className="downlaod-button">
+                    <button className="btn-primary-export" onClick={()=>handleChange(value)}>
+                        <DownloadIcon size={18} />
+                        Descargar Excel
+                    </button>
+                </div>
+
+            </div>
+            <ReportFilters
+                toggleItem={toggleMethod}
+                toggleItemById={toggleItemById}
+                selectedDate={selectedDate}
+                selectedCourses={selectedCourses}
+                setSelectedCourses={setSelectedCourses}
+                selectedMethods={selectedMethods}
+                setSelectedMethods={setSelectedMethods}
+                uniqueDates={dates}
+                allCourses={divisions}
+                allMethods={allMethods}
+            />
+            <ReportTable
+                totalGeneral={totalGeneral}
+                selectedCourses={selectedCourses}
+                selectedMethods={selectedMethods}
+                matrixData={matrixData}
+                columnTotals={columnTotals}
+            />
+        </div>
+    )
+};
+
+export default Report;

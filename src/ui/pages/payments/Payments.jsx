@@ -69,6 +69,23 @@ const Payments = () => {
         setIsDetailModalOpen(true);
     };
 
+    // --- Cuando usuario escoge Tipod de Pago
+    const handleConceptChange = (conceptId) => {
+        
+       const selectedConcept = concepts.find(
+            c => c.id === Number(conceptId)
+        );
+
+        setFormData(prev => ({
+            ...prev,
+            concept: conceptId,
+            amount: selectedConcept?.amount ?? ""
+        }));
+    };
+
+    const handleAmountChange = (e) => {
+        handleChange(e);
+    };
 
     // --- Handlers de Filtros ---
     const handleFilterChange = useCallback((e) => {
@@ -348,6 +365,8 @@ const Payments = () => {
                 <PaymentsForm 
                     formData={formData}
                     handleChange={handleChange}
+                    handleConcept={handleConceptChange}
+                    handleAmount={handleAmountChange}
                     onSubmit={handleSubmit}
                     isLoading={isLoading}
                     concepts={concepts}

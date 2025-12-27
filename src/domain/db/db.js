@@ -79,8 +79,8 @@ class AppDB {
                 date TEXT NOT NULL,
                 amount REAL NOT NULL,
                 payment_method TEXT NOT NULL, -- Corresponde a PaymentMethod (EFECTIVO, TRANSFERENCIA)
-                concept_id INTEGER,
-                division_id INTEGER,
+                concept_id INTEGER,   -- Matricula, Mensualidad, Otros
+                division_id INTEGER,  -- Corresponde a Taller, SINEM, etc.
                 student_id INTEGER,
                 status TEXT NOT NULL, -- Corresponde a PaymentStatus (ACTIVE, CANCELED)
                 timestamp TEXT NOT NULL,
@@ -316,6 +316,18 @@ class AppDB {
                                      ORDER BY 
                                         year;`
                                     );
+        const years = sql.all();
+        return years;
+    }
+
+    getDateOfPayments(){
+        const sql = this.db.prepare(`SELECT DISTINCT
+                                        strftime('%d-%m-%Y', date) AS date_only
+                                     FROM 
+                                        payments
+                                     ORDER BY 
+                                        strftime('%Y-%m-%d', date);
+                                    `);
         const years = sql.all();
         return years;
     }

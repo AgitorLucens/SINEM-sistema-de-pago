@@ -7,5 +7,6 @@ export const Page = {
   EXPENSES_REGISTRY: 'expenses_registry',
   STUDENTS_REGISTRY: 'students_registry',
   PRICING_REGISTRY: 'pricing_registry',
+  REPORT_REGISTRY: 'report_registry',
   EXPORT_REGISTRY: 'export_registry',
 };

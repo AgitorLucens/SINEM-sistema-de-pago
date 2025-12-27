@@ -419,6 +419,10 @@ export async function exportStudentsByActiveToExcel(students) {
 }
 
 
+export async function exportReportPayments(){
+  
+}
+
 function getAssetPath(filename) {
   let assetPath;
    if (app.isPackaged) {
