@@ -8,6 +8,7 @@ const api = {
     getAllPayments: () => ipcRenderer.invoke('get-all-payments'),
     getPaymentsByYear: (year) => ipcRenderer.invoke('get-payments-by-year', year),
     getYearsOfPayments: () => ipcRenderer.invoke('get-year-payments'),
+    getDateOfPayments: () => ipcRenderer.invoke('get-date-payments'),
     deletePaymentById: (id) => ipcRenderer.invoke('delete-payment-by-id', id),
     getPaymentConcepts: () => ipcRenderer.invoke('get-payment-concepts'),
     getPaymentDivisions: () => ipcRenderer.invoke('get-payment-divisions'),

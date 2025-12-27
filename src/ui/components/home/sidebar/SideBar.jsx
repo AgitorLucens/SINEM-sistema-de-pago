@@ -2,7 +2,8 @@ import NavLink from "../navlink/NavLink.jsx";
 import { Page } from '../../../constant/Pages.jsx';
 import { HomeIcon, IconArrowDownLeft, ColonIcon, TrendingUp} from "../../icons/Icons.jsx";
 import { ClipboardIcon, PersonIcon, ExitIcon, FileTextIcon, ArrowBottomLeftIcon,
-         ChevronLeftIcon, ChevronRightIcon, Pencil2Icon  } from "@radix-ui/react-icons";
+         ChevronLeftIcon, ChevronRightIcon, Pencil2Icon,
+         ReaderIcon  } from "@radix-ui/react-icons";
 
 import {useState} from "react";
 import './sidebar.css';
@@ -71,6 +72,14 @@ const Sidebar = ({ currentPage, setCurrentPage, isOpen: externalIsOpen, setIsOpe
                         icon={Pencil2Icon} 
                         title="Precios" 
                         page={Page.PRICING_REGISTRY} 
+                        currentPage={currentPage} 
+                        onClick={setCurrentPage}
+                        isOpen={isOpen}
+                    />
+                    <NavLink 
+                        icon={ReaderIcon} 
+                        title="Reporte" 
+                        page={Page.REPORT_REGISTRY} 
                         currentPage={currentPage} 
                         onClick={setCurrentPage}
                         isOpen={isOpen}

@@ -4,6 +4,7 @@ import Expenses from '../../../pages/expenses/Expenses.jsx';
 import Students from '../../../pages/students/Students.jsx';
 import Pricing from  '../../../pages/pricing/Pricing.jsx';
 import Export from   '../../../pages/export/Export.jsx';
+import Report from '../../../pages/report/Report.jsx';
 
 import './page.css';
 const Content = ({ page }) => {
@@ -38,8 +39,14 @@ const Content = ({ page }) => {
         );
     case Page.PRICING_REGISTRY:
         return (
-          <div className="pricing-page-containerv">
+          <div className="pricing-page-container">
             <Pricing />
+          </div>
+        );
+    case Page.REPORT_REGISTRY:
+        return (
+          <div className="report-page-container">
+            <Report/>
           </div>
         );
     case Page.EXPORT_REGISTRY:

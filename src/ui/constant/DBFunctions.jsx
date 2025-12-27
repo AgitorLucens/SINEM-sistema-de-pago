@@ -36,6 +36,15 @@ export async function getYearsOfPayments() {
     }
 }
 
+export async function getDateOfPayments() {
+    try {
+        return await window.api.getDateOfPayments();
+    } catch (error) {
+        console.error('Error al obtener año de pagos:', error.message);
+        return []; 
+    }
+}
+
 export async function getPaymentById(paymentId) {
     try {
         return await window.api.getPaymentById(paymentId);
@@ -235,6 +244,7 @@ export async function exportStudentsByActiveToExcel(studentData) {
 export default {
     //Pagos
     getYearsOfPayments,
+    getDateOfPayments,
     getPaymentsByYear,
     getPaymentConcepts,
     getPaymentDivisions,

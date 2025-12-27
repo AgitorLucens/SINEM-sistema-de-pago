@@ -2,7 +2,7 @@ import SelectRadix from "../generic/select/SelectRadix.jsx"
 import DatePicker from "../generic/datepicker/DatePicker.jsx";
 import {onRadixChange,handleFieldChange} from "../generic/function/Function.jsx"
 
-const PaymentsForm = ({ formData, handleChange, onSubmit, isLoading, concepts, divisions, students }) => {
+const PaymentsForm = ({ formData, handleChange, handleConcept,handleAmount,onSubmit, isLoading, concepts, divisions, students }) => {
    
     return (
         <div style={{ padding: '0.5rem' }}>
@@ -40,7 +40,7 @@ const PaymentsForm = ({ formData, handleChange, onSubmit, isLoading, concepts, d
                                  value={formData.concept}
                                  valueKey="id"
                                  labelKey="name"
-                                 onChange={onRadixChange(handleChange,"concept")}
+                                 onChange={handleConcept}
                                  options={concepts}
                         />   
                     </div>
@@ -78,7 +78,7 @@ const PaymentsForm = ({ formData, handleChange, onSubmit, isLoading, concepts, d
                             id="amount"
                             name="amount"
                             value={formData.amount}
-                            onChange={handleChange}
+                            onChange={handleAmount}
                             required
                             min="0.01"
                             step="0.01"

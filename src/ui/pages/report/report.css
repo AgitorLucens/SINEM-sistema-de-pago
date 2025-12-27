@@ -1,0 +1,24 @@
+.header {
+    margin-bottom: 5px;
+    flex-direction: column;
+    
+}
+
+.header-report{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 16px;
+}
+.header h1 {
+    margin: 0;
+    font-size: 20px;
+    color: #1e293b;
+}
+
+.header p {
+    margin: 5px 0 0;
+    color: #64748b;
+}
+
+          
