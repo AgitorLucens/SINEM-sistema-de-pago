@@ -7,7 +7,9 @@ import { Users, FileText,  TrendingUp, TrendingDown} from "../../components/icon
 
 import {getYearsOfPayments,getYearsOfExpenses,getStudentsActive,
         getPaymentsByYear,getExpensesByYear,getStudentsByActive,
-        exportPaymentsByYearToExcel,exportExpensesByYearToExcel,exportStudentsByActiveToExcel} from "../../constant/DBFunctions.jsx"
+        getAllPayments, getAllExpenses,
+        exportPaymentsByYearToExcel,exportExpensesByYearToExcel,exportStudentsByActiveToExcel
+    } from "../../constant/DBFunctions.jsx"
 
 import './export.css';
 import { se } from "react-day-picker/locale";
@@ -50,21 +52,33 @@ const Export = () => {
         }
         setErrorInfo("");
         setError(false);
+        let err;
         if (selectedType === "Pagos") {
-            const payments = await getPaymentsByYear(data);
-            const err = await exportPaymentsByYearToExcel(payments)
-            if (!err.sucess) {
-                setError(true);
-                setErrorInfo(err.error);
-                return
-            }
+            let payments;
+            if (data === "all"){
+                payments = await getAllPayments();
+                err = await exportPaymentsByYearToExcel(payments);
+            } else {
+                payments = await getPaymentsByYear(data);
+                err = await exportPaymentsByYearToExcel(payments);
+            }   
         } else if(selectedType === "Gastos") {
-            const expenses = await getExpensesByYear(data);
-            const err = await exportExpensesByYearToExcel(expenses)
+            if (data === "all"){
+                expenses = await getAllExpenses();
+                err = await exportExpensesByYearToExcel(expenses);
+            } else {
+                expenses = await getExpensesByYear(data);
+                err = await exportExpensesByYearToExcel(expenses);
+            }
         } else if(selectedType === "Estudiantes") {
             const students = await getStudentsByActive(data);
             const err = await exportStudentsByActiveToExcel(students);
         }
+        if (!err.success) {
+                setError(true);
+                setErrorInfo(err.error);
+                return
+            }
         setIsModalOpen(false);
     };
 

@@ -208,6 +208,17 @@ export async function exportPaymentsToExcel(payment) {
     }
 }
 
+export async function exportReportToExcel(data) {
+    try {
+        return await window.api.exportReportToExcel(data);
+    } catch (error) {
+        console.error('Error al exportar reporte a excel:', error.message);
+        return {
+            error: "Error al exportar reporte a excel. Revise que no tengaa el archivo con el mismo nombre abierto.",
+        }; 
+    }
+}
+
 export async function exportPaymentsByYearToExcel(paymentData) {
     try {
         return await window.api.exportPaymentsByYearToExcel(paymentData);
@@ -263,6 +274,7 @@ export default {
     updatePriceConcept,
     //Exportar
     exportPaymentsToExcel,
+    exportReportToExcel,
     exportPaymentsByYearToExcel,
     exportStudentsByActiveToExcel
 };

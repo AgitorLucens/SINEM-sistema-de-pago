@@ -2,7 +2,7 @@ import ReportFilters from "../../components/report/ReportFilters.jsx";
 import ReportTable from "../../components/report/ReportTable.jsx";
 import { useState, useEffect, useCallback, useMemo } from 'react';
 import { getPaymentConcepts, getPaymentDivisions, getAllPayments,
-        getDateOfPayments, 
+        getDateOfPayments, exportReportToExcel
         } from "../../constant/DBFunctions.jsx";
 import { CalendarIcon, DownloadIcon } from "@radix-ui/react-icons";
 import './report.css';
@@ -22,44 +22,60 @@ const Report = () =>{
     const [selectedCourses, setSelectedCourses] = useState([]);
     const [selectedMethods, setSelectedMethods] = useState(allMethods);
 
+
+    const handleExportReport = async (data) => {
+        //console.log("Exportando datos de:", selectedType, data);
+        
+        if (!data) {
+            setError("Escoga los valores adecuados")
+            return
+        }
+        
+        setError("");
+            
+        const err = await exportReportToExcel(data);
+        if (!err.sucess) {
+            setError(err.error);
+            return
+        }     
+    };
+
     // Lógica de filtrado
     const matrixData = useMemo(() => {
-  const filteredByDate =
-    selectedDate === "all"
-      ? payments
-      : payments.filter(p => p.date === selectedDate);
+        const filteredByDate =
+            selectedDate === "all"
+            ? payments
+            : payments.filter(p => p.date === selectedDate);
 
-  const totals = {};
+        const totals = {};
 
-  selectedMethods.forEach(method => {
-    totals[method.value] = {};
+        selectedMethods.forEach(method => {
+            totals[method.value] = {};
 
-    selectedCourses.forEach(course => {
-      totals[method.value][course.id] = filteredByDate
-        .filter(
-          p =>
-            p.payment_method === method.value &&
-            p.division_name === course.name
-        )
-        .reduce((acc, curr) => acc + curr.amount, 0);
-    });
-  });
+            selectedCourses.forEach(course => {
+                totals[method.value][course.id] = filteredByDate
+                .filter(
+                    p =>
+                        p.payment_method === method.value &&
+                        p.division_name === course.name
+                )
+                .reduce((acc, curr) => acc + curr.amount, 0);
+            });
+        });
 
-  return totals;
-}, [payments, selectedDate, selectedCourses, selectedMethods]);
+    return totals;
+    }, [payments, selectedDate, selectedCourses, selectedMethods]);
 
 
     const columnTotals = useMemo(() => {
-  const totals = {};
-  selectedCourses.forEach(course => {
-    totals[course.id] = selectedMethods.reduce(
-      (acc, method) =>
-        acc + (matrixData[method.value]?.[course.id] || 0),
-      0
-    );
-  });
-  return totals;
-}, [matrixData, selectedCourses, selectedMethods]);
+        const totals = {};
+        selectedCourses.forEach(course => {
+            totals[course.id] = selectedMethods.reduce(
+                (acc, method) =>
+                    acc + (matrixData[method.value]?.[course.id] || 0),0);
+        });
+        return totals;
+    }, [matrixData, selectedCourses, selectedMethods]);
 
     
     const totalGeneral = Object.values(columnTotals).reduce((a, b) => a + b, 0);
@@ -133,7 +149,7 @@ const Report = () =>{
                     {/*<p>Visualización matricial de ingresos recaudados.</p>*/}
                 </div>
                 <div className="downlaod-button">
-                    <button className="btn-primary-export" onClick={()=>handleChange(value)}>
+                    <button className="btn-primary-export" onClick={()=>handleExportReport({selectedCourses, selectedMethods, matrixData ,columnTotals, totalGeneral, selectedDate})}>
                         <DownloadIcon size={18} />
                         Descargar Excel
                     </button>
