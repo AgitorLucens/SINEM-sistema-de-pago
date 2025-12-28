@@ -7,17 +7,20 @@ import './exportform.css';
 const ExportForm = ({ selectData, data, type, onClose, onSave , handleChange}) => {
   const [value, setValue] = useState(null);
   const selectOptions = (() => {
-  if (type === "Pagos" || type === "Gastos") {
-    return (data ?? []).map(item => ({
-      value: item.year,
-      label: item.year,
-    }));
-  }
+    if (type === "Pagos" || type === "Gastos") {
+      return [
+            { value: "all", label: "Todos los años" },
+            ...data.map(y => ({
+                value: y.year.toString(),
+                label: y.year.toString(),
+            })),
+        ];
+    }
 
-  if (type === "Estudiantes") {
-    return (data ?? []).map(item => ({
-      value: item.active,
-      label: item.active === 1 ? "Activos" : "Inactivos",
+    if (type === "Estudiantes") {
+      return (data ?? []).map(item => ({
+        value: item.active,
+        label: item.active === 1 ? "Activos" : "Inactivos",
     }));
   }
 

@@ -335,45 +335,120 @@ export async function exportPaymentsByYearToExcel(payments) {
   return { success: true, path: filePath };
 }
 
-export async function exportExpensesByYearToExcel(expenses) {
-  if (!expenses) return { success: false };
+export async function exportExpensesByYearToExcel(expenses = []) {
+  const workbook = new ExcelJS.Workbook();
+  const sheet = workbook.addWorksheet("Egresos", {
+    views: [{ showGridLines: false }],
+  });
 
-    const safeExpenses = Array.isArray(expenses)
-      ? expenses
-      : [expenses];
+  /* =====================
+     CONFIGURACIÓN GENERAL
+  ===================== */
 
-    const data = safeExpenses.map(p => ({
-      Fecha: p.date,
-      Detalle: p.description,
-      Referencia: p.reference,
-      Monto: Number(p.amount),
-    }));
+  sheet.columns = [
+    { header: "Fecha", key: "date", width: 10.25 },
+    { header: "Detalle", key: "detail", width: 30 },
+    { header: "Referencia", key: "reference", width: 28 },
+    { header: "Monto", key: "amount", width: 10.25 },
+  ];
 
-    const worksheet = XLSX.utils.json_to_sheet(data);
-    const workbook = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(workbook, worksheet, "Egresos");
+  /* =====================
+     HEADER (fila 1)
+  ===================== */
+  const headerRow = sheet.getRow(1);
 
-    // 🔹 Pedir ruta al usuario
-    const { canceled, filePath } = await dialog.showSaveDialog({
-      title: "Guardar gastos",
-      defaultPath: path.join("egresos.xlsx"),
-      filters: [{ name: "Excel", extensions: ["xlsx"] }],
+  headerRow.eachCell(cell => {
+    cell.alignment = {
+      horizontal: "left",
+      vertical: "middle",
+    };
+  });
+
+  /* =====================
+     DATA (si existe)
+  ===================== */
+  expenses.forEach(e => {
+    sheet.addRow({
+      date: e.date
+        ? new Intl.DateTimeFormat("es-CR").format(new Date(e.date))
+        : "",
+      detail: e.description ?? "",
+      reference: e.reference ?? "",
+      amount: e.amount ? Number(e.amount) : "",
     });
+  });
 
-    if (canceled || !filePath) {
-      return { success: false };
-    }
+  /* =====================
+     FILAS VACÍAS (hasta fila 28)
+  ===================== */
+  const MAX_ROWS = 28;
+  while (sheet.rowCount < MAX_ROWS) {
+    sheet.addRow({});
+  }
 
-    // 🔹 Generar buffer
-    const buffer = XLSX.write(workbook, {
-      bookType: "xlsx",
-      type: "buffer",
+  /* =====================
+     FORMATO COLUMNAS
+  ===================== */
+  sheet.getColumn("amount").numFmt = '"₡"#,##0.00';
+
+  /* =====================
+     BORDES (TABLA COMPLETA)
+  ===================== */
+  sheet.eachRow({ includeEmpty: true }, row => {
+    row.eachCell({ includeEmpty: true }, cell => {
+      cell.border = {
+        top: { style: "thin" },
+        left: { style: "thin" },
+        bottom: { style: "thin" },
+        right: { style: "thin" },
+      };
+      cell.font = {
+        name: "Aptos Narrow",
+        size: 11,
+      };
     });
+  });
 
-    // 🔹 Guardar archivo
-    fs.writeFileSync(filePath, buffer);
+  sheet.getCell("A1").font = { name: "Aptos Narrow",
+                               color: { argb: "FFFFFF" },
+                               bold: true };
+  sheet.getCell("A1").fill = { type: "pattern",
+                               pattern: "solid",
+                               fgColor: { argb: "FF1F4E78" } };
+  sheet.getCell("B1").font = { name: "Aptos Narrow",
+                               color: { argb: "FFFFFF" },
+                               bold: true };                           
+  sheet.getCell("B1").fill = { type: "pattern",
+                               pattern: "solid",
+                               fgColor: { argb: "FF1F4E78" } };
+  sheet.getCell("C1").font = { name: "Aptos Narrow",
+                               color: { argb: "FFFFFF" },
+                               bold: true };
+  sheet.getCell("C1").fill = { type: "pattern",
+                               pattern: "solid",
+                               fgColor: { argb: "FF1F4E78" } };
+  sheet.getCell("D1").font = { name: "Aptos Narrow",
+                               color: { argb: "FFFFFF" },
+                               bold: true };
+  sheet.getCell("D1").fill = { type: "pattern",
+                               pattern: "solid",
+                               fgColor: { argb: "FF1F4E78" } };
+  /* =====================
+     GUARDAR ARCHIVO
+  ===================== */
+  const { canceled, filePath } = await dialog.showSaveDialog({
+    title: "Guardar egresos",
+    defaultPath: path.join("Egresos.xlsx"),
+    filters: [{ name: "Excel", extensions: ["xlsx"] }],
+  });
 
-    return { success: true, path: filePath };
+  if (canceled || !filePath) {
+    return { success: false };
+  }
+
+  await workbook.xlsx.writeFile(filePath);
+
+  return { success: true, path: filePath };
 }
 
 export async function exportStudentsByActiveToExcel(students) {
@@ -418,11 +493,191 @@ export async function exportStudentsByActiveToExcel(students) {
     return { success: true, path: filePath };
 }
 
+export async function exportReportToExcel(
+  selectedCourses,
+  selectedMethods,
+  matrixData,
+  columnTotals,
+  totalGeneral,
+  selectedDate
+) {
+  /* =========================
+     WORKBOOK
+  ========================= */
+  const workbook = new ExcelJS.Workbook();
+  const sheet = workbook.addWorksheet("Reporte", {
+    views: [{ showGridLines: false }],
+  });
 
-export async function exportReportPayments(){
-  
+  /* =========================
+     HOJA AUXILIAR (LISTAS)
+  ========================= */
+  const lists = workbook.addWorksheet("lists");
+  lists.state = "veryHidden";
+
+  const dateOptions = ["- todo -", selectedDate].filter(Boolean);
+  const courseNames = selectedCourses.map(c => c.name);
+  const methodNames = selectedMethods.map(m => m.label ?? m.name);
+
+  dateOptions.forEach((v, i) => lists.getCell(`A${i + 1}`).value = v);
+  courseNames.forEach((v, i) => lists.getCell(`B${i + 1}`).value = v);
+  methodNames.forEach((v, i) => lists.getCell(`C${i + 1}`).value = v);
+
+  /* =========================
+     ESTILOS
+  ========================= */
+  const headerStyle = {
+    font: { name: "Aptos Narrow", bold: true },
+    alignment: { horizontal: "center", vertical: "middle" },
+    fill: {
+      type: "pattern",
+      pattern: "solid",
+      fgColor: { argb: "FFD9D9D9" },
+    },
+    border: {
+      top: { style: "thin" },
+      left: { style: "thin" },
+      bottom: { style: "thin" },
+      right: { style: "thin" },
+    },
+  };
+
+  const cellBorder = {
+    top: { style: "thin" },
+    left: { style: "thin" },
+    bottom: { style: "thin" },
+    right: { style: "thin" },
+  };
+
+  /* =========================
+     CABECERA SUPERIOR
+  ========================= */
+  sheet.getCell("A1").value = "Fecha";
+  sheet.getCell("A1").font = { name: "Aptos Narrow", bold: true };
+
+  sheet.getCell("B1").dataValidation = {
+    type: "list",
+    allowBlank: false,
+    formulae: [`lists!$A$1:$A$${dateOptions.length}`],
+  };
+
+  /* =========================
+     TITULOS
+  ========================= */
+  sheet.getCell("A3").value = "Suma - Monto";
+  sheet.getCell("A3").font = { name: "Aptos Narrow", bold: true };
+
+  sheet.getCell("B3").value = "Curso";
+  sheet.getCell("B3").font = { name: "Aptos Narrow"};
+  sheet.getCell("B3").dataValidation = {
+    type: "list",
+    allowBlank: false,
+    formulae: [`lists!$B$1:$B$${courseNames.length}`],
+  };
+
+  /* =========================
+     HEADER DE TABLA
+  ========================= */
+  sheet.getCell("A4").value = "Modo de Pago";
+  sheet.getCell("A4").style = headerStyle;
+
+  selectedCourses.forEach((course, i) => {
+    const col = 2 + i;
+    const cell = sheet.getCell(4, col);
+    cell.value = course.name;
+    cell.style = headerStyle;
+  });
+
+  const totalCol = 2 + selectedCourses.length;
+  sheet.getCell(4, totalCol).value = "Total Resultado";
+  sheet.getCell(4, totalCol).style = headerStyle;
+
+  /* =========================
+     FILAS DE DATOS
+  ========================= */
+  selectedMethods.forEach((method, rowIndex) => {
+    const row = 5 + rowIndex;
+
+    sheet.getCell(row, 1).value = method.label ?? method.name;
+    sheet.getCell(row, 1).border = cellBorder;
+
+    sheet.getCell(row, 1).dataValidation = {
+      type: "list",
+      allowBlank: false,
+      formulae: [`lists!$C$1:$C$${methodNames.length}`],
+    };
+
+    let rowTotal = 0;
+
+    selectedCourses.forEach((course, colIndex) => {
+      const col = 2 + colIndex;
+      const value = matrixData[method.value]?.[course.id] || 0;
+      rowTotal += value;
+
+      const cell = sheet.getCell(row, col);
+      cell.value = value;
+      cell.numFmt = '"₡"#,##0.00';
+      cell.border = cellBorder;
+    });
+
+    const totalCell = sheet.getCell(row, totalCol);
+    totalCell.value = rowTotal;
+    totalCell.numFmt = '"₡"#,##0.00';
+    totalCell.font = { name: "Aptos Narrow", bold: true };
+    totalCell.border = cellBorder;
+  });
+
+  /* =========================
+     FILA TOTAL GENERAL
+  ========================= */
+  const totalRow = 5 + selectedMethods.length;
+
+  sheet.getCell(totalRow, 1).value = "Total Resultado";
+  sheet.getCell(totalRow, 1).font = { name: "Aptos Narrow", bold: true };
+  sheet.getCell(totalRow, 1).border = cellBorder;
+
+  selectedCourses.forEach((course, i) => {
+    const col = 2 + i;
+    const cell = sheet.getCell(totalRow, col);
+    cell.value = columnTotals[course.id] || 0;
+    cell.numFmt = '"₡"#,##0.00';
+    cell.font = { name: "Aptos Narrow", bold: true };
+    cell.border = cellBorder;
+  });
+
+  sheet.getCell(totalRow, totalCol).value = totalGeneral;
+  sheet.getCell(totalRow, totalCol).numFmt = '"₡"#,##0.00';
+  sheet.getCell(totalRow, totalCol).font = { name: "Aptos Narrow", bold: true };
+  sheet.getCell(totalRow, totalCol).border = cellBorder;
+
+  /* =========================
+     AJUSTES DE COLUMNAS
+  ========================= */
+  sheet.columns.forEach(col => {
+    col.width = 18;
+  });
+
+  /* =========================
+     GUARDAR ARCHIVO
+  ========================= */
+  const { canceled, filePath } = await dialog.showSaveDialog({
+    title: "Guardar reporte",
+    defaultPath: "Reporte_Pagos.xlsx",
+    filters: [{ name: "Excel", extensions: ["xlsx"] }],
+  });
+
+  if (canceled || !filePath) return { success: false };
+
+  await workbook.xlsx.writeFile(filePath);
+
+  return { success: true, path: filePath };
 }
 
+
+
+/*
+  Helper Functions
+*/
 function getAssetPath(filename) {
   let assetPath;
    if (app.isPackaged) {

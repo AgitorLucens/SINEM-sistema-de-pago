@@ -1,6 +1,6 @@
 import {app,ipcMain} from 'electron';
 import {exportPaymentsToExcel,exportPaymentsByYearToExcel,exportExpensesByYearToExcel,
-        exportStudentsByActiveToExcel} from "../excel/excel.js"
+        exportStudentsByActiveToExcel, exportReportToExcel} from "../excel/excel.js"
 
 export default function setUpHandlers(dbInstance) {
     /*
@@ -98,8 +98,27 @@ export default function setUpHandlers(dbInstance) {
     /*
         Excel
     */
-   ipcMain.handle('export-payment-excel', async ( _ , payment) => {
+    ipcMain.handle('export-payment-excel', async ( _ , payment) => {
         return exportPaymentsToExcel(payment);
+    });
+
+    ipcMain.handle('export-report-excel', async ( _ , data) => {
+        const {
+                selectedCourses,
+                selectedMethods,
+                matrixData,
+                columnTotals,
+                totalGeneral,
+                selectedDate,
+              } = data;
+        return exportReportToExcel(
+                                    selectedCourses,
+                                    selectedMethods,
+                                    matrixData,
+                                    columnTotals,
+                                    totalGeneral,
+                                    selectedDate 
+        );
     });
 
     ipcMain.handle('export-payments-by-year', async ( _ , paymentData) => {

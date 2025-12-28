@@ -33,6 +33,8 @@ const api = {
 
     // Excel
     exportPaymentsToExcel: (payment) => ipcRenderer.invoke('export-payment-excel', payment),
+    exportReportToExcel: (data) => ipcRenderer.invoke('export-report-excel', data),
+        
     exportPaymentsByYearToExcel: (paymentData) => ipcRenderer.invoke('export-payments-by-year', paymentData),
     exportExpensesByYearToExcel: (expenseData) => ipcRenderer.invoke('export-expenses-by-year', expenseData),
     exportStudentsByActiveToExcel: (studentData) => ipcRenderer.invoke('export-students-by-active', studentData),
