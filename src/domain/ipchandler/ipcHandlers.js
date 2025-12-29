@@ -10,6 +10,14 @@ export default function setUpHandlers(dbInstance) {
         return dbInstance.addPayment(paymentData);
     });
 
+    ipcMain.handle('add-payment-without-consecutive', async ( _ , paymentData) => {
+        return dbInstance.addPaymentWithConsecutive(paymentData);
+    });
+
+    ipcMain.handle('get-consecutive', async ( _ , year) => {
+        return dbInstance.getNextConsecutiveByYear(year);
+    });
+
     ipcMain.handle('get-all-payments', async () => {
         return dbInstance.getAllPayments();
     });
@@ -19,6 +27,10 @@ export default function setUpHandlers(dbInstance) {
     });
 
     ipcMain.handle('get-year-payments', async () => {
+        return dbInstance.getYearsOfPayments();
+    });
+
+    ipcMain.handle('get-consecutive-payments', async () => {
         return dbInstance.getYearsOfPayments();
     });
 

@@ -5,6 +5,8 @@ const { contextBridge, ipcRenderer } = require('electron');
 const api = {
     // Pagina Pagos
     addPayment: (paymentData) => ipcRenderer.invoke('add-payment', paymentData),
+    addPaymentWithConsecutive: (data) => ipcRenderer.invoke('add-payment-without-consecutive', data),
+    getNextConsecutiveByYear: (year) => ipcRenderer.invoke('get-consecutive', year),
     getAllPayments: () => ipcRenderer.invoke('get-all-payments'),
     getPaymentsByYear: (year) => ipcRenderer.invoke('get-payments-by-year', year),
     getYearsOfPayments: () => ipcRenderer.invoke('get-year-payments'),

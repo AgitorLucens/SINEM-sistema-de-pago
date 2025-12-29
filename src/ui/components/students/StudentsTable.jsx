@@ -92,7 +92,7 @@ const StudentsTable = ({ students, minTableWidth = '700px', onDeleteStudent, onR
                                     <td className='students-td'>{s.reference}</td>
                                     <td className='students-td'>{s.phone}</td>
                                     <td className='students-td'>{s.email}</td>         
-                                    <td className='students-td'>{s.active}</td>
+                                    <td className='students-td'>{s.active === 1 ? "Activo" : "Inactivo"}</td>
                                     {/* Boton Borrado  */}
                                     <td className="payments-td" style={{ textAlign: 'center' }}>
                                         <button 

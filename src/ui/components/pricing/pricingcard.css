@@ -1,6 +1,5 @@
 .card {
     background-color: #ffffff;
-    border: 1px solid #e5e7eb;
     padding: 1.25rem;
     border-radius: 0.75rem;
     display: flex;
@@ -10,6 +9,39 @@
     transition: all 0.2s ease;
     box-shadow: 0 1px 3px rgba(0,0,0,0.05);
 }
+
+.card:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+}
+
+.card.card-1 {
+    border: 1px solid #e5e7eb;
+    transition: border-color 0.15s ease;
+}
+
+.card.card-1:hover{
+    border-color:#2563eb;
+}
+
+.card.card-2 {
+    border: 1px solid #e5e7eb;
+    transition: border-color 0.15s ease;
+}
+
+.card.card-2:hover{
+    border-color:#bc9b41;
+}
+
+.card.card-3 {
+    border: 1px solid #e5e7eb;
+    transition: border-color 0.15s ease;
+}
+
+.card.card-3:hover{
+    border-color: #8551fd;
+}
+
 .card-icon {
     width: 3rem;
     height: 3rem;
@@ -20,29 +52,29 @@
     align-items: center;
     justify-content: center;
 }
-.card-icon-Matrícula {
+.card-icon-1 {
     background-color: #dbeafe;
     color: #2546eb;
 }
-.card-icon-Matrícula:hover {
+.card-icon-1:hover {
     background-color: #153764;
     color: #ffffff;
 }
 
-.card-icon-Mensualidad {
+.card-icon-2 {
     background-color: #f7da8b;
     color: #bc9b41;
 }
-.card-icon-Mensualidad:hover {
+.card-icon-2:hover {
     background-color: #f08902;
     color: #ffffff;
 }
 
-.card-icon-Otros {
+.card-icon-3 {
     background-color: #bca0ff;
     color: #8551fd;
 }
-.card-icon-Otros:hover {
+.card-icon-3:hover {
     background-color: #4815be;
     color: #ffffff;
 }

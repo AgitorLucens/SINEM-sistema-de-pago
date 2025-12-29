@@ -6,7 +6,8 @@ import Modal from '../../components/generic/modal/Modal.jsx';
 import SuccessMessage from '../../components/generic/message/SuccessMessage.jsx';
 import ErrorMessage from '../../components/generic/message/ErrorMessage.jsx';
 import {getPaymentConcepts, getPaymentDivisions, getAllPayments, getAllStudents,
-        deletePaymentById, addPayment
+        deletePaymentById, addPaymentWithConsecutive,
+        getNextConsecutiveByYear
  } from "../../constant/DBFunctions.jsx";
 import { PlusCircledIcon } from "@radix-ui/react-icons";
 
@@ -20,9 +21,13 @@ const Payments = () => {
         student_id: '',
         amount: '',
         date: null,
+        month: 0, 
+        year: 0,
         method: '',
         concept: '',
         division: '',
+        consecutive: 0,
+        receipt: '',
     };
     
     const initialFilterState = {
@@ -33,6 +38,21 @@ const Payments = () => {
         endDate: '',
     };
     
+    const allMonths = [
+        { label: "Enero", value: 1},
+        { label: "Febrero", value: 2},
+        { label: "Marzo", value: 3},
+        { label: "Abril", value: 4},
+        { label: "Mayo", value: 5},
+        { label: "Junio", value: 6},
+        { label: "Julio", value: 7},
+        { label: "Agosto", value: 8},
+        { label: "Septiembre", value: 9},
+        { label: "Octubre", value: 10},
+        { label: "Noviembre", value: 11},
+        { label: "Diciembre", value: 12},
+    ]
+
     // datos del formulario
     const [formData, setFormData] = useState(initialFormState);
     
@@ -55,6 +75,7 @@ const Payments = () => {
     const [divisions, setDivisions] = useState([]);
     const [isConceptsLoading, setIsConceptsLoading] = useState(false);
     const [isDivisionsLoading, setIsDivisionsLoading] = useState(false); // Estado corregido
+    const [months, setMonths] = useState(allMonths);
 
     // estudiantes
     const [students, setStudents] = useState([]);
@@ -69,7 +90,9 @@ const Payments = () => {
         setIsDetailModalOpen(true);
     };
 
-    // --- Cuando usuario escoge Tipod de Pago
+   // const handle
+
+    // --- Cuando usuario escoge Tipo de Pago
     const handleConceptChange = (conceptId) => {
         
        const selectedConcept = concepts.find(
@@ -85,6 +108,22 @@ const Payments = () => {
 
     const handleAmountChange = (e) => {
         handleChange(e);
+    };
+
+    const handleDateChange = async (date) => {
+        handleChange({
+            target: { name: "date", value: date }
+        });
+
+        const yearDate = new Date(date).getFullYear();
+
+        const nextConsecutive = await getNextConsecutiveByYear(yearDate);
+
+        setFormData(prev => ({
+            ...prev,
+            year: yearDate,
+            consecutive: nextConsecutive
+        }));
     };
 
     // --- Handlers de Filtros ---
@@ -218,30 +257,32 @@ const Payments = () => {
         const paymentDataToSend = {
             date: new Date(formData.date).toISOString(),
             amount: amountNumber,
+            receipt: formData.receipt,
             payment_method: formData.method,
             concept_id: parseInt(formData.concept, 10),
             division_id: parseInt(formData.division, 10),
-            student_id: parseInt(formData.student_id,10), 
-            invoice_id: null,
-            created_by: 1, 
+            student_id: parseInt(formData.student_id,10),
+            year: formData.year,
+            month: formData.month,
+            sequence: formData.consecutive,
             status: 'ACTIVE',
             timestamp: new Date().toISOString(),
         };
 
         setIsLoading(true);
-
-            const err = await addPayment(paymentDataToSend);
-            if (!err.success){
-                setError(true);
-                setErrorInfo(err.error);
-                return
-            }
-            setFormData(initialFormState);
-            setMessage("Pago creado exitosamente");
-            setTimeout(() => { setMessage(""); setErrorInfo(''); }, 4000);
-            await fetchPayments(); 
-            setIsModalOpen(false); 
-            setIsLoading(false);
+        //console.log(JSON.stringify(formData));
+        const err = await addPaymentWithConsecutive(paymentDataToSend);
+        if (!err.success){
+            setError(true);
+            setErrorInfo(err.error);
+            return
+        }
+        setFormData(initialFormState);
+        setMessage("Pago creado exitosamente");
+        setTimeout(() => { setMessage(""); setErrorInfo(''); }, 4000);
+        await fetchPayments(); 
+        setIsModalOpen(false); 
+        setIsLoading(false);
     }, [formData, fetchPayments, initialFormState]);
 
     const deletePayment = async (e, paymentId) => {
@@ -367,11 +408,13 @@ const Payments = () => {
                     handleChange={handleChange}
                     handleConcept={handleConceptChange}
                     handleAmount={handleAmountChange}
+                    handleDate={handleDateChange}
                     onSubmit={handleSubmit}
                     isLoading={isLoading}
                     concepts={concepts}
                     divisions={divisions}
                     students={students}
+                    months={months}
                     formError={error}
                 />
             </Modal>

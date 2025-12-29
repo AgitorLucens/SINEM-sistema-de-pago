@@ -1,16 +1,14 @@
-import './pricingcard.css';
 import { BellIcon,Pencil1Icon } from '@radix-ui/react-icons';
 
+import './pricingcard.css';
 const PricingCard = ({ price, onClick}) => {
   return (
     <div
       onClick={onClick}
-      className="card"
-      onMouseOver={(e) => e.currentTarget.style.borderColor = '#2563eb'}
-      onMouseOut={(e) => e.currentTarget.style.borderColor = '#e5e7eb'}
+      className={`card card-${price.id}`}
     >
       <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-        <div className={`card-icon card-icon-${price.name}`}><BellIcon size={20} /></div>
+        <div className={`card-icon card-icon-${price.id}`}><BellIcon size={20} /></div>
         <div>
           <h4 className='card-title'>{price.name}</h4>
           <span className='card-category'>{price.name}</span>
