@@ -85,6 +85,7 @@ class AppDB {
                 status TEXT NOT NULL, -- Corresponde a PaymentStatus (ACTIVE, CANCELED)
                 timestamp TEXT NOT NULL,
                 month INTEGER, -- Corresponde al mes al que se aplica el pago (1-12)
+                receipt TEXT,
                 -- consecutivo
                 year INTEGER NOT NULL, -- Corresponde al año para el concecutivo
                 sequence INTEGER NOT NULL, -- Número de secuencia para el consecutivo
@@ -214,6 +215,51 @@ class AppDB {
         }
     }
 
+    getNextConsecutiveByYear(year) {
+        const stmt = this.db.prepare(`
+            SELECT COALESCE(MAX(sequence), 0) + 1 AS nextSeq
+            FROM payments
+            WHERE year = ?
+        `);
+        return stmt.get(year)?.nextSeq ?? 0;
+    }
+
+    addPaymentWithConsecutive(payment) {
+        const sql = this.db.prepare(`
+                INSERT INTO payments (
+                    date,
+                    amount,
+                    receipt,
+                    payment_method,
+                    concept_id,
+                    division_id,
+                    student_id,
+                    year,
+                    month,
+                    sequence,
+                    status,
+                    timestamp
+                    )
+                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            `);
+            const data = sql.run(payment.date, 
+                                payment.amount,
+                                payment.receipt || "",
+                                payment.payment_method, 
+                                payment.concept_id, 
+                                payment.division_id,
+                                payment.student_id,  
+                                payment.year,
+                                payment.month || 0,
+                                payment.sequence,
+                                payment.status, 
+                                payment.timestamp);
+            return {
+                success: true,
+                data: data.lastInsertRowid
+            };
+    }
+
     getAllPayments() {
         
         const sql = this.db.prepare(`SELECT
@@ -266,6 +312,8 @@ class AppDB {
         return payments;
     }
 
+
+   
     getPaymentsByYear(year) {
         let sql = ``;
         let payments = [];
@@ -513,7 +561,7 @@ class AppDB {
             `);
             const data = sql.run(studentData.name, 
                                  studentData.phone,    
-                                 stuentData.email,
+                                 studentData.email,
                                  studentData.reference,
                                  studentData.active);
             return data.lastInsertRowid;

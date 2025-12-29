@@ -5,16 +5,43 @@ export async function getAllPayments() {
     try {
         return await window.api.getAllPayments();
     } catch (error) {
-        console.error('Error al obtener pagos:', error.message);
-        return []; 
+        console.error('Error al cargar datos:', error.message);
+        return {
+            error: "Error al cargar pagos.",
+        };  
     }
 }
+
 export async function addPayment(payment) {
     try {
         return await window.api.addPayment(payment);;
     } catch (error) {
-        console.error('Error al obtener pagos:', error.message);
-        return []; 
+        console.error('Error al agregar pago:', error.message);
+        return {
+            error: "Error al agregar pago.",
+        };  
+    }
+}
+
+export async function addPaymentWithConsecutive(payment) {
+    try {
+        return await window.api.addPaymentWithConsecutive(payment);;
+    } catch (error) {
+        console.error('Error al agregar pago:', error.message);
+        return {
+            error: "Error al agregar pago.",
+        }; 
+    }
+}
+
+export async function getNextConsecutiveByYear(year){
+    try {
+        return await window.api.getNextConsecutiveByYear(year);
+    } catch (error) {
+        console.error('Error al obtener consecutivo:', error.message);
+        return {
+            error: "Error al obtener consecutivo.",
+        }; 
     }
 }
 
@@ -254,7 +281,10 @@ export async function exportStudentsByActiveToExcel(studentData) {
 
 export default {
     //Pagos
+    addPayment,
+    addPaymentWithConsecutive,
     getYearsOfPayments,
+    getNextConsecutiveByYear,
     getDateOfPayments,
     getPaymentsByYear,
     getPaymentConcepts,
