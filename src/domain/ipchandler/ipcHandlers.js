@@ -10,6 +10,10 @@ export default function setUpHandlers(dbInstance) {
         return dbInstance.addPayment(paymentData);
     });
 
+    ipcMain.handle('update-payment', async ( _ , paymentData) => {
+        return dbInstance.updatePayment(paymentData);
+    });
+
     ipcMain.handle('add-payment-without-consecutive', async ( _ , paymentData) => {
         return dbInstance.addPaymentWithConsecutive(paymentData);
     });
@@ -38,8 +42,8 @@ export default function setUpHandlers(dbInstance) {
         return dbInstance.getDateOfPayments();
     });
 
-    ipcMain.handle('get-payment-by-id', async ( _ , id) => {
-        return dbInstance.getPaymentById(id);
+    ipcMain.handle('get-payment-by-student-id', async ( _ , id) => {
+        return dbInstance.getPaymentByStudentId(id);
     });
 
     ipcMain.handle('delete-payment-by-id', async ( _ , id) => {
@@ -73,6 +77,10 @@ export default function setUpHandlers(dbInstance) {
         return dbInstance.addExpense(expenseData);
     });
 
+    ipcMain.handle('update-expense', async ( _ , expenseData) => {
+        return dbInstance.updateExpense(expenseData);
+    });
+
     ipcMain.handle('delete-expense-by-id', async ( _ , id) => {
         return dbInstance.deleteExpenseById(id);
     });
@@ -94,6 +102,10 @@ export default function setUpHandlers(dbInstance) {
     
     ipcMain.handle('add-student', async ( _ , studentsData) => {
         return dbInstance.addStudent(studentsData);
+    });
+
+    ipcMain.handle('update-student', async ( _ , studentsData) => {
+        return dbInstance.updateStudent(studentsData);
     });
 
     ipcMain.handle('delete-student-by-id', async ( _ , id) => {

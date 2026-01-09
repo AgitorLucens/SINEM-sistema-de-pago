@@ -1,5 +1,8 @@
 import { useState, useEffect, useRef } from 'react';
-import EditableCell from '../generic/table/EditableCell';
+import { updatePayment } from "../../constant/DBFunctions.jsx"
+import EditableCellDropdown from '../generic/table/EditableCellDropdown';
+import EditableCellInput  from '../generic/table/EditableCellInput.jsx';
+import EditableCellDate  from '../generic/table/EditableCellDate.jsx';
 
 import './paymentstable.css';
 const formatDate = (dateString) => {
@@ -15,7 +18,7 @@ const formatDate = (dateString) => {
 };
 
 // Componente para visualizar el historial de pagos con redimensionamiento manual
-const PaymentsTable = ({ payments, minTableWidth = '800px' , onDeletePayment, onRowClick, confirmingId}) => {
+const PaymentsTable = ({ concepts, divisions, payments, minTableWidth = '800px' , onDeletePayment, onRowClick, confirmingId, handleTableUpdate}) => {
     // Convertir el prop de cadena a número para cálculos
     const minWidthValue = parseInt(minTableWidth, 10) || 600;
     const [isDragging, setIsDragging] = useState(false);
@@ -118,30 +121,69 @@ const PaymentsTable = ({ payments, minTableWidth = '800px' , onDeletePayment, on
                                                 {p.year && p.sequence ? `${p.year}-${String(p.sequence).padStart(5, '0')}` : '---'}
                                             </span>
                                     </td>
-                                    <td className="payments-td">{formatDate(p.date)}</td>
+                                    <td className="payments-td">
+                                        <EditableCellDate
+                                            value={p.date}
+                                            onSave={(val) =>
+                                                handleTableUpdate(
+                                                    { id: p.id, fields: { date: val } },
+                                                    updatePayment
+                                                )
+                                            }
+                                        />
+                                        {/*formatDate(p.date)*/}
+                                    </td>
                                     <td className="payments-td">{p.student_name}</td>
                                     <td className="payments-td">
-                                         <span className={`badge-method ${p.payment_method?.toLowerCase().includes('trans') ? 'method-transfer' : 'method-other'}`}>
-                                            <EditableCell
-                                            options={[
-                                                { value: "transfer", label: "Transferencia" },
-                                                { value: "cash", label: "Efectivo" },
-                                            ]}
-                                            value={p.payment_method}
-                                            onSave={(val) => handleCellSave(p.id, "division_name", val)}
-                                        />
-                                        </span>
-                                        
+                                        <span className={`badge-method ${p.payment_method?.toLowerCase().includes('trans') ? 'method-transfer' : 'method-other'}`}>
+                                            <EditableCellDropdown
+                                                options={[
+                                                    { value: "Transferencia", label: "Transferencia" },
+                                                    { value: "Efectivo", label: "Efectivo" },
+                                                ]}
+                                                value={p.payment_method}
+                                                onSave={(val) => handleTableUpdate({id: p.id, fields: {payment_method: val}}, updatePayment)}
+                                            />
+                                        </span> 
                                     </td>
-                                    <td className="payments-td">{p.division_name}</td>
-                                    <td className="payments-td">{p.concept_type}</td>
+                                    <td className="payments-td">
+                                        <EditableCellDropdown
+                                            options={divisions}
+                                            value={p.division_name}
+                                            valueKey='id'
+                                            labelKey='name'
+                                            onSave={(val) => handleTableUpdate({id: p.id, fields: {division_id: val}}, updatePayment)}
+                                        />
+                                    </td>
+                                    <td className="payments-td">
+                                        <EditableCellDropdown
+                                            options={concepts}
+                                            value={p.concept_type}
+                                            valueKey='id'
+                                            labelKey='name'
+                                            onSave={(val) => handleTableUpdate({id: p.id, fields: {concept_id: val}}, updatePayment)}
+                                        />
+                                    </td>
                                 
                                     {/* Mostrar monto con dos decimales */}
-                                    <td className='payments-td amount-column'>{new Intl.NumberFormat("es-CR", {
-                                                                                        style: "currency",
-                                                                                        currency: "CRC",
-                                                                                        minimumFractionDigits: 2,
-                                                                                }).format(p.amount)}
+                                    <td className='payments-td amount-column'>
+                                        <EditableCellInput
+                                            value={p.amount}
+                                            type="number"
+                                            formatDisplay={(val) =>
+                                                new Intl.NumberFormat("es-CR", {
+                                                    style: "currency",
+                                                    currency: "CRC",
+                                                    minimumFractionDigits: 2,
+                                                }).format(val)
+                                            }
+                                            onSave={(val) =>
+                                                handleTableUpdate(
+                                                    { id: p.id, fields: { amount: parseFloat(val) } },
+                                                    updatePayment
+                                                )
+                                            }
+                                        />
                                     </td>
                                     {/* Boton Borrado  */}
                                     <td className="payments-td" style={{ textAlign: 'center' }}>

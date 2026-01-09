@@ -6,13 +6,23 @@ import {useState} from "react";
 import "react-day-picker/dist/style.css";
 import "./datepicker.css";
 
-const DatePicker = ({ value, onChange, placeholder = "Seleccionar fecha" }) => {
+const DatePicker = ({
+                  value,
+                  onChange,
+                  onOpenChange, 
+                  placeholder = "Seleccionar fecha",
+                }) => {
   const [open, setOpen] = useState(false);
+
+  const handleOpenChange = (val) => {
+    setOpen(val);
+    onOpenChange?.(val); // 👈 avisa al padre
+  };
+
   return (
-    <Popover.Root open={open} onOpenChange={setOpen}>
+    <Popover.Root open={open} onOpenChange={handleOpenChange}>
       <Popover.Trigger asChild>
-        <button type="button" className="form-control date-trigger"
-                onClick={() => setOpen(true)}>
+        <button type="button" className="form-control date-trigger">
           <span>
             {value ? format(value, "dd-MM-yyyy") : placeholder}
           </span>
@@ -27,7 +37,7 @@ const DatePicker = ({ value, onChange, placeholder = "Seleccionar fecha" }) => {
             selected={value}
             onSelect={(date) => {
               if (date) onChange(date);
-              setOpen(false);
+              handleOpenChange(false);
             }}
           />
         </Popover.Content>

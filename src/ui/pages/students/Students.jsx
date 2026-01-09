@@ -1,12 +1,16 @@
 import StudentsTable from '../../components/students/StudentsTable';
-import StudentsModal from '../../components/students/StudentsModal';
+import Modal from '../../components/generic/modal/Modal.jsx';
+import StudentsDetail from '../../components/students/StudentDetail.jsx';
 import SuccessMessage from '../../components/generic/message/SuccessMessage.jsx';
 import ErrorMessage from '../../components/generic/message/ErrorMessage.jsx';
 import StudentForm from '../../components/students/StudentsForm';
-import { getAllStudents, addStudent, deleteStudentById } from '../../constant/DBFunctions.jsx'; 
+import { getAllStudents, addStudent, deleteStudentById,
+         getYearsOfPayments, getPaymentByStudentId
+ } from '../../constant/DBFunctions.jsx'; 
 import { PlusCircledIcon } from "@radix-ui/react-icons";
 
 import { useState, useEffect, useCallback } from 'react';
+import StudentDetail from '../../components/students/StudentDetail.jsx';
 
 const Students = () => {
 
@@ -20,22 +24,48 @@ const Students = () => {
         
     const [formData, setFormData] = useState(initialFormState);
     const [students, setStudents] = useState([]);
+    const [yearsPayments, setYearsPayments] = useState([]);
+
+
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState(null);
     const [message, setMessage] = useState('');
 
-    const [isModalOpen, setIsModalOpen] = useState(false); 
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    const [isModalDetailOpen, setIsModalDetailOpen] = useState(false);
 
+    const [selectedYear, setSelectedYear] = useState(null);
+    const [selectedStudent, setSelectedStudent] = useState(null);
+    const [studentPayments, setStudentPayments] = useState([]);
     // eliminar estudiante
     const [confirmingId, setConfirmingId] = useState(null);
 
-    const fetchStudents = useCallback(async () => {
+
+    //student details
+    const loadStudentPayments = async (student) => {
+        //console.log("estudante entrane: "+JSON.stringify(student));
+        const studentPayments = await getPaymentByStudentId(student.id);
+        //console.log(studentPayments);
+        setSelectedStudent(student);
+        setStudentPayments(studentPayments);
+        if (studentPayments.length > 0) {
+            setSelectedYear(Number(studentPayments[0].year))
+        }
+    }
+
+    // cargar tabla
+    const fetchData = useCallback(async () => {
             setIsLoading(true);
             try {
-                console.log("Cargando estudiantes...");
-                const fetchedStudents = await getAllStudents();
+                //console.log("Cargando estudiantes...");
+                const [fetchedYearsPayments,fetchedStudents] = await Promise.all([
+                    getYearsOfPayments(),
+                    getAllStudents()
+                ]);
+                //console.log(fetchedYearsPayments);
                 setStudents(Array.isArray(fetchedStudents) ? fetchedStudents : []);
-                console.log(fetchStudents);
+                setYearsPayments(Array.isArray(fetchedYearsPayments) ? fetchedYearsPayments : []);
+                //console.log(fetchStudents);
             } catch (e) {
                 console.error("Error al recargar estudiantes:", e);
                 setError("Error al recargar el historial de egresos.");
@@ -47,9 +77,22 @@ const Students = () => {
 
     // Cargar Pagos, Conceptos y Divisiones al montar
     useEffect(() => {
-        fetchStudents();
-    }, [fetchStudents]);
+        fetchData();
+    }, [fetchData]);
 
+    // Handles
+
+    const handleTableUpdate = async (data, func) => {
+        const res = await func(data);
+        if (!res.success){
+            setError(res.error);
+            setTimeout(() => { setError(""); setMessage(''); }, 4000);
+            return
+        }
+        setMessage("Estudiante actualizado exitosamente");
+        setTimeout(() => { setMessage(""); setError(''); }, 4000);
+        await fetchData(); 
+    }
 
     const handleChange = (e) => {
         const { name, value } = e.target;
@@ -76,7 +119,7 @@ const Students = () => {
       
                 setFormData(initialFormState);
                 setError(null);
-                await fetchStudents(); 
+                await fetchData(); 
             } catch (e) {
                 console.error("Error al guardar el pago vía IPC:", e);
                 setError("Error al guardar el pago: " + (e.message || 'Error desconocido. Verifique la consola.'));
@@ -150,17 +193,31 @@ const Students = () => {
                     message={message}
                 />
             )}
+            {error && (
+                <ErrorMessage
+                    message={error}
+                />
+            )}
 
             {/* Renderiza la Tabla */}
             <StudentsTable students={students} 
+                           loadStudent={loadStudentPayments}
+                           modalDetailOpen={setIsModalDetailOpen}
                            onDeleteStudent={deleteStudent}
-                           confirmingId={confirmingId}/>
+                           confirmingId={confirmingId}
+                           handleTableUpdate={handleTableUpdate}
+            />
 
             {/* Renderiza el Modal que contiene el formulario */}
-            
-            <StudentsModal 
+            <StudentsDetail
+                years={yearsPayments}
+            />
+            <Modal 
                 isOpen={isModalOpen} 
-                onClose={() => setIsModalOpen(false)} // Permite cerrar el modal con la X
+                onClose={() => {
+                            setIsModalOpen(false);
+                            setSelectedStudent(null);
+                        }} // Permite cerrar el modal con la X
                 title="Registrar Nuevo Estudiante"
             >
                 {error && (
@@ -175,8 +232,28 @@ const Students = () => {
                     isLoading={isLoading}
                 />
                 
-            </StudentsModal>
-            
+            </Modal>
+            <Modal 
+                isOpen={isModalDetailOpen} 
+                onClose={() => setIsModalDetailOpen(false)
+
+                } // Permite cerrar el modal con la X
+                title="Meses registrados"
+            >
+                {error && (
+                    <ErrorMessage
+                        message={error}
+                    />
+                )}
+                <StudentDetail
+                    student={selectedStudent}
+                    payments={studentPayments}
+                    years={yearsPayments}
+                    filterYear={selectedYear}
+                    setFilterYear={setSelectedYear}
+                />
+                
+            </Modal>
         </div>
     );
 };

@@ -65,7 +65,7 @@ const ExpensesForm = ({ formData, handleChange, onSubmit, isLoading }) => {
                             value={formData.amount}
                             onChange={handleChange}
                             required
-                            pattern="[0-9]{4}-[0-9]{4}"
+                            pattern="^([0-9]{4}-[0-9]{4}|[0-9]{8})$"
                             style={{ width: '100%', padding: '0.75rem', border: '1px solid #d1d5db', borderRadius: '0.5rem', boxSizing: 'border-box' }}
                             placeholder="Ej: 8888-8888"
                         />

@@ -18,6 +18,7 @@
 .card.card-1 {
     border: 1px solid #e5e7eb;
     transition: border-color 0.15s ease;
+    border-left: 4px solid #2563eb;
 }
 
 .card.card-1:hover{
@@ -27,6 +28,7 @@
 .card.card-2 {
     border: 1px solid #e5e7eb;
     transition: border-color 0.15s ease;
+    border-left: 4px solid #bc9b41;
 }
 
 .card.card-2:hover{
@@ -36,8 +38,8 @@
 .card.card-3 {
     border: 1px solid #e5e7eb;
     transition: border-color 0.15s ease;
+    border-left: 4px solid #8551fd;
 }
-
 .card.card-3:hover{
     border-color: #8551fd;
 }
@@ -95,5 +97,5 @@
 .amount {
     font-size: 1.5rem;
     font-weight: 900;
-    color: #111827;
+    color: #059669;
 }
