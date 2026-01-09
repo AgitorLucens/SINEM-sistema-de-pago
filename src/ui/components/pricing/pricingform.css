@@ -37,6 +37,7 @@
 .pricing-modal-action {
     display: flex;
     gap: 10px;
+
 }
 
 .pricing-input-group {
@@ -67,7 +68,7 @@
 }
 
 .modal-header {
-    margin-bottom: 25px;
+
     text-align: center;
 }
 

@@ -31,9 +31,9 @@ const Payments = () => {
     };
     
     const initialFilterState = {
-        concept: '',
-        division: '',
-        method: '',
+        concept: [],
+        division: [],
+        method: [],
         startDate: '',
         endDate: '',
     };
@@ -53,15 +53,18 @@ const Payments = () => {
         { label: "Diciembre", value: 12},
     ]
 
+    const paymentMethods = [
+        {label: "Efectivo", value: "Efectivo"},
+        {label: "Transferencia", value: "Transferencia"}
+    ]
+
     // datos del formulario
     const [formData, setFormData] = useState(initialFormState);
-    
+
     // pagos para tabla
     const [payments, setPayments] = useState([]);
-    const [filterState, setFilterState] = useState(initialFilterState); // Estado de los filtros
     const [isLoading, setIsLoading] = useState(false);
-    const [error, setError] = useState(null);
-    const [errorInfo, setErrorInfo] = useState('');
+    const [error, setError] = useState("");
     const [message, setMessage] = useState('');
 
     // agregar pago
@@ -71,6 +74,8 @@ const Payments = () => {
     const [confirmingId, setConfirmingId] = useState(null);
 
     // datos de los filtros
+    const [filterState, setFilterState] = useState(initialFilterState); // Estado de los filtros
+    const [initFilters, setInitFilters] = useState(false);
     const [concepts, setConcepts] = useState([]);
     const [divisions, setDivisions] = useState([]);
     const [isConceptsLoading, setIsConceptsLoading] = useState(false);
@@ -90,7 +95,20 @@ const Payments = () => {
         setIsDetailModalOpen(true);
     };
 
-   // const handle
+    // const handle
+
+
+    const handleTableUpdate = async (data, func) => {
+        const res = await func(data);
+        if (!res.success){
+            setError(res.error);
+            setTimeout(() => { setError(""); setMessage(''); }, 4000);
+            return
+        }
+        setMessage("Pago actualizado exitosamente");
+        setTimeout(() => { setMessage(""); setError(''); }, 4000);
+        await fetchPayments(); 
+    }
 
     // --- Cuando usuario escoge Tipo de Pago
     const handleConceptChange = (conceptId) => {
@@ -133,13 +151,20 @@ const Payments = () => {
     }, []);
 
     const handleClearFilters = useCallback(() => {
-        setFilterState(initialFilterState);
-    }, [initialFilterState]);
+
+        setFilterState(prev => ({
+            ...prev,
+            concept: concepts.map(c => c.name),
+            division: divisions.map(d => d.name),
+            method: paymentMethods.map(m => m.value),
+        }));
+
+    }, [concepts, divisions, paymentMethods]);
 
     // --- Lógica de Carga de Datos ---
     const fetchPayments = useCallback(async () => {
         setIsLoading(true);
-        setError(false);
+        setError("");
         try {
             const loadedData = await getAllPayments(); 
             
@@ -149,8 +174,7 @@ const Payments = () => {
             setPayments(loadedData);
         } catch (e) {
             console.error("Error al cargar pagos:", e);
-            setError(true);
-            setErrorInfo("Error al cargar datos desde la base de datos local: " + e.message);
+            setError("Error al cargar datos desde la base de datos local: " + e.message);
         } finally {
             setIsLoading(false);
         }
@@ -185,7 +209,28 @@ const Payments = () => {
         fetchPayments();
     }, [fetchPayments]);
 
-    // --- Lógica de Filtrado (Clasificación) ---
+    // Inicializar filtros
+    useEffect(() => {
+        if (initFilters) return;
+
+        let ready =
+            concepts.length &&
+            divisions.length &&
+            paymentMethods.length;
+
+        if (!ready) return;
+
+        setFilterState(prev => ({
+            ...prev,
+            concept: concepts.map(c => c.name),
+            division: divisions.map(d => d.name),
+            method: paymentMethods.map(m => m.value),
+        }));
+        setInitFilters(true);
+    }, [concepts, divisions, paymentMethods, initFilters]);
+
+
+    // --- Logica de Filtrado  ---
     const filteredPayments = useMemo(() => {
         
         if (payments.length === 0) return [];
@@ -194,20 +239,21 @@ const Payments = () => {
             //console.log("filtro"+JSON.stringify(filterState)+"\n");
             //console.log(JSON.stringify(payments));
 
-            const { concept, division, method, startDate, endDate } = filterState;
+            const { startDate, endDate } = filterState;
 
             // 1. Filtrar por Concepto (Tipo de Pago)
-            if (concept && concept !== payment.concept_type ) {
+            if (filterState.concept.length > 0 && !filterState.concept.includes(payment.concept_type)) {
                 return false;
             }
 
             // 2. Filtrar por División/Curso
-            if (division && division !== payment.division_name ) {
+                
+            if (filterState.division.length > 0 && !filterState.division.includes(payment.division_name)) {
                 return false;
             }
 
             // 3. Filtrar por Método de Pago
-            if (method && method !== payment.payment_method ) {
+            if (filterState.method.length > 0 && !filterState.method.includes(payment.payment_method)) {
                 return false;
             }
 
@@ -233,26 +279,24 @@ const Payments = () => {
 
     const handleSubmit = useCallback(async (e) => {
         e.preventDefault();
-        setError(null);
+        setError("");
         
         const amountNumber = parseFloat(formData.amount);
         
         if (isNaN(amountNumber) || amountNumber <= 0 || !formData.concept || !formData.division) {
-            setError(true);
-            setErrorInfo("Por favor, completa todos los campos obligatorios (Monto, Concepto, División).");
+            setError("Por favor, completa todos los campos obligatorios (Monto, Concepto, División).");
             return;
         }
 
-        setError(false); setErrorInfo("");
+        setError("");
 
         if (!formData.date) {
-            setError(true);
-            setErrorInfo("Por favor, ingrese una fecha");
+            setError("Por favor, ingrese una fecha");
             //setTimeout(() => { setError("Por favor, introduzca una fecha"); setMessage(''); }, 4000);
             return;
         }
 
-        setError(false); setErrorInfo("");
+        setError("");
 
         const paymentDataToSend = {
             date: new Date(formData.date).toISOString(),
@@ -273,20 +317,18 @@ const Payments = () => {
         //console.log(JSON.stringify(formData));
         const err = await addPaymentWithConsecutive(paymentDataToSend);
         if (!err.success){
-            setError(true);
-            setErrorInfo(err.error);
+            setError(err.error);
             return
         }
         setFormData(initialFormState);
         setMessage("Pago creado exitosamente");
-        setTimeout(() => { setMessage(""); setErrorInfo(''); }, 4000);
+        setTimeout(() => { setMessage(""); setError(''); }, 4000);
         await fetchPayments(); 
         setIsModalOpen(false); 
         setIsLoading(false);
     }, [formData, fetchPayments, initialFormState]);
 
     const deletePayment = async (e, paymentId) => {
-        // En el entorno real, usa un modal o componente de confirmación en lugar de window.confirm()
         e.stopPropagation();
         if (confirmingId === paymentId) {
             setIsLoading(true);
@@ -299,14 +341,14 @@ const Payments = () => {
             try {
                 await deletePaymentById(paymentId);
                 setMessage('Pago eliminado correctamente.');
-                setError(null);
+                setError("");
                 await fetchPayments();
             } catch (e) {
                 console.error("Error al eliminar el pago:", e);
                 setError("Error al eliminar el pago: " + e.message);
             } finally {
                 setIsLoading(false);
-                setTimeout(() => { setError(null); setMessage(''); }, 5000); 
+                setTimeout(() => { setError(""); setMessage(''); }, 5000); 
             }
             
             setConfirmingId(null);
@@ -332,7 +374,7 @@ const Payments = () => {
                     <button
                         onClick={() => {
                             setFormData(initialFormState);
-                            setError(null);
+                            setError("");
                             setIsModalOpen(true);
                         }} 
                         disabled={isTotalLoading}
@@ -350,7 +392,11 @@ const Payments = () => {
                     message={message}
                 />
             )}
-            
+            {(error) && (
+                <ErrorMessage
+                    message={error}
+                />
+            )}
             {/* Indicador de Carga */}
             {isTotalLoading && (
                 <div className="p-4 text-center text-indigo-600 font-semibold">
@@ -362,20 +408,25 @@ const Payments = () => {
             {!isTotalLoading && (
                 <PaymentFilters 
                     filterState={filterState}
+                    setFilterState={setFilterState}
                     handleFilterChange={handleFilterChange}
                     clearFilters={handleClearFilters}
                     concepts={concepts}
                     divisions={divisions}
+                    methods={paymentMethods}
                 />
             )}
 
             {/* Renderiza la Tabla (con datos filtrados) */}
             {!isTotalLoading && (
                 <PaymentsTable 
-                    payments={filteredPayments} 
+                    payments={filteredPayments}
+                    concepts={concepts}
+                    divisions={divisions}
                     onRowClick={handleRowClick}
                     onDeletePayment={deletePayment}
                     confirmingId={confirmingId}
+                    handleTableUpdate={handleTableUpdate}
                 />
             )}
             {/* modal detalles pago */}
@@ -383,7 +434,8 @@ const Payments = () => {
                 isOpen={isDetailModalOpen}
                 onClose={() => {
                     setFormData(initialFormState);
-                    setIsDetailModalOpen(false)}}
+                    setIsDetailModalOpen(false);
+                    }}
                 title="Detalles del pago"
             >
                 <PaymentsDetail
@@ -394,13 +446,13 @@ const Payments = () => {
             {/* modal formulario */}
             <Modal 
                 isOpen={isModalOpen} 
-                onClose={() => setIsModalOpen(false)}
+                onClose={() => {setIsModalOpen(false)}}
                 title="Registrar Nuevo Pago (Ingresos)"
             >
                 {/* Mensaje de Error */}
                 {error && (
                     <ErrorMessage
-                        message={errorInfo}
+                        message={error}
                     />
                 )}
                 <PaymentsForm 

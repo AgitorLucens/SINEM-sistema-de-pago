@@ -1,0 +1,11 @@
+.editable-input {
+  padding: 4px 6px;
+  border: 1px solid #6366f1;
+  border-radius: 4px;
+  font-size: 0.875rem;
+  width: 100%;
+}
+
+.editable-input:focus {
+  border-color: #4f46e5 !important;
+}

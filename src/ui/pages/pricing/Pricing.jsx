@@ -57,7 +57,7 @@ const Pricing = () => {
     return (
         <div className="container">
             <div className="content-wrapper">
-                <div className="header">
+                <div className="pricing-header">
                     <h2 className="title">Precios</h2>
                     <p className="subtitle">Configuración de costos y conceptos de pago.</p>
                 </div>

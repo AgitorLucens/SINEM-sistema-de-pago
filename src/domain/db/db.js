@@ -1,6 +1,7 @@
 import { app } from 'electron';
 import path from 'node:path';
 import Database from 'better-sqlite3';
+import {validatePaymentsUpdate,validateExpensesUpdate, validateStudentsUpdate} from "./validate.js";
 
 class AppDB {
     constructor() {
@@ -140,19 +141,6 @@ class AppDB {
         `;
         this.db.exec(createCashRegisterTable);
 
-        /*
-            Tabla Estudiantes
-        */
-        const createIncomeCategoriesTable = `
-            CREATE TABLE IF NOT EXISTS income_categories (
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
-                name TEXT NOT NULL,
-                total_income REAL,
-                total_expense REAL,
-                available_cash REAL
-            );
-        `;
-        this.db.exec(createIncomeCategoriesTable);
     }
 
 
@@ -213,6 +201,28 @@ class AppDB {
             success: true,
             transaction: transaction(payment)
         }
+    }
+
+    updatePayment(data){
+        const keys = validatePaymentsUpdate(data);
+        if (!keys) return {
+            success: false,
+            transaction: null
+        } 
+
+        const setClause = keys.map(k => `${k} = ?`).join(", ");
+        const values = keys.map(k => data.fields[k]);
+
+        const stmt = this.db.prepare(`
+                UPDATE payments
+                SET ${setClause}
+                WHERE id = ?
+        `);
+        const result = stmt.run(...values, data?.id);
+        return {
+            success: true,
+            result: result.changes
+        } 
     }
 
     getNextConsecutiveByYear(year) {
@@ -296,7 +306,8 @@ class AppDB {
                                         p.payment_method,
                                         d.name AS division_name,
                                         c.type AS concept_type,
-                                        p.amount                    
+                                        p.amount,
+                                        p.month                
                                      FROM
                                         payments p
                                      INNER JOIN
@@ -327,7 +338,7 @@ class AppDB {
                                     c.type AS concept_type,
                                     p.amount,
                                     p.year,
-                                    p.sequence
+                                    p.sequencp.month
                                    FROM 
                                     payments p
                                    INNER JOIN
@@ -380,9 +391,30 @@ class AppDB {
         return years;
     }
 
-    getPaymentById(id) {
-        const sql = this.db.prepare(`SELECT * FROM payments WHERE id = ?`);
-        const payment = sql.run(id)
+    getPaymentByStudentId(id) {
+        const sql = this.db.prepare(`SELECT  
+                                        p.id,
+                                        p.date,
+                                        s.name AS student_name,
+                                        p.payment_method,
+                                        d.name AS division_name,
+                                        c.type AS concept_type,
+                                        p.amount,
+                                        p.year,
+                                        p.sequence,
+                                        p.month,
+                                        p.status
+                                     FROM 
+                                        payments p
+                                     INNER JOIN
+                                        payment_concepts c ON p.concept_id = c.id
+                                     INNER JOIN  
+                                        divisions d ON p.division_id = d.id
+                                     INNER JOIN
+                                        students s ON p.student_id = s.id
+                                     WHERE 
+                                        student_id = ?`);
+        const payment = sql.all(id)
         return payment;
     }
 
@@ -484,6 +516,28 @@ class AppDB {
             return data.lastInsertRowid;
     }
 
+    updateExpense(data){
+        const keys = validateExpensesUpdate(data);
+        if (!keys) return {
+            success: false,
+            transaction: null
+        } 
+
+        const setClause = keys.map(k => `${k} = ?`).join(", ");
+        const values = keys.map(k => data.fields[k]);
+
+        const stmt = this.db.prepare(`
+                UPDATE expenses
+                SET ${setClause}
+                WHERE id = ?
+        `);
+        const result = stmt.run(...values, data?.id);
+        return {
+            success: true,
+            result: result.changes
+        } 
+    }
+
     deleteExpenseById(id) {
             const sql = this.db.prepare(`DELETE FROM expenses WHERE id = ?`);
             const expense = sql.run(id);
@@ -565,6 +619,28 @@ class AppDB {
                                  studentData.reference,
                                  studentData.active);
             return data.lastInsertRowid;
+    }
+
+    updateStudent(data){
+        const keys = validateStudentsUpdate(data);
+        if (!keys) return {
+            success: false,
+            transaction: null
+        } 
+
+        const setClause = keys.map(k => `${k} = ?`).join(", ");
+        const values = keys.map(k => data.fields[k]);
+
+        const stmt = this.db.prepare(`
+                UPDATE students
+                SET ${setClause}
+                WHERE id = ?
+        `);
+        const result = stmt.run(...values, data?.id);
+        return {
+            success: true,
+            result: result.changes
+        }
     }
 
     deleteStudentById(id) {

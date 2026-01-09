@@ -1,5 +1,5 @@
 import './paymentfilter.css';
-const PaymentsFilters = ({ filterState, handleFilterChange, concepts, divisions, clearFilters }) => {
+const PaymentsFilters = ({ filterState, setFilterState, handleFilterChange, concepts, divisions, methods, clearFilters }) => {
     
     return (
         <div className="filter-card">
@@ -9,50 +9,90 @@ const PaymentsFilters = ({ filterState, handleFilterChange, concepts, divisions,
           
           {/* Campo Concepto */}
           <div className="filter-group">
-            <label htmlFor="concept" className="filter-label">Concepto</label>
-            <select
-              id="concept"
-              name="concept"
-              value={filterState.concept}
-              onChange={handleFilterChange}
-              className="filter-input"
-            >
-              <option value="">Todos</option>
-              {concepts.map(c => <option key={c.id} value={c.name}>{c.name}</option>)}
-            </select>
+            <label className="filter-label">Concepto</label>
+
+            <div className="chip-container">
+              {concepts.map(c => {
+                const selected = filterState.concept.includes(c.name);
+                return (
+                  <button
+                    key={c.id}
+                    type="button"
+                    className={`chip ${selected ? "chip-active" : ""}`}
+                    onClick={() => {
+                      setFilterState(prev => ({
+                        ...prev,
+                        concept: selected
+                          ? prev.concept.filter(v => v !== c.name)
+                          : [...prev.concept, c.name]
+                      }));
+                    }}
+                  >
+                    {c.name}
+                  </button>
+                );
+              })}
+            </div>
           </div>
 
           {/* Campo Curso/División */}
           <div className="filter-group">
-            <label htmlFor="division" className="filter-label">Curso/División</label>
-            <select
-              id="division"
-              name="division"
-              value={filterState.division}
-              onChange={handleFilterChange}
-              className="filter-input"
-            >
-              <option value="">Todos</option>
-              {divisions.map(d => <option key={d.id} value={d.name}>{d.name}</option>)}
-            </select>
+            <label className="filter-label">Curso/Division</label>
+
+            <div className="chip-container">
+              {divisions.map(d => {
+                const selected = filterState.division.includes(d.name);
+                return (
+                  <button
+                    key={d.id}
+                    type="button"
+                    className={`chip ${selected ? "chip-active" : ""}`}
+                    onClick={() => {
+                      setFilterState(prev => ({
+                        ...prev,
+                        division: selected
+                          ? prev.division.filter(v => v !== d.name)
+                          : [...prev.division, d.name]
+                      }));
+                    }}
+                  >
+                    {d.name}
+                  </button>
+                );
+              })}
+            </div>
           </div>
 
           {/* Campo Método de Pago */}
           <div className="filter-group">
-            <label htmlFor="method" className="filter-label">Método de Pago</label>
-            <select
-              id="method"
-              name="method"
-              value={filterState.mode}
-              onChange={handleFilterChange}
-              className="filter-input"
-            >
-              <option value="">Todos</option>
-              <option value="cash">Efectivo</option>
-              <option value="transfer">Transferencia</option>
-            </select>
+            <label className="filter-label">Metodo de Pago</label>
+
+            <div className="chip-container">
+              {methods.map(m => {
+                const selected = filterState.method.includes(m.value);
+                return (
+                  <button
+                    key={m.value}
+                    type="button"
+                    className={`chip ${selected ? "chip-active" : ""}`}
+                    onClick={() => {
+                      setFilterState(prev => ({
+                        ...prev,
+                        method: selected
+                          ? prev.method.filter(v => v !== m.value)
+                          : [...prev.method, m.value]
+                      }));
+                    }}
+                  >
+                    {m.label}
+                  </button>
+                );
+              })}
+            </div>
           </div>
           
+        </div>
+        <div className="filter-grid">
           {/* Campo Fecha Inicial */}
           <div className="filter-group">
             <label htmlFor="startDate" className="filter-label">Fecha Inicial</label>
@@ -80,9 +120,7 @@ const PaymentsFilters = ({ filterState, handleFilterChange, concepts, divisions,
               placeholder="dd/mm/aaaa"
             />
           </div>
-
         </div>
-
         {/* Botón de Limpiar Filtros */}
         <div className="filter-actions">
           <button

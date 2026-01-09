@@ -6,13 +6,14 @@ import {
 	ChevronUpIcon,
 } from "@radix-ui/react-icons";
 
-
 import './selectradix.css';
 
 const SelectRadix = ({ label,
                        name,
                        value,
                        onChange,
+                       onOpenChange,
+                       open,
                        options = [],
                        valueKey = "value",
                        labelKey = "label",
@@ -50,7 +51,10 @@ const SelectRadix = ({ label,
         </label>
       )}
 
-      <Select.Root value={value?.toString()} onValueChange={onChange}>
+      <Select.Root value={value?.toString()} 
+                   onValueChange={onChange} 
+                   onOpenChange={onOpenChange}
+                   open={open}>
         <Select.Trigger className="form-control SelectTrigger">
           <Select.Value placeholder={placeholder} />
           <Select.Icon>

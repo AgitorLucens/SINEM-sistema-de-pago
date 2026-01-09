@@ -34,6 +34,17 @@ export async function addPaymentWithConsecutive(payment) {
     }
 }
 
+export async function updatePayment(payment) {
+    try {
+        return await window.api.updatePayment(payment);;
+    } catch (error) {
+        console.error('Error al agregar pago:', error.message);
+        return {
+            error: "Error al cambiar pago.",
+        };  
+    }
+}
+
 export async function getNextConsecutiveByYear(year){
     try {
         return await window.api.getNextConsecutiveByYear(year);
@@ -72,13 +83,15 @@ export async function getDateOfPayments() {
     }
 }
 
-export async function getPaymentById(paymentId) {
+export async function getPaymentByStudentId(id) {
     try {
-        return await window.api.getPaymentById(paymentId);
+        return await window.api.getPaymentByStudentId(id);
     }
     catch (error) {
-        console.error('Error al obtener pago por ID:', error.message);
-        return []; 
+        console.error('Error al obtener pago por ID de estudiante:', error.message);
+        return {
+            error: "Error al obtener pago por ID de estudiante",
+        };
     }
 }
 
@@ -150,6 +163,17 @@ export async function addExpense(expenseData) {
     }
 }
 
+export async function updateExpense(expense) {
+    try {
+        return await window.api.updateExpense(expense);
+    } catch (error) {
+        console.error('Error al cambiar gasto:', error.message);
+        return {
+            error: "Error al cambiar gasto",
+        };  
+    }
+}
+
 export async function deleteExpenseById(expenseId) {
     try {
         return await window.api.deleteExpenseById(expenseId);
@@ -196,6 +220,17 @@ export async function addStudent(studentData) {
     } catch (error) {
         console.error('Error al agregar estudiante:', error.message);
         return []; 
+    }
+}
+
+export async function updateStudent(student) {
+    try {
+        return await window.api.updateStudent(student);;
+    } catch (error) {
+        console.error('Error al cambiar estudiante:', error.message);
+        return {
+            error: "Error al cambiar estudiante.",
+        };  
     }
 }
 
@@ -289,7 +324,7 @@ export default {
     getPaymentsByYear,
     getPaymentConcepts,
     getPaymentDivisions,
-    getPaymentById,
+    getPaymentByStudentId,
     deletePaymentById,
     //Gastos
     getAllExpenses,

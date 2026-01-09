@@ -5,6 +5,7 @@ import { getPaymentConcepts, getPaymentDivisions, getAllPayments,
         getDateOfPayments, exportReportToExcel
         } from "../../constant/DBFunctions.jsx";
 import { CalendarIcon, DownloadIcon } from "@radix-ui/react-icons";
+
 import './report.css';
 const Report = () =>{
     const [error, setError] = useState("");
@@ -13,15 +14,24 @@ const Report = () =>{
     const [dates, setDates] = useState([]);
     const [divisions, setDivisions] = useState([]);
     const allMethods = [
-           { label: "Efectivo", value: "cash"} , 
-           { label: "Transferencia", value: "transfer" }        
+           { label: "Efectivo", value: "Efectivo"} , 
+           { label: "Transferencia", value: "Transferencia" }        
         ];
 
     // Estados
-    const [selectedDate, setSelectedDate] = useState("all");
+    const [selectedDate, setSelectedDate] = useState([]);
     const [selectedCourses, setSelectedCourses] = useState([]);
     const [selectedMethods, setSelectedMethods] = useState(allMethods);
 
+    
+    const formatDate = (isoDate) => {
+        const d = new Date(isoDate);
+        return d.toLocaleDateString('es-CR', {
+            day: '2-digit',
+            month: '2-digit',
+            year: 'numeric'
+        }).replaceAll('/', '-');
+    };
 
     const handleExportReport = async (data) => {
         //console.log("Exportando datos de:", selectedType, data);
@@ -43,9 +53,9 @@ const Report = () =>{
     // Lógica de filtrado
     const matrixData = useMemo(() => {
         const filteredByDate =
-            selectedDate === "all"
-            ? payments
-            : payments.filter(p => p.date === selectedDate);
+            selectedDate.length === 0
+                ? payments
+                : payments.filter(p => selectedDate.includes(formatDate(p.date)));
 
         const totals = {};
 
@@ -141,6 +151,12 @@ const Report = () =>{
         }
     }, [divisions]);
 
+    useEffect( ()=> {
+        if (dates.length > 0 && selectedDate.length === 0) {
+            setSelectedDate(dates.map(d => d.date_only));
+        }
+    }, [dates]);
+
     return(
         <div>
             <div className="header-report">
@@ -160,6 +176,7 @@ const Report = () =>{
                 toggleItem={toggleMethod}
                 toggleItemById={toggleItemById}
                 selectedDate={selectedDate}
+                setSelectedDate={setSelectedDate}
                 selectedCourses={selectedCourses}
                 setSelectedCourses={setSelectedCourses}
                 selectedMethods={selectedMethods}

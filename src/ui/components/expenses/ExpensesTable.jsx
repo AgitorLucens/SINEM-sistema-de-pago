@@ -1,8 +1,11 @@
 import { useState, useEffect, useRef } from 'react';
-import { formatDate } from "../generic/function/Function.jsx"
+import        { formatDate }           from "../generic/function/Function.jsx"
+import       { updateExpense }         from "../../constant/DBFunctions.jsx"
+import        EditableCellInput        from '../generic/table/EditableCellInput.jsx';
+import        EditableCellDate         from '../generic/table/EditableCellDate.jsx';
 
 import './expensestable.css';
-const ExpensesTable = ({expenses, minTableWidth = '700px', onDeleteExpense, onRowClick, confirmingId}) => {
+const ExpensesTable = ({expenses, minTableWidth = '700px', handleTableUpdate, onDeleteExpense, onRowClick, confirmingId}) => {
 
     const minWidthValue = parseInt(minTableWidth, 10) || 600;
     
@@ -88,15 +91,61 @@ const ExpensesTable = ({expenses, minTableWidth = '700px', onDeleteExpense, onRo
                                 // Asegura que el ID sea único
                                 <tr key={ex.id} className='expenses-tr'
                                     style={{ backgroundColor: index % 2 === 0 ? 'white' : '#f9fafb' }}>
-                                    <td className='expenses-td'>{formatDate(ex.date)}</td>
-                                    <td className='expenses-td'>{ex.description}</td>
-                                    <td className='expenses-td'>{ex.reference}</td>
+                                    <td className='expenses-td'>
+                                        <EditableCellDate
+                                            value={ex.date}
+                                            onSave={(val) =>
+                                                handleTableUpdate(
+                                                    { id: ex.id, fields: { date: val } },
+                                                    updateExpense
+                                                )
+                                            }
+                                        />
+                                        {/*formatDate(ex.date)*/}
+                                    </td>
+                                    <td className='expenses-td'>
+                                        <EditableCellInput
+                                            value={ex.description}
+                                            type="text"
+                                            onSave={(val) =>
+                                                handleTableUpdate(
+                                                    { id: ex.id, fields: { description: val} },
+                                                    updateExpense
+                                                )
+                                            }
+                                        />
+                                    </td>
+                                    <td className='expenses-td'>
+                                        <EditableCellInput
+                                            value={ex.reference}
+                                            type="text"
+                                            onSave={(val) =>
+                                                handleTableUpdate(
+                                                    { id: ex.id, fields: { reference: val} },
+                                                    updateExpense
+                                                )
+                                            }
+                                        />
+                                    </td>
                                     {/* Mostrar monto con dos decimales */}
-                                    <td className='expenses-td amount-column'>{new Intl.NumberFormat("es-CR", {
-                                                                                        style: "currency",
-                                                                                        currency: "CRC",
-                                                                                        minimumFractionDigits: 2,
-                                                                                }).format(ex.amount)}
+                                    <td className='expenses-td amount-column'>
+                                        <EditableCellInput
+                                            value={ex.amount}
+                                            type="number"
+                                            formatDisplay={(val) =>
+                                                new Intl.NumberFormat("es-CR", {
+                                                    style: "currency",
+                                                    currency: "CRC",
+                                                    minimumFractionDigits: 2,
+                                                }).format(val)
+                                            }
+                                            onSave={(val) =>
+                                                handleTableUpdate(
+                                                    { id: ex.id, fields: { total_amount: parseFloat(val) } },
+                                                    updateExpense
+                                                )
+                                            }
+                                        />
                                     </td>         
                                     {/* Boton Borrado  */}
                                     <td className="expenses-td" style={{ textAlign: 'center' }}>

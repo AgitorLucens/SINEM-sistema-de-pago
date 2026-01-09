@@ -230,6 +230,7 @@ npm install @radix-ui/react-select \
             @radix-ui/colors \
             @radix-ui/react-icons \
             @radix-ui/react-popover \
+            @radix-ui/react-dropdown-menu \
             react-day-picker
 ```
 

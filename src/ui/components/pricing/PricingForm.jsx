@@ -37,9 +37,8 @@ const PricingForm = ({ price, onClose, onSave,
   return (
     <div
       style={{
-        inset: 0,
         display: "flex",
-
+        flexDirection: "column"
       }}
     >
       <div
@@ -49,17 +48,6 @@ const PricingForm = ({ price, onClose, onSave,
             <h2>Registrar Precio</h2>
             <span>{price.name}</span>
         </div>
-        {/*
-        <div style={{ position: 'relative' }}>
-          <ColonIcon size={16} transform='translateY(-50%)'/>
-          <input 
-            type="number" 
-            value={value} 
-            onChange={(e) => setValue(Number(e.target.value))}
-            className="input-pricing"
-          />
-        </div>
-        */}
         <div className="pricing-input-group">
               <label>Monto a cobrar</label>
               <input

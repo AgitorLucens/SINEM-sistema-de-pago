@@ -35,7 +35,7 @@ const PaymentsForm = ({ formData, handleChange, handleConcept, handleAmount, han
                         <SelectRadix
                                  label=""
                                  name="month"
-                                 placeholder="Sel"
+                                 placeholder="Selecciones un mes"
                                  value={formData.month}
                                  valueKey="value"
                                  labelKey="label"
@@ -50,7 +50,6 @@ const PaymentsForm = ({ formData, handleChange, handleConcept, handleAmount, han
                         <label htmlFor="concept" style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '500', fontSize: '0.875rem' }}>
                             Tipo de Pago
                         </label>
-                        
                         <SelectRadix
                                  label=""
                                  name="concept"

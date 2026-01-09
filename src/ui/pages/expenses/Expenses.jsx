@@ -31,7 +31,7 @@ const Expenses = () => {
     const fetchExpenses = useCallback(async () => {
         setIsLoading(true);
         try {
-            console.log("Cargando egresos...");
+            //console.log("Cargando egresos...");
             const fetchedExpenses = await getAllExpenses();
             setExpenses(Array.isArray(fetchedExpenses) ? fetchedExpenses : []);
         } catch (e) {
@@ -60,7 +60,7 @@ const Expenses = () => {
     // Lógica para registrar y añadir un nuevo pago
     const handleSubmit = async (e) => {
         e.preventDefault();
-        console.log(JSON.stringify(formData));
+        //console.log(JSON.stringify(formData));
         const amountNumber = parseFloat(formData.amount);
         if (isNaN(amountNumber) || amountNumber <= 0) {
             setError("Por favor, introduce un monto válido y positivo.");
@@ -92,6 +92,17 @@ const Expenses = () => {
 
     };
 
+    const handleTableUpdate = async (data, func) => {
+        const res = await func(data);
+        if (!res.success){
+            setError(res.error);
+            setTimeout(() => { setError(""); setMessage(''); }, 4000);
+            return
+        }
+        setMessage("Pago actualizado exitosamente");
+        setTimeout(() => { setMessage(""); setError(''); }, 4000);
+        await fetchExpenses(); 
+    }
 
     const deleteExpense = async (e, expenseId) => {
             // En el entorno real, usa un modal o componente de confirmación en lugar de window.confirm()
@@ -159,6 +170,7 @@ const Expenses = () => {
             {/* Renderiza la Tabla */}
             <ExpensesTable expenses={expenses} 
                            confirmingId={confirmingId}
+                           handleTableUpdate={handleTableUpdate}
                            onDeleteExpense={deleteExpense}/>
 
             {/* Renderiza el Modal que contiene el formulario */}

@@ -160,3 +160,11 @@
   padding: 40px;
   color: #9ca3af;
 }
+
+.cell-even:hover{
+  background-color: #f9fafb;
+}
+
+.cell-odd:hover{
+  background-color: white;
+}
