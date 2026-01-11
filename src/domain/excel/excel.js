@@ -3,7 +3,12 @@ import fs from "fs";
 import * as XLSX from "xlsx";
 import ExcelJS from "exceljs";
 import path from "path";
-import { app } from "electron";
+import { getAssetPath, createWorkbook, createWorksheet, saveWorkbook } from "./utils.js";
+import { groupPaymentsByStudentAndYear, buildStudentRow, getStudentColumns,
+         styleStudentSheet, addSheetTitle
+ } from "./students.js";
+import { getExpensesColumns, styleExpensesSheet} from "./expenses.js";
+import { getPaymentsColumns, buildPaymentRow, stylePaymentSheet } from "./payments.js";
 
 const cmToPoints = (cm) => cm * 28.3465;
 const cmToColumnWidth = (cm) => cm * 5.5;
@@ -181,192 +186,46 @@ export async function exportPaymentsToExcel(payment) {
   return { success: true, path: filePath };
 }
 
+/*
+  Export Payments
+*/
 export async function exportPaymentsByYearToExcel(payments) {
   if (!payments) return { success: false };
 
-    const safePayments = Array.isArray(payments) ? payments : [payments];
+  const {name,paymentsFiltered} = payments;
+  const safePayments = Array.isArray(paymentsFiltered) ? paymentsFiltered : [paymentsFiltered];
 
-  /* =========================
-     WORKBOOK & SHEET
-  ========================= */
-  const workbook = new ExcelJS.Workbook();
-  const sheet = workbook.addWorksheet("Ingresos", {
-      views: [{ 
-        showGridLines: false,
-      }],
-    }
-  );
+  const workbook = createWorkbook();
+  const sheet = createWorksheet(workbook, "",getPaymentsColumns,"Ingresos");
 
-  const tableBorder = {
-  top: { style: "thin" },
-  left: { style: "thin" },
-  bottom: { style: "thin" },
-  right: { style: "thin" },
-  };
-
-  /* =========================
-     COLUMNAS
-  ========================= */
-  sheet.columns = [
-    { header: "# Factura", key: "consecutive", width: 10.25 },
-    { header: "Fecha", key: "date", width: 10.25 },
-    { header: "Nombre Estudiante", key: "student", width: 24 },
-    { header: "Modo de Pago", key: "method", width: 12 },
-    { header: "Curso", key: "division", width: 10.25 },
-    { header: "Tipo de pago", key: "concept", width: 14 },
-    { header: "Monto", key: "amount", width: 10.25 },
-    { header: "# Comprobante", key: "-", width: 12.95 },
-  ];
-
-  /* =========================
-     DATA
-  ========================= */
+  // data
   safePayments.forEach(p => {
-    sheet.addRow({
-      consecutive: `${p.year}-${String(p.sequence).padStart(5, '0')}`,
-      date: new Intl.DateTimeFormat("es-CR").format(new Date(p.date)),
-      student: p.student_name ?? "",
-      concept: p.concept_type,
-      division: p.division_name,
-      method: p.payment_method,
-      amount: Number(p.amount),
-      "-": "-",
-    });
+    sheet.addRow(buildPaymentRow(p));
   });
 
-  /* =========================
-     FORMATOS
-  ========================= */
+  // formatos
   sheet.getColumn("amount").numFmt = '"₡"#,##0.00';
   sheet.getColumn("amount").alignment = { horizontal: "right" };
   sheet.getColumn("date").alignment = { horizontal: "center" };
   sheet.getColumn("consecutive").alignment = { horizontal: "center" };
-
-  /* =========================
-     FILA DE TOTALES (OPCIONAL)
-  ========================= */
-  const totalRow = sheet.addRow({
-    concept: "TOTAL",
-    amount: {
-      formula: `SUM(G2:G${sheet.rowCount})`,
-    },
-  });
-
-  totalRow.font = { bold: true };
-  totalRow.getCell("amount").numFmt = '"₡"#,##0.00';
-
-  sheet.eachRow({ includeEmpty: false }, row => {
-    row.eachCell({ includeEmpty: false }, cell => {
-      cell.border = tableBorder;
-      cell.font = { name: "Aptos Narrow" };
-    });
-  });
-
-  sheet.getRow(1).alignment = { horizontal: "center" };
-
-    /* =========================
-     ESTILO HEADER
-  ========================= */
-
-  sheet.getCell("A1").font = { name: "Aptos Narrow",
-                               color: { argb: "FFFFFF" },
-                               bold: true };
-  sheet.getCell("A1").fill = { type: "pattern",
-                               pattern: "solid",
-                               fgColor: { argb: "FF808080" } };
-  sheet.getCell("B1").font = { name: "Aptos Narrow",
-                               color: { argb: "FFFFFF" },
-                               bold: true };                           
-  sheet.getCell("B1").fill = { type: "pattern",
-                               pattern: "solid",
-                               fgColor: { argb: "FF808080" } };
-  sheet.getCell("C1").font = { name: "Aptos Narrow",
-                               color: { argb: "FFFFFF" },
-                               bold: true };
-  sheet.getCell("C1").fill = { type: "pattern",
-                               pattern: "solid",
-                               fgColor: { argb: "FF808080" } };
-  sheet.getCell("D1").font = { name: "Aptos Narrow",
-                               color: { argb: "FFFFFF" },
-                               bold: true };
-  sheet.getCell("D1").fill = { type: "pattern",
-                               pattern: "solid",
-                               fgColor: { argb: "FF808080" } };
-  sheet.getCell("E1").font = { name: "Aptos Narrow",
-                               color: { argb: "FFFFFF" },
-                               bold: true };
-  sheet.getCell("E1").fill = { type: "pattern",
-                               pattern: "solid",
-                               fgColor: { argb: "FF808080" } };
-  sheet.getCell("F1").font = { name: "Aptos Narrow",
-                               color: { argb: "FFFFFF" },
-                               bold: true };
-  sheet.getCell("F1").fill = { type: "pattern",
-                               pattern: "solid",
-                               fgColor: { argb: "FF808080" } };
-  sheet.getCell("G1").font = { name: "Aptos Narrow",
-                               color: { argb: "FFFFFF" },
-                               bold: true };
-  sheet.getCell("G1").fill = { type: "pattern",
-                               pattern: "solid",
-                               fgColor: { argb: "FF808080" } };
-  sheet.getCell("H1").font = { name: "Aptos Narrow",
-                               color: { argb: "FFFFFF" },
-                               bold: true };
-  sheet.getCell("H1").fill = { type: "pattern",
-                               pattern: "solid",
-                               fgColor: { argb: "FF808080" } };
-
-  /* =========================
-     GUARDAR ARCHIVO
-  ========================= */
-  const { canceled, filePath } = await dialog.showSaveDialog({
-    title: "Guardar pagos",
-    defaultPath: "Pagos.xlsx",
-    filters: [{ name: "Excel", extensions: ["xlsx"] }],
-  });
-
-  if (canceled || !filePath) {
-    return { success: false };
-  }
-
-  await workbook.xlsx.writeFile(filePath);
+ 
+  stylePaymentSheet(sheet);
+  
+  const filePath = await saveWorkbook(workbook, "Guardar Pagos",`${name}.xlsx`);
+  if (!filePath) return {success: false}
 
   return { success: true, path: filePath };
 }
+/*
+  Export Expenses
+*/
+export async function exportExpensesByYearToExcel(expenses) {
+  if (!expenses) return {success: false}
+  
+  const workbook = createWorkbook();
+  const sheet = createWorksheet(workbook, "", getExpensesColumns, "Egresos");
 
-export async function exportExpensesByYearToExcel(expenses = []) {
-  const workbook = new ExcelJS.Workbook();
-  const sheet = workbook.addWorksheet("Egresos", {
-    views: [{ showGridLines: false }],
-  });
-
-  /* =====================
-     CONFIGURACIÓN GENERAL
-  ===================== */
-
-  sheet.columns = [
-    { header: "Fecha", key: "date", width: 10.25 },
-    { header: "Detalle", key: "detail", width: 30 },
-    { header: "Referencia", key: "reference", width: 28 },
-    { header: "Monto", key: "amount", width: 10.25 },
-  ];
-
-  /* =====================
-     HEADER (fila 1)
-  ===================== */
-  const headerRow = sheet.getRow(1);
-
-  headerRow.eachCell(cell => {
-    cell.alignment = {
-      horizontal: "left",
-      vertical: "middle",
-    };
-  });
-
-  /* =====================
-     DATA (si existe)
-  ===================== */
+  // datos
   expenses.forEach(e => {
     sheet.addRow({
       date: e.date
@@ -385,112 +244,120 @@ export async function exportExpensesByYearToExcel(expenses = []) {
   while (sheet.rowCount < MAX_ROWS) {
     sheet.addRow({});
   }
-
-  /* =====================
-     FORMATO COLUMNAS
-  ===================== */
-  sheet.getColumn("amount").numFmt = '"₡"#,##0.00';
-
-  /* =====================
-     BORDES (TABLA COMPLETA)
-  ===================== */
-  sheet.eachRow({ includeEmpty: true }, row => {
-    row.eachCell({ includeEmpty: true }, cell => {
-      cell.border = {
-        top: { style: "thin" },
-        left: { style: "thin" },
-        bottom: { style: "thin" },
-        right: { style: "thin" },
-      };
-      cell.font = {
-        name: "Aptos Narrow",
-        size: 11,
-      };
-    });
-  });
-
-  sheet.getCell("A1").font = { name: "Aptos Narrow",
-                               color: { argb: "FFFFFF" },
-                               bold: true };
-  sheet.getCell("A1").fill = { type: "pattern",
-                               pattern: "solid",
-                               fgColor: { argb: "FF1F4E78" } };
-  sheet.getCell("B1").font = { name: "Aptos Narrow",
-                               color: { argb: "FFFFFF" },
-                               bold: true };                           
-  sheet.getCell("B1").fill = { type: "pattern",
-                               pattern: "solid",
-                               fgColor: { argb: "FF1F4E78" } };
-  sheet.getCell("C1").font = { name: "Aptos Narrow",
-                               color: { argb: "FFFFFF" },
-                               bold: true };
-  sheet.getCell("C1").fill = { type: "pattern",
-                               pattern: "solid",
-                               fgColor: { argb: "FF1F4E78" } };
-  sheet.getCell("D1").font = { name: "Aptos Narrow",
-                               color: { argb: "FFFFFF" },
-                               bold: true };
-  sheet.getCell("D1").fill = { type: "pattern",
-                               pattern: "solid",
-                               fgColor: { argb: "FF1F4E78" } };
-  /* =====================
-     GUARDAR ARCHIVO
-  ===================== */
-  const { canceled, filePath } = await dialog.showSaveDialog({
-    title: "Guardar egresos",
-    defaultPath: path.join("Egresos.xlsx"),
-    filters: [{ name: "Excel", extensions: ["xlsx"] }],
-  });
-
-  if (canceled || !filePath) {
-    return { success: false };
-  }
-
-  await workbook.xlsx.writeFile(filePath);
+  
+  styleExpensesSheet(sheet);
+  
+  const filePath = await saveWorkbook(workbook, "Guardar Egresos",`Egresos.xlsx`);
+  if (!filePath) return { success: false };
 
   return { success: true, path: filePath };
 }
 
-export async function exportStudentsByActiveToExcel(students) {
-  if (!students) return { success: false };
+/*
+    Export Students
+*/
+export async function exportStudentsByActiveToExcel(students,payments,years) {
+  if (!students?.length || !payments?.length || !years?.length) return { success: false, error: "Estudiantes, Pagos o Años vacios." };
 
-    const safeStudents = Array.isArray(students)
-      ? students
-      : [students];
+  const workbook = createWorkbook();
+  years.forEach(year => {
+    const paymentsByStudent =
+      groupPaymentsByStudentAndYear(payments, year);
 
-    const data = safeStudents.map(p => ({
-      "Nombre Matriculado": p.name,
-      Correo: p.email,
-      Activo: p.active,
-      Telefono: p.phone,
-      Referencia: p.reference,
-    }));
+      const sheet = createWorksheet(workbook,year,getStudentColumns,`Matriculados ${year}`);
 
-    const worksheet = XLSX.utils.json_to_sheet(data);
-    const workbook = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(workbook, worksheet, "Matriculados");
+      students.forEach(student => {
+        const studentPayments = paymentsByStudent[student.id] || [];
+        const row = buildStudentRow(student, studentPayments);
+        sheet.addRow(row);
+      });
+      styleStudentSheet(sheet);
+  });
 
-    // 🔹 Pedir ruta al usuario
-    const { canceled, filePath } = await dialog.showSaveDialog({
-      title: "Guardar Estudiantes",
-      defaultPath: path.join("estudiantes.xlsx"),
-      filters: [{ name: "Excel", extensions: ["xlsx"] }],
+  const path = await saveWorkbook(
+    workbook,
+    "Guardar estudiantes",
+    `Estudiantes_${years.join("_")}.xlsx`
+  );
+  if (!path) return { success: false };
+
+  return { success: true, path: path };
+}
+
+/*
+  Export Historic
+*/
+export async function exportHistoric(data){
+  const {payments,years,students,expenses} = data;
+  const workbook = createWorkbook();
+
+  //students
+  if (years !== null && payments !== null && years?.length === 0 && payments?.length === 0){
+    years.forEach(year => {
+    const paymentsByStudent =
+      groupPaymentsByStudentAndYear(payments, year);
+
+      const sheet = createWorksheet(workbook,year,getStudentColumns,`Matriculados ${year}`);
+
+      students.forEach(student => {
+        const studentPayments = paymentsByStudent[student.id] || [];
+        const row = buildStudentRow(student, studentPayments);
+        sheet.addRow(row);
+      });
+      styleStudentSheet(sheet);
+  });
+  }
+  // payments
+  if (payments !== null && payments?.length === 0){
+    const sheet = createWorksheet(workbook, "",getPaymentsColumns,"Ingresos");
+
+    // data
+    const safePayments = Array.isArray(payments) ? payments : [payments];
+    safePayments.forEach(p => {
+      sheet.addRow(buildPaymentRow(p));
     });
 
-    if (canceled || !filePath) {
-      return { success: false };
+    // formatos
+    sheet.getColumn("amount").numFmt = '"₡"#,##0.00';
+    sheet.getColumn("amount").alignment = { horizontal: "right" };
+    sheet.getColumn("date").alignment = { horizontal: "center" };
+    sheet.getColumn("consecutive").alignment = { horizontal: "center" };
+ 
+    stylePaymentSheet(sheet);
+  }
+
+  // expenses
+  if (expenses !== null && payments?.length === 0){
+    const sheet = createWorksheet(workbook, "", getExpensesColumns, "Egresos");
+
+    // datos
+    expenses.forEach(e => {
+      sheet.addRow({
+        date: e.date
+          ? new Intl.DateTimeFormat("es-CR").format(new Date(e.date))
+          : "",
+        detail: e.description ?? "",
+        reference: e.reference ?? "",
+        amount: e.amount ? Number(e.amount) : "",
+      });
+    });
+
+    const MAX_ROWS = 28;
+    while (sheet.rowCount < MAX_ROWS) {
+      sheet.addRow({});
     }
+  
+    styleExpensesSheet(sheet);
+  }
 
-    // 🔹 Generar buffer
-    const buffer = XLSX.write(workbook, {
-      bookType: "xlsx",
-      type: "buffer",
-    });
+  const path = await saveWorkbook(
+    workbook,
+    "Guardar Respaldo",
+    `Respaldo.xlsx`
+  );
+  if (!path) return {success: false}
 
-    // 🔹 Guardar archivo
-    fs.writeFileSync(filePath, buffer);
-
-    return { success: true, path: filePath };
+  return { success: true, path: path };
 }
 
 export async function exportReportToExcel(
@@ -673,33 +540,6 @@ export async function exportReportToExcel(
   return { success: true, path: filePath };
 }
 
-
-
-/*
-  Helper Functions
-*/
-function getAssetPath(filename) {
-  let assetPath;
-   if (app.isPackaged) {
-    // PRODUCCIÓN (extraResources)
-    assetPath = path.join(
-      process.resourcesPath,
-      "/assets/",
-      filename
-    );
-  } else {
-    // DESARROLLO
-    assetPath = path.join(
-      process.cwd(),
-      "src",
-      "ui",
-      "assets",
-      filename
-    );
-  }
-  return assetPath;
-}
-
 function invoiceCellHeigth(sheet) {
   const rowHeightLogo = cmToPoints(0.87);
   const rowHeightHeader = cmToPoints(1.01);
@@ -756,3 +596,4 @@ function invoiceCellHeigth(sheet) {
   sheet.getRow(26).height = rowHeightHeader;
   return sheet;
 }
+

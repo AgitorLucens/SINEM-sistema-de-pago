@@ -44,7 +44,7 @@ const ReportTable = ({matrixData, totalGeneral, columnTotals,selectedCourses,sel
                                     </td>
                                 ))}
                             <td style={{textAlign: 'right', color: '#34d399', fontSize: '16px'}}>
-                                ${totalGeneral.toLocaleString()}
+                                ₡{totalGeneral.toLocaleString()}
                             </td>
                         </tr>
                     </tfoot>

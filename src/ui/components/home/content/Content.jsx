@@ -6,6 +6,8 @@ import Pricing from  '../../../pages/pricing/Pricing.jsx';
 import Export from   '../../../pages/export/Export.jsx';
 import Report from '../../../pages/report/Report.jsx';
 
+import sinem from "../../../assets/SINEM_home.png";
+
 import './page.css';
 const Content = ({ page }) => {
   let title, description;
@@ -63,14 +65,12 @@ const Content = ({ page }) => {
   return (
     <div className="content-area">
       <h1 className="main-header">{title}</h1>
+      <img src={sinem} width={500} height={500} alt='sinem-logo' className="img" id="" />
       <div className="info-card">
-        <h2 className="card-title">Información del Módulo</h2>
+        <h2 className="card-title">Pagina Inicial</h2>
         <p className="card-text">{description}</p>
       </div>
-      
-      <p className="card-text" style={{ marginTop: '2rem' }}>
-        Pagina Inicial
-      </p>
+
     </div>
   );
 };

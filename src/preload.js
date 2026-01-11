@@ -44,7 +44,7 @@ const api = {
     exportPaymentsByYearToExcel: (paymentData) => ipcRenderer.invoke('export-payments-by-year', paymentData),
     exportExpensesByYearToExcel: (expenseData) => ipcRenderer.invoke('export-expenses-by-year', expenseData),
     exportStudentsByActiveToExcel: (studentData) => ipcRenderer.invoke('export-students-by-active', studentData),
-
+    exportHistoric: (data) => ipcRenderer.invoke('export-historic', data),
     // App functionality
     quitApp: () => ipcRenderer.invoke("app:quit"),
 }

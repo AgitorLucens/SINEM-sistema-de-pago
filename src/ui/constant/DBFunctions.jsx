@@ -265,7 +265,7 @@ export async function exportPaymentsToExcel(payment) {
     } catch (error) {
         console.error('Error al exportar pago a excel:', error.message);
         return {
-            error: "Error al exportar recivo a excel. Revise que no tengaa el archivo con el mismo nombre abierto.",
+            error: "Error al exportar recivo a excel. Revise que no tenga el archivo con el mismo nombre abierto.",
         }; 
     }
 }
@@ -314,6 +314,17 @@ export async function exportStudentsByActiveToExcel(studentData) {
     }
 }
 
+export async function exportHistoric(data) {
+    try {
+        return await window.api.exportHistoric(data);
+    } catch (error) {
+        console.error('Error al exportar respaldo por estado a excel:', error.message);
+        return {
+            error: "Error al exportar respaldo por estado a excel.",
+        }; 
+    }
+}
+
 export default {
     //Pagos
     addPayment,
@@ -341,5 +352,6 @@ export default {
     exportPaymentsToExcel,
     exportReportToExcel,
     exportPaymentsByYearToExcel,
-    exportStudentsByActiveToExcel
+    exportStudentsByActiveToExcel,
+    exportHistoric
 };
