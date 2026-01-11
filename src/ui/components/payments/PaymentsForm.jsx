@@ -1,9 +1,36 @@
+import { useEffect, useState } from "react";
 import SelectRadix from "../generic/select/SelectRadix.jsx"
 import DatePicker from "../generic/datepicker/DatePicker.jsx";
-import {onRadixChange,handleFieldChange, formatConsecutive} from "../generic/function/Function.jsx"
+import {onRadixChange,handleFieldChange, formatConsecutive, formatCRC} from "../generic/function/Function.jsx"
 
 const PaymentsForm = ({ formData, handleChange, handleConcept, handleAmount, handleDate, onSubmit, isLoading, concepts, divisions, students, months }) => {
-   
+    const [value, setValue] = useState(formData.amount);
+    const [isEditing, setIsEditing] = useState(false);
+    let displayValue = isEditing
+        ? value
+        : value === "" ? "" : formatCRC(value);
+
+
+    const handleAmountChange = (e) => {
+        const raw = e.target.value.replace(/[^\d.]/g, "");
+
+        // permitir borrar completamente
+        if (raw === "") {
+            setValue("");
+            return;
+        }
+
+        // solo un punto decimal
+        if ((raw.match(/\./g) || []).length > 1) return;
+
+        setValue(raw);
+        formData.amount = value;
+    };
+
+    useEffect(()=>{
+        setValue(formData.amount ?? "");
+    }, [formData.amount])
+
     return (
         <div style={{ padding: '0.5rem' }}>
             <p className="card-text" style={{ color: '#4b5563' }}>Ingrese los detalles del pago recibido.</p>
@@ -91,14 +118,19 @@ const PaymentsForm = ({ formData, handleChange, handleConcept, handleAmount, han
                             Monto (₡)
                         </label>
                         <input
-                            type="number"
+                            type="text"
                             id="amount"
                             name="amount"
-                            value={formData.amount}
-                            onChange={handleAmount}
+                            value={displayValue}
+                            onChange={handleAmountChange}
+                            onFocus={() => setIsEditing(true)}
+                            onBlur={() => {
+                                setIsEditing(false);
+                                if (value !== "") {
+                                    setValue(Number(value)); // normalizar
+                                }
+                            }}
                             required
-                            min="0.01"
-                            step="0.01"
                             style={{ width: '100%', padding: '0.75rem', border: '1px solid #d1d5db', borderRadius: '0.5rem', boxSizing: 'border-box' }}
                             placeholder="Ej: 50.00"
                         />

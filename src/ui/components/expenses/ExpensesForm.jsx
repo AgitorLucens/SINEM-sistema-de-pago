@@ -1,7 +1,32 @@
+import { useState } from "react";
 import DatePicker from "../generic/datepicker/DatePicker.jsx";
 import {handleFieldChange} from "../generic/function/Function.jsx"
+import { formatCRC } from "../generic/function/Function.jsx";
 
 const ExpensesForm = ({ formData, handleChange, onSubmit, isLoading }) => {
+    const [value, setValue] = useState(null);
+    const [isEditing, setIsEditing] = useState(false);
+    const displayValue = isEditing
+        ? value
+        : value === "" ? "" : formatCRC(value);
+
+
+    const handleAmountChange = (e) => {
+        const raw = e.target.value.replace(/[^\d.]/g, "");
+
+        // permitir borrar completamente
+        if (raw === "") {
+            setValue("");
+            return;
+        }
+
+        // solo un punto decimal
+        if ((raw.match(/\./g) || []).length > 1) return;
+
+        setValue(raw);
+        formData.amount = value;
+    };
+
     return (
         <div style={{ padding: '0.5rem' }}>
             <p className="card-text" style={{ marginBottom: '1.5rem', color: '#4b5563' }}>Ingrese los detalles del egreso.</p>
@@ -45,15 +70,21 @@ const ExpensesForm = ({ formData, handleChange, onSubmit, isLoading }) => {
                             Monto (₡)
                         </label>
                         <input
-                            type="number"
+                            type="text"
                             id="amount"
                             name="amount"
-                            value={formData.amount}
-                            onChange={handleChange}
-                            min="0.01"
-                            step="0.01"
+                            value={displayValue}
+                            onChange={handleAmountChange}
+                            onFocus={() => setIsEditing(true)}
+                            onBlur={() => {
+                                setIsEditing(false);
+                                if (value !== "") {
+                                    setValue(Number(value)); // normalizar
+                                }
+                            }}
+                            required
                             style={{ width: '100%', padding: '0.75rem', border: '1px solid #d1d5db', borderRadius: '0.5rem', boxSizing: 'border-box' }}
-                            placeholder="Ej: 50.00"
+                            placeholder="₡0,00"
                         />
                     </div>
                     <div>

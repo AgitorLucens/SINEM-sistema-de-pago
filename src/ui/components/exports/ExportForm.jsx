@@ -22,24 +22,6 @@ const ExportForm = ({
                       formState = [],
                       handleChange, 
                     }) => {
-
-  const selectOptions = (() => {
-      return [
-            { value: "all", label: "Todos los años" },
-            ...data.map(y => ({
-                value: y.year.toString(),
-                label: y.year.toString(),
-            })),
-        ];
-  })();
-
-  const yearTypeSelected = () =>{
-    switch (type){
-      case "Pagos":
-        return 
-    }
-  }
-
   return (
       <div className="form-group">
         {/* Tres primeras Opciones  */}
@@ -76,7 +58,7 @@ const ExportForm = ({
                     onChange={(years) =>
                       setFilters(prev => ({
                         ...prev,
-                        payments: {
+                        expenses: {
                           ...prev.expenses,
                           years,
                         },
@@ -101,18 +83,6 @@ const ExportForm = ({
                     placeholder="Escoger Años"
                   />
                 )}
-                {/*
-                <SelectRadix
-                  label=""
-                  name="select"
-                  placeholder="Seleccione una opcion"
-                  value={filters.year}
-                  valueKey="value"
-                  labelKey="label"
-                  onChange={(val)=> setFilters(prev => ({ ...prev, year: val }))}
-                  options={selectOptions}
-                /> 
-                */}
               </div>
               {filterConfig.studentStatus &&(
                 <div>

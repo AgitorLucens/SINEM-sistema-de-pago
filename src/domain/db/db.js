@@ -276,12 +276,17 @@ class AppDB {
                                         p.id,
                                         p.date,
                                         s.name AS student_name,
+                                        p.student_id,
                                         p.payment_method,
                                         d.name AS division_name,
+                                        p.division_id,
                                         c.type AS concept_type,
+                                        p.concept_id,
                                         p.amount,
+                                        p.month,
                                         p.year,
-                                        p.sequence
+                                        p.sequence,
+                                        p.receipt
                                      FROM
                                         payments p
                                      INNER JOIN

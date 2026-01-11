@@ -7,9 +7,9 @@ import { Users, FileText,  TrendingUp, TrendingDown} from "../../components/icon
 
 import {getYearsOfPayments,getYearsOfExpenses,getStudentsActive,
         getPaymentsByYear,getExpensesByYear,getStudentsByActive,
-        getAllPayments, getAllExpenses,
+        getAllPayments, getAllExpenses, getAllStudents,
         getPaymentDivisions,getPaymentConcepts,
-        exportPaymentsByYearToExcel,exportExpensesByYearToExcel,exportStudentsByActiveToExcel
+        exportPaymentsByYearToExcel,exportExpensesByYearToExcel,exportStudentsByActiveToExcel, exportHistoric
     } from "../../constant/DBFunctions.jsx"
 
 const EXPORT_FILTERS = {
@@ -68,7 +68,7 @@ const Export = () => {
     const [concepts, setConcepts] = useState([]);
     const methodsOptions = [
         { value: 0, label: "Efectivo"},
-        { value: 1, label: "Transferencias"}
+        { value: 1, label: "Transferencia"}
     ]
     const [methods, setMethods] = useState(methodsOptions);
 
@@ -105,6 +105,7 @@ const Export = () => {
     });
 
     const [error,setError] = useState("");
+    const [message, setMessage] = useState("");
 
     const exportData =
             selectedType === "Pagos"
@@ -127,45 +128,203 @@ const Export = () => {
         let err;
         if (selectedType === "Pagos") {
             let payments;
-            if (filters.concepts.length<1){
+            if (filters.payments.concepts.length === 0){
                 setError("Escoja al menos un concepto de pago.");
                 return
             }
-            if (filters.divisions.length<1){
+            if (filters.payments.divisions.length === 0){
                 setError("Escoja al menos un curso.");
                 return
             }
-            if (filters.methods.length<1){
+            if (filters.payments.methods.length === 0){
                 setError("Escoja al menos un metodo de pago.");
                 return
             }
-            if (filters.year.length<1){
+            if (filters.payments.years.length === 0){
                 setError("Escoja al menos un año.");
                 return
             }
-            if (data === "all"){
-                payments = await getAllPayments();
-                err = await exportPaymentsByYearToExcel(payments);
-            } else {
-                payments = await getPaymentsByYear(data);
-                err = await exportPaymentsByYearToExcel(payments);
-            }   
+           
+            payments = await getAllPayments();
+            const filteredPayments = payments.filter(p => {
+                const valueM = methodsOptions.find(
+                    m => m.label === p.payment_method
+                )?.value;
+                // Año
+                if (
+                    filters.payments.years.length &&
+                    !filters.payments.years.includes(String(p.year))
+                ) {
+                    return false;
+                }
+
+                // División
+                if (
+                    filters.payments.divisions.length &&
+                    !filters.payments.divisions.includes(p.division_id)
+                ) {
+                    return false;
+                }
+
+                // Concepto
+                if (
+                    filters.payments.concepts.length &&
+                    !filters.payments.concepts.includes(p.concept_id)
+                ) {
+                    return false;
+                }
+
+                // Método de pago (0 / 1)
+                if (
+                    filters.payments.methods.length &&
+                    !filters.payments.methods.includes(valueM)
+                ) {
+                    
+                    return false;
+                }
+
+                return true;
+            });
+            err = await exportPaymentsByYearToExcel({
+                                                    paymentsFiltered: filteredPayments,
+                                                    name: `Pagos${filters.payments.years?.length === yearsPayments?.length ? " Historico" : ""}`});
+              
         } else if(selectedType === "Gastos") {
-            if (data === "all"){
-                expenses = await getAllExpenses();
-                err = await exportExpensesByYearToExcel(expenses);
-            } else {
-                expenses = await getExpensesByYear(data);
-                err = await exportExpensesByYearToExcel(expenses);
+            if (!filters.expenses.years || filters.expenses.years === 0){
+                setError("Escoja al menos un año para los gastos");
+                return
             }
+            const expenses = await getAllExpenses();
+            const filteredExpenses = expenses.filter(e => {
+                if (
+                    filters.expenses.years.length &&
+                    !filters.expenses.years.includes(String(new Date(e.date).getFullYear()))
+                ) {
+                    return false;
+                }
+                return true;
+            })
+            err = await exportExpensesByYearToExcel(filteredExpenses);
+
         } else if(selectedType === "Estudiantes") {
-            if (!filters.studentStatus || filters.studentStatus.length<1){
+            if (!filters.students.studentStatus || filters.students.studentStatus.length === 0){
                 setError("Escoja al menos un estado de estudiante.");
                 return
             }
-            const statuses = filters.studentStatus.map(s => s.active);
-            const students = await getStudentsByActive(statuses);
-            err = await exportStudentsByActiveToExcel(students);
+            if (!filters.students.years || filters.students.studentStatus.years === 0){
+                setError("Escoja al menos un estado de estudiante.");
+                return
+            }
+            //const statuses = filters.studentStatus.map(s => s.active);
+            const students = await getAllStudents();
+            const payments = await getAllPayments();
+
+            const filteredStudents = students.filter(s => {
+                if (
+                    filters.students.studentStatus.length &&
+                    !filters.students.studentStatus.includes(s.active)
+                ) {
+                    return false;
+                }
+                return true;
+            });
+
+            
+            const filteredPayments = payments.filter(p => {
+                if (
+                    filters.students.years.length &&
+                    !filters.students.years.includes(String(p.year,10))
+                ) {
+                    return false;
+                }
+                return true;
+            });
+
+            err = await exportStudentsByActiveToExcel({
+                                                        students: filteredStudents,
+                                                        payments: filteredPayments,
+                                                        years: filters.students.years,
+                                                    });
+        } else if (selectedType === "Todo") {
+            //Pagos
+            if (yearsPayments.length > 0 && 
+                filters.payments.concepts.length === 0){
+                setError("Escoja al menos un concepto de pago.");
+                return
+            }
+            if (yearsPayments.length > 0 && 
+                filters.payments.divisions.length === 0){
+                setError("Escoja al menos un curso.");
+                return
+            }
+            if (yearsPayments.length > 0 &&
+                filters.payments.methods.length === 0){
+                setError("Escoja al menos un metodo de pago.");
+                return
+            }
+            if (yearsPayments.length > 0 &&
+                filters.payments.years.length === 0){
+                setError("Escoja al menos un año para pagos.");
+                return
+            }
+            //Gastos
+            if (yearsExpenses.length > 0 && filters.expenses.years === 0){
+                setError("Escoja al menos un año para los gastos.");
+                return
+            }
+            //Estudiantes
+            if (studentActive.length && filters.students.studentStatus.length === 0){
+                setError("Escoja al menos un estado de estudiante.");
+                return
+            }
+            if (yearsPayments.length && filters.students.years === 0){
+                setError("Escoja al menos año.");
+                return
+            }
+            //data
+            const students = await getAllStudents();
+            const payments = await getAllPayments();
+            const expenses = await getAllExpenses();
+
+            //pagos      
+            const filteredPayments = payments?.filter(p => {
+                if (
+                    filters.students.years.length &&
+                    !filters.students.years.includes(String(p.year,10))
+                ) {
+                    return false;
+                }
+                return true;
+            });
+
+            //estudiantes
+            const filteredStudents = students.filter(s => {
+                if (
+                    filters.students.studentStatus.length &&
+                    !filters.students.studentStatus.includes(s.active)
+                ) {
+                    return false;
+                }
+                return true;
+            });
+
+            //gastos
+            const filteredExpenses = expenses.filter(e => {
+                if (
+                    filters.expenses.years.length &&
+                    !filters.expenses.years.includes(String(new Date(e.date).getFullYear()))
+                ) {
+                    return false;
+                }
+                return true;
+            })
+            err = await exportHistoric({
+                                        payments: filteredPayments,
+                                        years: filters?.students.years,
+                                        students: filteredStudents,
+                                        expenses: filteredExpenses,
+                                        });
+
         }
         if (!err.success) {
                 setError(err.error);
@@ -333,7 +492,11 @@ const Export = () => {
 
             <Modal
                 isOpen={isModalOpen}
-                onClose={() => setIsModalOpen(false)}
+                onClose={() => {
+                    setError("");
+                    setMessage("");
+                    setIsModalOpen(false)
+                }}
                 title="Informacion a exportar"
             >
                 {/* Mensaje de Error */}
