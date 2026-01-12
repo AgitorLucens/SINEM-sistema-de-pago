@@ -34,24 +34,39 @@ class AppDB {
         const createPaymentConceptsTable = `
             CREATE TABLE IF NOT EXISTS payment_concepts (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
-                type TEXT NOT NULL, -- Corresponde a ConceptType (MATRICULA, MENSUALIDAD, etc.)
+                type TEXT NOT NULL UNIQUE, -- Corresponde a ConceptType (MATRICULA, MENSUALIDAD, etc.)
                 amount REAL,
                 description TEXT
             );
         `;
         this.db.exec(createPaymentConceptsTable);
 
+        const seedPaymentConcepts = `
+            INSERT OR IGNORE INTO payment_concepts (type, amount, description) VALUES
+                ('Matricula', 0, 'Pago de matrícula'),
+                ('Mensualidad', 0, 'Pago mensual'),
+                ('Otros', 0, 'Otros pagos');
+            `;
+        this.db.exec(seedPaymentConcepts);
         /*
             Tabla Curso / División
         */
         const createDivisionsTable = `
             CREATE TABLE IF NOT EXISTS divisions (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
-                name TEXT NOT NULL, -- Corresponde a DivisionType (SINEM, Taller, etc.)
+                name TEXT NOT NULL UNIQUE, -- Corresponde a DivisionType (SINEM, Taller, etc.)
                 description TEXT
             );
         `;
         this.db.exec(createDivisionsTable);
+        const seedDivisions = `
+            INSERT OR IGNORE INTO divisions (name, description) VALUES
+                ('SINEM', 'Cursos a menores de edad'),
+                ('Talleres', 'Cursos dados a la poblacion en Comun'),
+                ('Ventas Accesorios', 'Ventas de accesorios para cursos'),
+                ('Ventas Varias', 'Ventas Varias');
+            `;
+        this.db.exec(seedDivisions);
 
         /*
             Tabla ----

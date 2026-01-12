@@ -13,7 +13,9 @@
 }
 
 .expenses-scroll-area {
-  overflow-x: auto;
+  max-height: 400px;
+  overflow-y: auto;
+  overflow-x: auto; 
   width: 100%;
 }
 

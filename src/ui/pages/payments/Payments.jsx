@@ -423,6 +423,7 @@ const Payments = () => {
                     payments={filteredPayments}
                     concepts={concepts}
                     divisions={divisions}
+                    students={students}
                     onRowClick={handleRowClick}
                     onDeletePayment={deletePayment}
                     confirmingId={confirmingId}

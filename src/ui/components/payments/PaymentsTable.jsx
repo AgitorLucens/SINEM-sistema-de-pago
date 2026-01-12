@@ -1,24 +1,14 @@
 import { useState, useEffect, useRef } from 'react';
-import { updatePayment } from "../../constant/DBFunctions.jsx"
-import EditableCellDropdown from '../generic/table/EditableCellDropdown';
-import EditableCellInput  from '../generic/table/EditableCellInput.jsx';
-import EditableCellDate  from '../generic/table/EditableCellDate.jsx';
+import { updatePayment }               from "../../constant/DBFunctions.jsx"
+import EditableCellDropdown            from '../generic/table/EditableCellDropdown';
+import EditableCellInput               from '../generic/table/EditableCellInput.jsx';
+import EditableCellDate                from '../generic/table/EditableCellDate.jsx';
+import EditableCellSearchDropdown      from "../generic/table/EditableCellSearchDropdown.jsx";
 
 import './paymentstable.css';
-const formatDate = (dateString) => {
-    if (!dateString) return '';
-    try {
-        const date = new Date(dateString);
-        // Utiliza 'es-ES' para formato día/mes/año
-        return date.toLocaleDateString('es-ES'); 
-    } catch (e) {
-        // En caso de error, devuelve la cadena original
-        return dateString;
-    }
-};
 
 // Componente para visualizar el historial de pagos con redimensionamiento manual
-const PaymentsTable = ({ concepts, divisions, payments, minTableWidth = '800px' , onDeletePayment, onRowClick, confirmingId, handleTableUpdate}) => {
+const PaymentsTable = ({ concepts, divisions, payments, students, minTableWidth = '800px' , onDeletePayment, onRowClick, confirmingId, handleTableUpdate}) => {
     // Convertir el prop de cadena a número para cálculos
     const minWidthValue = parseInt(minTableWidth, 10) || 600;
     const [isDragging, setIsDragging] = useState(false);
@@ -133,7 +123,17 @@ const PaymentsTable = ({ concepts, divisions, payments, minTableWidth = '800px' 
                                         />
                                         {/*formatDate(p.date)*/}
                                     </td>
-                                    <td className="payments-td">{p.student_name}</td>
+                                    <td className="payments-td">
+                                        <EditableCellSearchDropdown 
+                                            value={p.student_name}
+                                            options={students.map(s => ({value: s.id, label: s.name }))}
+                                            valueKey="value"
+                                            labelKey="label"
+                                            onSave={(value)=>console.log(value)}
+                                        />
+                                            
+                                        {/*p.student_name*/}
+                                    </td>
                                     <td className="payments-td">
                                         <span className={`badge-method ${p.payment_method?.toLowerCase().includes('trans') ? 'method-transfer' : 'method-other'}`}>
                                             <EditableCellDropdown
