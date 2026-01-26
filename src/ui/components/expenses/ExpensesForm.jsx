@@ -4,7 +4,7 @@ import {handleFieldChange} from "../generic/function/Function.jsx"
 import { formatCRC } from "../generic/function/Function.jsx";
 
 const ExpensesForm = ({ formData, handleChange, onSubmit, isLoading }) => {
-    const [value, setValue] = useState(null);
+    const [value, setValue] = useState("");
     const [isEditing, setIsEditing] = useState(false);
     const displayValue = isEditing
         ? value
@@ -43,7 +43,6 @@ const ExpensesForm = ({ formData, handleChange, onSubmit, isLoading }) => {
                         name="description"
                         value={formData.description}
                         onChange={handleChange}
-                        required
                         style={{ width: '100%', padding: '0.75rem', border: '1px solid #d1d5db', borderRadius: '0.5rem', boxSizing: 'border-box' }}
                         placeholder="Detalle"
                     />
@@ -58,7 +57,6 @@ const ExpensesForm = ({ formData, handleChange, onSubmit, isLoading }) => {
                         name="reference"
                         value={formData.reference}
                         onChange={handleChange}
-                        required
                         style={{ width: '100%', padding: '0.75rem', border: '1px solid #d1d5db', borderRadius: '0.5rem', boxSizing: 'border-box' }}
                         placeholder="Referencia"
                     />

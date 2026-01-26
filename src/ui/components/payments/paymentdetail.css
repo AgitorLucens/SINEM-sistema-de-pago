@@ -14,7 +14,7 @@
     transition: background 0.2s;
 }
 
-.detail-header{
+.detail-header {
     padding: 32px;
     background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
     color: #fff;
@@ -22,19 +22,19 @@
     border-radius: 0.75rem;
 }
 
-.detail-body{
+.detail-body {
     padding: 32px;
     background-color: #fff;
 }
 
-.detail-label{
+.detail-label {
     font-size: 12px;
     font-weight: 700;
     color: #94a3b8;
     text-transform: uppercase;
 }
 
-.detail-value{
+.detail-value {
     font-size: 15px;
     font-weight: 500;
     color: #1e293b;
@@ -43,13 +43,13 @@
     gap: 8px;
 }
 
-.detail-infoblock{
+.detail-infoblock {
     display: flex;
     flex-direction: column;
     gap: 4px;
 }
 
-.detail-infogrid{
+.detail-infogrid {
     font-size: 11px;
     font-weight: 700;
     color: #94a3b8;
@@ -61,7 +61,7 @@
     margin-top: 1rem;
 }
 
-.detail-amountcard{
+.detail-amountcard {
     background-color: #f8fafc;
     border-radius: 16px;
     padding: 24px;

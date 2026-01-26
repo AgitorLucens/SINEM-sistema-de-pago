@@ -191,6 +191,15 @@ npm install better-sqlite3
 
 ---
 
+## Excel
+
+ExcelJS lacks functionality for pivot tables, so a fork was used. Version used of the fork is `4.4.0-protobi.2`.
+
+```bash
+npm install @protobi/exceljs
+```
+Sadly, this library lack support for pivot tables as well. So, for advanced Excel operations such as pivot tables, a Go module is used. See the [Go-Excel Module](src/domain/excel/go-excel/README.md) documentation.
+
 ## Build & Packaging
 
 ### Install electron-builder
@@ -231,7 +240,9 @@ npm install @radix-ui/react-select \
             @radix-ui/react-icons \
             @radix-ui/react-popover \
             @radix-ui/react-dropdown-menu \
-            react-day-picker
+            @ariakit/react \
+            react-day-picker \
+            npm install match-sorter
 ```
 
 These libraries provide consistent styling and accessible interactions.

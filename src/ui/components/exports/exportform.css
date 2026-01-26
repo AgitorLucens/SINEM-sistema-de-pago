@@ -73,6 +73,7 @@
 .btn-ghost-export {
     width: 100%;
     background: transparent;
+    border-radius: 0.75rem;
     color: #6b7280;
     font-weight: 500;
     padding: 0.5rem;
@@ -81,17 +82,21 @@
     cursor: pointer;
 }
 
+.btn-ghost-export:hover {
+    background: var(--color-gray-100);
+}
+
 .close-btn {
     background: transparent;
     border: none;
     padding: 0.5rem;
     cursor: pointer;
     border-radius: 50%;
-    color: var(--gray-500);
+    color: var(--color-gray-500);
 }
 
 .close-btn:hover {
-    background: var(--gray-100);
+    background: var(--color-gray-100);
 }
 
 .chip-group{

@@ -1,3 +1,7 @@
+.container-report{
+    padding: 3rem 2rem;
+}
+
 .header {
     margin-bottom: 5px;
     flex-direction: column;

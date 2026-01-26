@@ -10,13 +10,13 @@ const PaymentsForm = ({ formData, handleChange, handleConcept, handleAmount, han
         ? value
         : value === "" ? "" : formatCRC(value);
 
-
     const handleAmountChange = (e) => {
         const raw = e.target.value.replace(/[^\d.]/g, "");
 
         // permitir borrar completamente
         if (raw === "") {
             setValue("");
+            handleAmount({ target: { name: 'amount', value: "" } });
             return;
         }
 
@@ -24,7 +24,7 @@ const PaymentsForm = ({ formData, handleChange, handleConcept, handleAmount, han
         if ((raw.match(/\./g) || []).length > 1) return;
 
         setValue(raw);
-        formData.amount = value;
+        handleAmount({ target: { name: 'amount', value: raw } });
     };
 
     useEffect(()=>{
@@ -59,6 +59,7 @@ const PaymentsForm = ({ formData, handleChange, handleConcept, handleAmount, han
                         <label htmlFor="month" style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '500', fontSize: '0.875rem' }}>
                             Mes
                         </label>
+                        
                         <SelectRadix
                                  label=""
                                  name="month"
@@ -96,17 +97,17 @@ const PaymentsForm = ({ formData, handleChange, handleConcept, handleAmount, han
                         </label>
 
                         <SelectRadix
-                                 label=""
-                                 name="method"
-                                 placeholder="Seleccione metodo de pago"
-                                 value={formData.method}
-                                 valueKey="value"
-                                 labelKey="label"
-                                 onChange={onRadixChange(handleChange,"method")}
-                                 options={[
-                                    { value: "Efectivo", label: "Efectivo" },
-                                    { value: "Transferencia", label: "Transferencia" },
-                                 ]}
+                            label=""
+                            name="method"
+                            placeholder="Seleccione metodo de pago"
+                            value={formData.method}
+                            valueKey="value"
+                            labelKey="label"
+                            onChange={onRadixChange(handleChange,"method")}
+                            options={[
+                                { value: "Efectivo", label: "Efectivo" },
+                                { value: "Transferencia", label: "Transferencia" },
+                            ]}
                         />
                     </div>
                 </div>

@@ -10,7 +10,10 @@ const StudentsTable = ({ students, loadStudent, minTableWidth = '700px', handleT
 
     const minWidthValue = parseInt(minTableWidth, 10) || 600;
     
-    const [tableWidth, setTableWidth] = useState(minWidthValue);
+    const [tableWidth, setTableWidth] = useState(() => {
+        const saved = localStorage.getItem("studentsTableWidth");
+        return saved ? Number(saved) : minWidthValue;
+    });
 
     const dragState = useRef(null);
     const handleMouseDown = (e) => {
@@ -51,6 +54,7 @@ const StudentsTable = ({ students, loadStudent, minTableWidth = '700px', handleT
         }
 
         setTableWidth(newWidth);
+        localStorage.setItem("expensesTableWidth", newWidth);
     };
 
     // Finaliza el proceso de redimensionamiento

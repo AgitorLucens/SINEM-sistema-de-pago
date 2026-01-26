@@ -11,7 +11,7 @@
 }
 
 .card:hover {
-    transform: translateY(-8px);
+    transform: translateY(-2px);
     box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
 }
 
@@ -81,9 +81,10 @@
     color: #ffffff;
 }
 
-.card-title {
-    font-weight: 700;
-    font-size: 1rem;
+.card-title-price {
+    font-size: 1.25rem;
+    font-weight: 600; 
+    margin-bottom: 0.5rem; 
     color: #1f2937;
     margin: 0
 }

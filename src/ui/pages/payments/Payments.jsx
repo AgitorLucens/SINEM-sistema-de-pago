@@ -7,13 +7,13 @@ import SuccessMessage from '../../components/generic/message/SuccessMessage.jsx'
 import ErrorMessage from '../../components/generic/message/ErrorMessage.jsx';
 import {getPaymentConcepts, getPaymentDivisions, getAllPayments, getAllStudents,
         deletePaymentById, addPaymentWithConsecutive,
-        getNextConsecutiveByYear
+        getNextConsecutiveByYear, exportReceiptToExcel
  } from "../../constant/DBFunctions.jsx";
-import { PlusCircledIcon } from "@radix-ui/react-icons";
+import { PlusCircledIcon, InfoCircledIcon, DownloadIcon } from "@radix-ui/react-icons";
 
 import { useState, useEffect, useCallback, useMemo } from 'react';
-import './payments.css';
 
+import './payments.css';
 const Payments = () => {
     
     // --- Estados de Datos y UI ---
@@ -21,7 +21,7 @@ const Payments = () => {
         student_id: '',
         amount: '',
         date: null,
-        month: 0, 
+        month: '', 
         year: 0,
         method: '',
         concept: '',
@@ -70,8 +70,14 @@ const Payments = () => {
     // agregar pago
     const [isModalOpen, setIsModalOpen] = useState(false); 
 
+    // generar recibo
+    const [receipt, setReceipt] = useState(null);
+    const [isReceiptOpen, setIsReceiptOpen] = useState(false);
+
     // eliminar pago
     const [confirmingId, setConfirmingId] = useState(null);
+    const [acceptDelete, setAcceptDelete] = useState(false);
+    const [isDeleteOpen, setIsDeleteOpen] = useState(false);
 
     // datos de los filtros
     const [filterState, setFilterState] = useState(initialFilterState); // Estado de los filtros
@@ -157,6 +163,8 @@ const Payments = () => {
             concept: concepts.map(c => c.name),
             division: divisions.map(d => d.name),
             method: paymentMethods.map(m => m.value),
+            startDate: '',
+            endDate: '',
         }));
 
     }, [concepts, divisions, paymentMethods]);
@@ -229,6 +237,14 @@ const Payments = () => {
         setInitFilters(true);
     }, [concepts, divisions, paymentMethods, initFilters]);
 
+    const normalize = (d) => {
+        if (!d) return null;
+
+        const str = typeof d === "string" ? d : d.toISOString();
+        const [y, m, day] = str.split("T")[0].split("-");
+
+        return new Date(Number(y), Number(m) - 1, Number(day));
+    };
 
     // --- Logica de Filtrado  ---
     const filteredPayments = useMemo(() => {
@@ -236,8 +252,6 @@ const Payments = () => {
         if (payments.length === 0) return [];
         
         return payments.filter(payment => {
-            //console.log("filtro"+JSON.stringify(filterState)+"\n");
-            //console.log(JSON.stringify(payments));
 
             const { startDate, endDate } = filterState;
 
@@ -258,12 +272,18 @@ const Payments = () => {
             }
 
             // 4. Filtrar por Rango de Fechas
+            const paymentDate = normalize(payment.date);
+
             if (startDate) {
-                if (payment.date < startDate) return false;
+                const start = normalize(startDate);
+                if (paymentDate < start) return false;
             }
+
             if (endDate) {
-                if (payment.date > endDate) return false;
+                const end = normalize(endDate);
+                if (paymentDate > end) return false;
             }
+
 
             return true;
         });
@@ -283,16 +303,23 @@ const Payments = () => {
         
         const amountNumber = parseFloat(formData.amount);
         
-        if (isNaN(amountNumber) || amountNumber <= 0 || !formData.concept || !formData.division) {
-            setError("Por favor, completa todos los campos obligatorios (Monto, Concepto, División).");
+        if (isNaN(amountNumber) || amountNumber <= 0 || !formData.concept || !formData.division || !formData.method) {
+            setError("Por favor, completa todos los campos obligatorios (Monto, Concepto, Curso, Metodo de Pago).");
             return;
         }
 
-        setError("");
+        if (!formData.student_id) {
+            setError("Por favor, ingrese un estudiante");
+            return;
+        }
 
         if (!formData.date) {
             setError("Por favor, ingrese una fecha");
-            //setTimeout(() => { setError("Por favor, introduzca una fecha"); setMessage(''); }, 4000);
+            return;
+        }
+
+        if (!formData.division) {
+            setError("Por favor, ingrese un curso");
             return;
         }
 
@@ -316,13 +343,19 @@ const Payments = () => {
         setIsLoading(true);
         //console.log(JSON.stringify(formData));
         const err = await addPaymentWithConsecutive(paymentDataToSend);
+        //console.log(JSON.stringify(err));
         if (!err.success){
             setError(err.error);
             return
         }
         setFormData(initialFormState);
+
+        setIsReceiptOpen(true);
+        setReceipt(err.payment);
+        /*
         setMessage("Pago creado exitosamente");
         setTimeout(() => { setMessage(""); setError(''); }, 4000);
+        */
         await fetchPayments(); 
         setIsModalOpen(false); 
         setIsLoading(false);
@@ -333,21 +366,24 @@ const Payments = () => {
         if (confirmingId === paymentId) {
             setIsLoading(true);
             e.stopPropagation();
-            if (!window.confirm("¿Estás seguro de que quieres eliminar este pago? Esta acción no se puede deshacer.")) {
+            setIsDeleteOpen(true);
+            if (acceptDelete === false) {
                 setIsLoading(false);
-                setConfirmingId(null);
-                return;
+                return
             }
             try {
                 await deletePaymentById(paymentId);
                 setMessage('Pago eliminado correctamente.');
-                setError("");
+                setError(""); 
                 await fetchPayments();
             } catch (e) {
                 console.error("Error al eliminar el pago:", e);
                 setError("Error al eliminar el pago: " + e.message);
             } finally {
                 setIsLoading(false);
+                setIsDeleteOpen(false);
+                setConfirmingId(null);
+                setAcceptDelete(false);
                 setTimeout(() => { setError(""); setMessage(''); }, 5000); 
             }
             
@@ -355,44 +391,48 @@ const Payments = () => {
         
         } else {
             setConfirmingId(paymentId);
-            setTimeout(() => setConfirmingId(null), 4000);
+            setTimeout(() => {
+                if (isDeleteOpen)
+                    setConfirmingId(null)
+            }, 4000);
         }
     }; 
 
     const isTotalLoading = isLoading || isConceptsLoading || isDivisionsLoading;
 
     return (
-        <div className="p-6 bg-gray-50 min-h-screen font-sans">
+        <div className="container-payment">
             <div className="header-container">
                 {/* Encabezado y botón de registro */}
                 <div className="header-text-group">
                     <h2 className="section-title">
-                        Gestión de Pagos
+                        Gestión de Ingresos
                     </h2>
                 </div>
                 <div className="header-action">
                     <button
+
                         onClick={() => {
                             setFormData(initialFormState);
                             setError("");
                             setIsModalOpen(true);
                         }} 
-                        disabled={isTotalLoading}
-                        className="btn btn-primary"
+                        disabled={(isTotalLoading || students.length === 0)}
+                        className={`btn btn-primary ${students.length === 0 ? " export-card--disabled" : " export-card--enable"}`}
                     >
-                        <span ><PlusCircledIcon/>
-                        Registrar Nuevo Pago
+                        <span> {students.length === 0 ? <InfoCircledIcon/> : <PlusCircledIcon/>}
+                        {payments.length === 0 ? "Agregue Estudiante" : "Registrar Nuevo Ingreso"}
                         </span> 
                     </button>
                 </div>
             </div>
             {/* Mensaje de confirmación/error */}
-            {(message) && (
+            {(message && !isModalOpen && !isDetailModalOpen) && (
                 <SuccessMessage
                     message={message}
                 />
             )}
-            {(error) && (
+            {(error && !isModalOpen && !isDetailModalOpen) && (
                 <ErrorMessage
                     message={error}
                 />
@@ -439,16 +479,100 @@ const Payments = () => {
                     }}
                 title="Detalles del pago"
             >
+                {(message) && (
+                    <SuccessMessage
+                        message={message}
+                    />
+                )}
                 <PaymentsDetail
                     detail={selectedPayment}
+                    divisions={divisions}
+                    concepts={concepts}
+                    months={months}
+                    students={students}
+                    onClick={setSelectedPayment}
                     isLoading={isLoading}
+                    handleTableUpdate={handleTableUpdate}
                 />
             </Modal>
+            {/* confirmacion borrado */}
+            <Modal 
+                isOpen={isDeleteOpen}
+                onClose={ ()=>{
+                    setConfirmingId(null);
+                    setIsDeleteOpen(false);
+                }}
+                title="Borrar Ingreso"
+            >
+                <div>
+                    <div className="alert-delete">
+                        <p>
+                        <strong>¿Estás seguro de que quieres eliminar este pago?</strong> Esta accion no se puede deshacer.
+                        </p>
+                    </div>
+                    <button className="btn-delete-confirm"
+                            onClick={(e)=>{
+                                setAcceptDelete(true);
+                                deletePayment(e,confirmingId);
+                                }}>
+                        Eliminar
+                    </button>
+                    <button className="btn-ghost-export"
+                            onClick={()=>{
+                                setConfirmingId(null);
+                                setIsDeleteOpen(false);
+                                }}>
+                        Cancelar
+                    </button>
+                </div>
+            </Modal>
+            
+            {/* generar factura */}
+            <Modal 
+                isOpen={isReceiptOpen}
+                onClose={ ()=>{  
+                    setIsReceiptOpen(false);
+                    setMessage("Se genero Ingreso exitosamente");
+                    setTimeout(() => { setMessage(""); setError(''); }, 4000);
+                }}
+                title="Generar Factura"
+            >
+                <div>
+                    <div className="alert-box">
+                        ¿Desea generar una factura para este pago?
+                        <p>
+                        <strong>Nota:</strong> Los datos se procesarán en formato <strong>.xlsx</strong>.
+                        </p>
+                    </div>
+                    <button className="btn-primary-export"
+                            onClick={()=>{
+                                exportReceiptToExcel(receipt);
+                                setIsReceiptOpen(false);
+                                setMessage("Se genero Ingreso y factura exitosamente");
+                                setTimeout(() => { setMessage(""); setError(''); }, 4000);
+                                }}>
+                        <DownloadIcon size={18} />
+                        Generar Factura
+                    </button>
+                    <button className="btn-ghost-export"
+                            onClick={()=>{
+                                setIsReceiptOpen(false);
+                                setMessage("Se genero Ingreso exitosamente");
+                                setTimeout(() => { setMessage(""); setError(''); }, 4000);
+                                }}>
+                        Cancelar
+                    </button>
+                </div>
+            </Modal>
+
             {/* modal formulario */}
             <Modal 
                 isOpen={isModalOpen} 
-                onClose={() => {setIsModalOpen(false)}}
-                title="Registrar Nuevo Pago (Ingresos)"
+                onClose={() => {
+                    setIsModalOpen(false);
+                    setError("");
+                }}
+                title="Registrar Nuevo Ingreso"
             >
                 {/* Mensaje de Error */}
                 {error && (

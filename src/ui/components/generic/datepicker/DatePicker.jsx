@@ -24,16 +24,23 @@ const DatePicker = ({
       <Popover.Trigger asChild>
         <button type="button" className="form-control date-trigger">
           <span>
-            {value ? format(value, "dd-MM-yyyy") : placeholder}
+            {value ? format(value, "dd/MM/yyyy") : placeholder}
           </span>
           <CalendarIcon />
         </button>
       </Popover.Trigger>
 
       <Popover.Portal>
-        <Popover.Content className="date-popover" sideOffset={8}>
+        <Popover.Content 
+              className="date-popover"
+              side="top"
+              align="start"
+              sticky="always"
+              sideOffset={8}
+        >
           <DayPicker
             mode="single"
+            fixedWeeks
             selected={value}
             onSelect={(date) => {
               if (date) onChange(date);

@@ -9,7 +9,7 @@ const PaymentsFilters = ({ filterState, setFilterState, handleFilterChange, conc
           
           {/* Campo Concepto */}
           <div className="filter-group">
-            <label className="filter-label">Concepto</label>
+            <label className="filter-label">Tipo de Pago</label>
 
             <div className="chip-container">
               {concepts.map(c => {

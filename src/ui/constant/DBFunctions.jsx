@@ -259,11 +259,11 @@ export async function updatePriceConcept(paymentData) {
 /*
     Excel
 */
-export async function exportPaymentsToExcel(payment) {
+export async function exportReceiptToExcel(payment) {
     try {
-        return await window.api.exportPaymentsToExcel(payment);
+        return await window.api.exportReceiptToExcel(payment);
     } catch (error) {
-        console.error('Error al exportar pago a excel:', error.message);
+        console.error('Error al exportar recivo a excel:', error.message);
         return {
             error: "Error al exportar recivo a excel. Revise que no tenga el archivo con el mismo nombre abierto.",
         }; 
@@ -349,7 +349,7 @@ export default {
     //Precios
     updatePriceConcept,
     //Exportar
-    exportPaymentsToExcel,
+    exportReceiptToExcel,
     exportReportToExcel,
     exportPaymentsByYearToExcel,
     exportStudentsByActiveToExcel,

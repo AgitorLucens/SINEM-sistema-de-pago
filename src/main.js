@@ -17,6 +17,7 @@ const createWindow = () => {
     width: 1400,
     height: 1000,
     alwaysOnTop: false,
+    autoHideMenuBar: true,
     icon: './ui/assets/SINEM',
     webPreferences: {
       preload: path.join(__dirname, 'preload.js'),
@@ -31,7 +32,7 @@ const createWindow = () => {
   }
 
   // Open the DevTools.
-  //mainWindow.webContents.openDevTools();
+  mainWindow.webContents.openDevTools();
 };
 
 // This method will be called when Electron has finished

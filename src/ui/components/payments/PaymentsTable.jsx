@@ -12,8 +12,11 @@ const PaymentsTable = ({ concepts, divisions, payments, students, minTableWidth 
     // Convertir el prop de cadena a número para cálculos
     const minWidthValue = parseInt(minTableWidth, 10) || 600;
     const [isDragging, setIsDragging] = useState(false);
-    const [tableWidth, setTableWidth] = useState(minWidthValue);
-    
+    const [tableWidth, setTableWidth] = useState(() => {
+        const saved = localStorage.getItem("studentsTableWidth");
+        return saved ? Number(saved) : minWidthValue;
+    });
+
     // Ref para almacenar temporalmente el estado del arrastre (posición inicial, ancho inicial)
     const dragState = useRef(null);
 
@@ -60,6 +63,7 @@ const PaymentsTable = ({ concepts, divisions, payments, students, minTableWidth 
         }
 
         setTableWidth(newWidth);
+        localStorage.setItem("studentsTableWidth", newWidth);
     };
 
     // Finaliza el proceso de redimensionamiento
@@ -98,7 +102,8 @@ const PaymentsTable = ({ concepts, divisions, payments, students, minTableWidth 
                                 <th className='payments-th'>Modo Pago</th>
                                 <th className='payments-th'>Curso</th>
                                 <th className='payments-th text-center'>Tipo Pago</th>
-                                <th className='payments-th text-center'>Monto</th> 
+                                <th className='payments-th text-center'>Monto</th>
+                                <th className='payments-th text-center'># Comprobante</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -129,10 +134,13 @@ const PaymentsTable = ({ concepts, divisions, payments, students, minTableWidth 
                                             options={students.map(s => ({value: s.id, label: s.name }))}
                                             valueKey="value"
                                             labelKey="label"
-                                            onSave={(value)=>console.log(value)}
+                                            onSave={(val)=>
+                                                handleTableUpdate(
+                                                    { id: p.id, fields: { student_id: val } },
+                                                    updatePayment
+                                                )
+                                            }
                                         />
-                                            
-                                        {/*p.student_name*/}
                                     </td>
                                     <td className="payments-td">
                                         <span className={`badge-method ${p.payment_method?.toLowerCase().includes('trans') ? 'method-transfer' : 'method-other'}`}>
@@ -159,8 +167,8 @@ const PaymentsTable = ({ concepts, divisions, payments, students, minTableWidth 
                                         <EditableCellDropdown
                                             options={concepts}
                                             value={p.concept_type}
-                                            valueKey='id'
-                                            labelKey='name'
+                                            valueKey="id"
+                                            labelKey="name"
                                             onSave={(val) => handleTableUpdate({id: p.id, fields: {concept_id: val}}, updatePayment)}
                                         />
                                     </td>
@@ -185,6 +193,20 @@ const PaymentsTable = ({ concepts, divisions, payments, students, minTableWidth 
                                             }
                                         />
                                     </td>
+
+                                    <td className='payments-td'>
+                                        <EditableCellInput
+                                            value={p.receipt}
+                                            type="text"
+                                            onSave={(val) =>
+                                                handleTableUpdate(
+                                                    { id: p.id, fields: { receipt: val } },
+                                                    updatePayment
+                                                )
+                                            }
+                                        />
+                                    </td>
+
                                     {/* Boton Borrado  */}
                                     <td className="payments-td" style={{ textAlign: 'center' }}>
                                         <button 

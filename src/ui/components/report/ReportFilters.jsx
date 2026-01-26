@@ -8,7 +8,8 @@ const ReportFilters = ({toggleItem,toggleItemById, selectedDate, allMethods, all
         <div>
           <section className="filters-grid">
             {/* Filtro Fecha */}
-            <div className="filter-card">
+            {(uniqueDates.length > 0) && (
+              <div className="filter-card">
               <span className="filter-label">Filtrar por Fecha</span>   
               <MultiSelectRadix
                 options={uniqueDates?.map(d => ({label: d.date_only, value: d.date_only}))}
@@ -19,7 +20,7 @@ const ReportFilters = ({toggleItem,toggleItemById, selectedDate, allMethods, all
                 placeholder="Escoger Fechas"
               />   
             </div>
-
+            )}
             {/* Filtro Cursos (Columnas) */}
             <div className="filter-card">
               <span className="filter-label">Columnas: Cursos</span>

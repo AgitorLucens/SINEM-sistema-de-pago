@@ -45,7 +45,6 @@ const PricingForm = ({ price, onClose, onSave,
         className="input-group"
       >
         <div className="modal-header">
-            <h2>Registrar Precio</h2>
             <span>{price.name}</span>
         </div>
         <div className="pricing-input-group">

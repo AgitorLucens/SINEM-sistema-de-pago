@@ -9,6 +9,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { PlusCircledIcon } from "@radix-ui/react-icons";
 import ErrorMessage from '../../components/generic/message/ErrorMessage.jsx';
 
+import './expenses.css';
 const Expenses = () => {
     // 1. Estado para la lista de pagos
     const initialFormState = {
@@ -26,6 +27,8 @@ const Expenses = () => {
 
     // eliminar pago
     const [confirmingId, setConfirmingId] = useState(null);
+    const [acceptDelete, setAcceptDelete] = useState(false);
+    const [isDeleteOpen, setIsDeleteOpen] = useState(false);
 
     //se usa este callback por cuestiones de rendimiento
     const fetchExpenses = useCallback(async () => {
@@ -64,6 +67,24 @@ const Expenses = () => {
         const amountNumber = parseFloat(formData.amount);
         if (isNaN(amountNumber) || amountNumber <= 0) {
             setError("Por favor, introduce un monto válido y positivo.");
+            setTimeout(() => { setError(""); setMessage(''); }, 4000); 
+            return;
+        }
+        if (!formData.description || !formData.date || !formData.reference) {
+            setError("Por favor, ingresa los campos obligatorios. (Detalle, Fecha o Refencia)");
+            setTimeout(() => { setError(""); setMessage(''); }, 4000);
+            return;
+        }
+
+        if (!formData.date) {
+            setError("Por favor, selecciona una fecha válida.");
+            setTimeout(() => { setError(""); setMessage(''); }, 4000); 
+            return;
+        }
+
+        if (!formData.description){
+            setError("Por favor, ingresa una detalle para el gasto.");
+            setTimeout(() => { setError(""); setMessage(''); }, 4000);
             return;
         }
 
@@ -88,6 +109,7 @@ const Expenses = () => {
             setIsLoading(false);
         }
         setIsModalOpen(false); // Cierra el modal al guardar
+        setMessage("Gasto registrado exitosamente");
         setTimeout(() => setMessage(''), 5000);
 
     };
@@ -110,11 +132,18 @@ const Expenses = () => {
             if (confirmingId === expenseId) {
                 setIsLoading(true);
                 e.stopPropagation();
+                setIsDeleteOpen(true);
+                if (acceptDelete === false) {
+                    setIsLoading(false);
+                    return
+                }
+                /*
                 if (!window.confirm("¿Estás seguro de que quieres eliminar este pago? Esta acción no se puede deshacer.")) {
                     setIsLoading(false);
                     setConfirmingId(null);
                     return;
                 }
+                */
                 try {
                     await deleteExpenseById(expenseId);
                     setMessage('Gasto eliminado correctamente.');
@@ -125,6 +154,9 @@ const Expenses = () => {
                     setError("Error al eliminar el pago: " + e.message);
                 } finally {
                     setIsLoading(false);
+                    setIsDeleteOpen(false);
+                    setConfirmingId(null);
+                    setAcceptDelete(false);
                     setTimeout(() => { setError(null); setMessage(''); }, 5000); 
                 }
                 
@@ -132,12 +164,15 @@ const Expenses = () => {
             
             } else {
                 setConfirmingId(expenseId);
-                setTimeout(() => setConfirmingId(null), 4000);
+                setTimeout(() => {
+                    if (isDeleteOpen)
+                        setConfirmingId(null);
+                }, 4000);
             }
         }; 
 
     return (
-        <div style={{ padding: '0.5rem' }}>
+        <div className='container-report'>
             {/* Encabezado y botón de registro */}
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
                 <h2 className="card-title" style={{ color: '#4f46e5', margin: 0 }}>Historial de Egresos</h2>
@@ -160,27 +195,61 @@ const Expenses = () => {
                 </button>
             </div>
 
-            {/* Mensaje de confirmación/error */}
+            {/* mensaje exito */}
             {message && (
                 <SuccessMessaage
                     message={message}
                 />
             )}
 
-            {/* Renderiza la Tabla */}
+            {/* tabla */}
             <ExpensesTable expenses={expenses} 
                            confirmingId={confirmingId}
                            handleTableUpdate={handleTableUpdate}
                            onDeleteExpense={deleteExpense}/>
 
-            {/* Renderiza el Modal que contiene el formulario */}
-            
+
+            {/* modal delete gasto */}
+            <Modal 
+                isOpen={isDeleteOpen}
+                onClose={ ()=>{
+                    setConfirmingId(null);
+                    setIsDeleteOpen(false);
+                }}
+                title="Borrar Ingreso"
+            >
+                <div>
+                    <div className="alert-delete">
+                        <p>
+                        <strong>¿Estás seguro de que quieres eliminar este pago?</strong> Esta accion no se puede deshacer.
+                        </p>
+                    </div>
+                    <button className="btn-delete-confirm"
+                            onClick={(e)=>{
+                                setAcceptDelete(true);
+                                deleteExpense(e,confirmingId);
+                                }}>
+                        Eliminar
+                    </button>
+                    <button className="btn-ghost-export"
+                            onClick={()=>{
+                                setConfirmingId(null);
+                                setIsDeleteOpen(false);
+                                }}>
+                        Cancelar
+                    </button>
+                </div>
+            </Modal>
+
+            {/* modal gasto */}
             <Modal 
                 isOpen={isModalOpen} 
                 onClose={() => {
                     setFormData(initialFormState);
-                    setIsModalOpen(false)}} // Permite cerrar el modal con la X
-                title="Registrar Nuevo Gasto (Egreso)"
+                    setIsModalOpen(false);
+                    setError("");
+                }} // Permite cerrar el modal con la X
+                title="Registrar Nuevo Egreso"
             >
                 {error &&(
                     <ErrorMessage

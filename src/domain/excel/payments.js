@@ -6,7 +6,7 @@ export function getPaymentsColumns() {
     { header: "Modo de Pago", key: "method", width: 12 },
     { header: "Curso", key: "division", width: 10.25 },
     { header: "Tipo de pago", key: "concept", width: 14 },
-    { header: "Monto", key: "amount", width: 10.25 },
+    { header: "Monto", key: "amount", width: 14 },
     { header: "# Comprobante", key: "receipt", width: 12.95 },
   ];
 }
@@ -29,7 +29,7 @@ export function buildPaymentRow(payment){
 */
 
 export function stylePaymentSheet(sheet){
-  addPaymentsTotal(sheet);
+  //addPaymentsTotal(sheet);
   applyPaymentBorders(sheet); 
   applyPaymentHeaderStyle(sheet);
 }

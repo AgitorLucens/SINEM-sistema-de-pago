@@ -10,7 +10,7 @@ const PricingCard = ({ price, onClick}) => {
       <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
         <div className={`card-icon card-icon-${price.id}`}><BellIcon size={20} /></div>
         <div>
-          <h4 className='card-title'>{price.name}</h4>
+          <h4 className='card-title-price'>{price.name}</h4>
           <span className='card-category'>{price.name}</span>
         </div>
       </div>

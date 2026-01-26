@@ -38,11 +38,23 @@
   background-color: #ef4444;
 }
 
+.student-badge-date {
+  font-size: 10px;
+  font-weight: 900;
+  padding: 4px 8px;
+  border-radius: 20px;
+  text-transform: uppercase;
+  color: rgb(84, 84, 84);
+  display: inline-block;
+  background-color: #f1f5f9;
+}
+
 .student-year-picker{
   display: flex;
   background-color: #f1f5f9;
   padding: 4px;
   border-radius: 12px;
+  overflow-x: auto;
 }
 
 .student-year-btn {
@@ -66,6 +78,24 @@
   background-color: transparent;
   color: #4f46e5;
   box-shadow: none;
+}
+
+.detail-infogrid2{
+    color: #94a3b8;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.75rem;
+    margin-bottom: 1rem;
+    margin-top: 1rem;
+}
+
+.empty-cont{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 150px;
+    font-size: 16px;
+    color: #94a3b8;
 }
 /*
 background-color: active ? '#ffffff' : 'transparent';

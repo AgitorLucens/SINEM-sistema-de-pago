@@ -4,7 +4,7 @@ import { useState, useEffect, useCallback, useMemo } from 'react';
 import { getPaymentConcepts, getPaymentDivisions, getAllPayments,
         getDateOfPayments, exportReportToExcel
         } from "../../constant/DBFunctions.jsx";
-import { CalendarIcon, DownloadIcon } from "@radix-ui/react-icons";
+import { DownloadIcon, InfoCircledIcon } from "@radix-ui/react-icons";
 
 import './report.css';
 const Report = () =>{
@@ -33,21 +33,21 @@ const Report = () =>{
         }).replaceAll('/', '-');
     };
 
-    const handleExportReport = async (data) => {
-        //console.log("Exportando datos de:", selectedType, data);
+    const handleExportReport = async () => {
         
-        if (!data) {
-            setError("Escoga los valores adecuados")
+        if (!payments || payments.length === 0) {
+            setError("No hay Ingresos registrados")
+            setTimeout(() => setError(""), 4000);
             return
-        }
-        
-        setError("");
-            
-        const err = await exportReportToExcel(data);
+        } 
+
+        const err = await exportReportToExcel({
+            payments: payments
+        });
+
         if (!err.sucess) {
             setError(err.error);
-            return
-        }     
+        }
     };
 
     // Lógica de filtrado
@@ -158,16 +158,20 @@ const Report = () =>{
     }, [dates]);
 
     return(
-        <div>
+        <div className="container-report">
             <div className="header-report">
                 <div className="header">
-                    <h1>Reporte de Pagos por Curso</h1>
+                    <h1>Reporte de Ingresos</h1>
                     {/*<p>Visualización matricial de ingresos recaudados.</p>*/}
                 </div>
                 <div className="downlaod-button">
-                    <button className="btn-primary-export" onClick={()=>handleExportReport({selectedCourses, selectedMethods, matrixData ,columnTotals, totalGeneral, selectedDate})}>
-                        <DownloadIcon size={18} />
-                        Descargar Excel
+                    <button 
+                        onClick={()=>handleExportReport()}
+                        disabled={payments.length === 0 ? true : false}
+                        className={`btn btn-primary${payments.length === 0 ? " export-card--disabled" : "-export"}`}
+                        >
+                        {payments.length === 0 ? <InfoCircledIcon/> : <DownloadIcon/>}
+                       {payments.length === 0 ? "Agregue Ingreso" : "Descargar Excel"}
                     </button>
                 </div>
 
