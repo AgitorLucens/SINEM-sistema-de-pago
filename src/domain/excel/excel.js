@@ -4,7 +4,6 @@ import fs from "fs";
 import { execFile } from 'child_process'
 import path from 'path'
 import os from "os";
-import ExcelJS from "@protobi/exceljs";
 import { createWorkbook, createWorksheet, saveWorkbook, getAssetPath } from "./utils.js";
 import { groupPaymentsByStudentAndYear, buildStudentRow, getStudentColumns,
          styleStudentSheet, addSheetTitle
@@ -16,7 +15,6 @@ import { styleReceiptSheet } from "./receipt.js";
 
 //refactor
 import { app } from 'electron';
-import { json } from "stream/consumers";
 
 /*
   Export Receipt
@@ -238,7 +236,6 @@ export async function exportReportToExcel(
   const tempJsonPath = path.join(os.tmpdir(), 'pagos.json');
   fs.writeFileSync(tempJsonPath, JSON.stringify(safePayments));
 
-  const jsonString = JSON.stringify(safePayments);
   const goExe = getAssetPath('excel-generator.exe');
 
   return new Promise((resolve, reject) => {

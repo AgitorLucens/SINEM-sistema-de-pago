@@ -132,8 +132,10 @@ This design ensures that sensitive operations remain isolated from the UI layer.
 ## Quick Start
 
 ### Prerequisites
-- Node.js (25+ recommended)
-- npm or yarn
+- Node.js 20.19
+- npm 10.8.2
+- Electron 39.2.5
+- Electron Forge 7.10.2
 
 ### Install Dependencies
 
@@ -193,10 +195,10 @@ npm install better-sqlite3
 
 ## Excel
 
-ExcelJS lacks functionality for pivot tables, so a fork was used. Version used of the fork is `4.4.0-protobi.2`.
+ExcelJS was used for basic excel files.
 
 ```bash
-npm install @protobi/exceljs
+npm install exceljs
 ```
 Sadly, this library lack support for pivot tables as well. So, for advanced Excel operations such as pivot tables, a Go module is used. See the [Go-Excel Module](src/domain/excel/go-excel/README.md) documentation.
 
