@@ -12,6 +12,7 @@ import { PlusCircledIcon } from "@radix-ui/react-icons";
 import { useState, useEffect, useCallback } from 'react';
 import StudentDetail from '../../components/students/StudentDetail.jsx';
 
+import './students.css';
 const Students = () => {
 
     const initialFormState = {
@@ -39,7 +40,8 @@ const Students = () => {
     const [studentPayments, setStudentPayments] = useState([]);
     // eliminar estudiante
     const [confirmingId, setConfirmingId] = useState(null);
-
+    const [acceptDelete, setAcceptDelete] = useState(false);
+    const [isDeleteOpen, setIsDeleteOpen] = useState(false);
 
     //student details
     const loadStudentPayments = async (student) => {
@@ -105,6 +107,24 @@ const Students = () => {
     const handleSubmit = async (e) => {
             e.preventDefault();
 
+            if (!formData.name || !formData.email || !formData.reference || !formData.active) {
+                setError("Por favor, complete todos los campos obligatorios. (Nombre, Email, Referencia, Activo)");
+                setTimeout(() => { setError(""); setMessage(''); }, 4000);
+                return;
+            }
+
+            if (!formData.name) {
+                setError("Introduzca un nombre para el estudiante.");
+                setTimeout(() => { setError(""); setMessage(''); }, 4000);
+                return;
+            }
+
+            if (!formData.email) {
+                setError("Introduzca un email para el estudiante.");
+                setTimeout(() => { setError(""); setMessage(''); }, 4000); 
+                return;
+            }
+
             const studentDataToSend = {
                 name: formData.name,
                 reference: formData.reference,
@@ -127,6 +147,7 @@ const Students = () => {
                 setIsLoading(false);
             }
             setIsModalOpen(false); // Cierra el modal al guardar
+            setMessage("Estudiante registrado exitosamente");
             setTimeout(() => setMessage(''), 5000);
     
     };
@@ -137,21 +158,31 @@ const Students = () => {
             if (confirmingId === studentId) {
                 setIsLoading(true);
                 e.stopPropagation();
+                setIsDeleteOpen(true);
+                if (acceptDelete === false) {
+                    setIsLoading(false);
+                    return
+                }
+                /*
                 if (!window.confirm("¿Estás seguro de que quieres eliminar este estudiante? Esta acción no se puede deshacer.")) {
                     setIsLoading(false);
                     setConfirmingId(null);
                     return;
                 }
+                */
                 try {
                     await deleteStudentById(studentId);
                     setMessage('Estudiante eliminado correctamente.');
                     setError(null);
-                    await fetchStudents();
+                    await fetchData();
                 } catch (e) {
                     console.error("Error al eliminar el estudiante:", e);
                     setError("Error al eliminar el estudiante: " + e.message);
                 } finally {
                     setIsLoading(false);
+                    setIsDeleteOpen(false);
+                    setConfirmingId(null);
+                    setAcceptDelete(false);
                     setTimeout(() => { setError(null); setMessage(''); }, 5000); 
                 }
                 
@@ -159,12 +190,15 @@ const Students = () => {
             
             } else {
                 setConfirmingId(studentId);
-                setTimeout(() => setConfirmingId(null), 4000);
+                setTimeout(() => { 
+                    if (isDeleteOpen)
+                        setConfirmingId(null);
+                }, 4000);
             }
     }; 
 
     return (
-        <div style={{ padding: '0.5rem' }}>
+        <div className='container-student'>
             {/* Encabezado y botón de registro */}
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
                 <h2 className="card-title" style={{ color: '#4f46e5', margin: 0 }}>Estudiantes</h2>
@@ -188,12 +222,12 @@ const Students = () => {
             </div>
 
             {/* Mensaje de confirmación/error */}
-            {message && (
+            {(message && !isModalDetailOpen && !isModalOpen) && (
                 <SuccessMessage
                     message={message}
                 />
             )}
-            {error && (
+            {(error && !isModalDetailOpen && !isModalOpen) && (
                 <ErrorMessage
                     message={error}
                 />
@@ -209,14 +243,13 @@ const Students = () => {
             />
 
             {/* Renderiza el Modal que contiene el formulario */}
-            <StudentsDetail
-                years={yearsPayments}
-            />
+
             <Modal 
                 isOpen={isModalOpen} 
                 onClose={() => {
                             setIsModalOpen(false);
                             setSelectedStudent(null);
+                            setError("");
                         }} // Permite cerrar el modal con la X
                 title="Registrar Nuevo Estudiante"
             >
@@ -233,16 +266,53 @@ const Students = () => {
                 />
                 
             </Modal>
+            {/* modal confirmacion borrado*/}
+            <Modal 
+                isOpen={isDeleteOpen}
+                onClose={ ()=>{
+                    setConfirmingId(null);
+                    setIsDeleteOpen(false);
+                }}
+                title="Borrar Estudiante"
+            >
+                <div>
+                    <div className="alert-delete">
+                        <p>
+                        <strong>¿Estás seguro de que quieres eliminar este pago?</strong> Esta accion no se puede deshacer.
+                        </p>
+                    </div>
+                    <button className="btn-delete-confirm"
+                            onClick={(e)=>{
+                                setAcceptDelete(true);
+                                deleteStudent(e,confirmingId);
+                                }}>
+                        Eliminar
+                    </button>
+                    <button className="btn-ghost-export"
+                            onClick={()=>{
+                                setConfirmingId(null);
+                                setIsDeleteOpen(false);
+                                }}>
+                        Cancelar
+                    </button>
+                </div>
+            </Modal>
+            {/* modal ver detalles*/}
             <Modal 
                 isOpen={isModalDetailOpen} 
                 onClose={() => setIsModalDetailOpen(false)
 
                 } // Permite cerrar el modal con la X
-                title="Meses registrados"
+                title="Detalle del Estudiante"
             >
                 {error && (
                     <ErrorMessage
                         message={error}
+                    />
+                )}
+                {(message) && (
+                    <SuccessMessage
+                        message={message}
                     />
                 )}
                 <StudentDetail
@@ -250,6 +320,8 @@ const Students = () => {
                     payments={studentPayments}
                     years={yearsPayments}
                     filterYear={selectedYear}
+                    handleTableUpdate={handleTableUpdate}
+                    onClick={setSelectedStudent}
                     setFilterYear={setSelectedYear}
                 />
                 

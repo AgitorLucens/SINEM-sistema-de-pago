@@ -11,6 +11,8 @@
 
 .date-popover {
   background: white;
+  max-height: 450px;
+  overflow-y: auto;
   border-radius: 0.75rem;
   padding: 0.75rem;
   box-shadow:

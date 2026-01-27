@@ -130,7 +130,7 @@ const ExportForm = ({
                       setFilters(prev => ({
                         ...prev,
                         payments: {
-                          ...prev.concepts,
+                          ...prev.payments,
                           concepts: prev.payments.concepts.includes(value)
                             ? prev.payments.concepts.filter(s => s !== value)
                             : [...prev.payments.concepts, value],
@@ -198,8 +198,7 @@ const ExportForm = ({
                             methods: prev.payments.methods.includes(value)
                               ? prev.payments.methods.filter(s => s !== value)
                               : [...prev.payments.methods, value],
-                          }
-                          
+                          } 
                         }))
                       }}
                     >

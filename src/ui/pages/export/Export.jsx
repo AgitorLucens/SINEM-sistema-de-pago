@@ -187,7 +187,7 @@ const Export = () => {
             });
             err = await exportPaymentsByYearToExcel({
                                                     paymentsFiltered: filteredPayments,
-                                                    name: `Pagos${filters.payments.years?.length === yearsPayments?.length ? " Historico" : ""}`});
+                                                    name: `Ingresos${filters.payments.years?.length === yearsPayments?.length ? " Historico" : ""}`});
               
         } else if(selectedType === "Gastos") {
             if (!filters.expenses.years || filters.expenses.years === 0){
@@ -445,7 +445,7 @@ const Export = () => {
                     colorClass={"color-ingresos"}
                     icon={TrendingUp}
                     disabled={yearsPayments.length > 0 ? false : true}
-                    disabledMessage={"Agrega pago para exportar"}
+                    disabledMessage={"Agrega Ingreso para exportar"}
                     onClick={() => {
                         setIsModalOpen(true)
                         setSelectedType("Pagos")
@@ -458,7 +458,7 @@ const Export = () => {
                     colorClass={"color-egresos"}
                     icon={TrendingDown}
                     disabled={yearsExpenses.length > 0 ? false : true}
-                    disabledMessage={"Agrega gasto para exportar"}
+                    disabledMessage={"Agrega Egreso para exportar"}
                     onClick={() => {
                         setIsModalOpen(true)
                         setSelectedType("Gastos")
@@ -469,7 +469,7 @@ const Export = () => {
                     title="Estudiantes"
                     description="Listado de alumnos matriculados por año"
                     colorClass={"color-estudiantes"}
-                    disabled={studentActive.length > 0 ? false : true}
+                    disabled={(studentActive.length > 0 && yearsPayments.length > 0) ? false : true}
                     disabledMessage={"Agrega gasto para exportar"}
                     icon={Users}
                     onClick={() => {
@@ -482,6 +482,8 @@ const Export = () => {
                     title="Historico"
                     description="Archivo que incluye todos los módulos."
                     colorClass={"color-completo"}
+                    disabled={((studentActive.length > 0 && yearsPayments.length > 0) || yearsExpenses.length > 0 ) ? false : true}
+                    disabledMessage={"Agrega Ingreso, Egreso o Estudiante para exportar"}
                     icon={FileText}
                     onClick={() => {
                         setIsModalOpen(true)
@@ -524,7 +526,7 @@ const Export = () => {
                     formState={{
                         payments: yearsPayments.length > 0 ? true : false,
                         expenses: yearsExpenses.length > 0 ? true : false,
-                        students: studentActive.length > 0 ? true : false,
+                        students: (studentActive.length > 0 && yearsPayments.length > 0) ? true : false,
                     }}
                     onClose={() => setIsModalOpen(false)}
                 />

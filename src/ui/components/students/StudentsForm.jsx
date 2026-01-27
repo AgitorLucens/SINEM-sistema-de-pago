@@ -18,7 +18,6 @@ const ExpensesForm = ({ formData, handleChange, onSubmit, isLoading }) => {
                         name="name"
                         value={formData.name}
                         onChange={handleChange}
-                        required
                         style={{ width: '100%', padding: '0.75rem', border: '1px solid #d1d5db', borderRadius: '0.5rem', boxSizing: 'border-box' }}
                         placeholder="Nombre"
                     />
@@ -33,7 +32,6 @@ const ExpensesForm = ({ formData, handleChange, onSubmit, isLoading }) => {
                         name="reference"
                         value={formData.reference}
                         onChange={handleChange}
-                        required
                         style={{ width: '100%', padding: '0.75rem', border: '1px solid #d1d5db', borderRadius: '0.5rem', boxSizing: 'border-box' }}
                         placeholder="Referencia"
                     />
@@ -80,7 +78,6 @@ const ExpensesForm = ({ formData, handleChange, onSubmit, isLoading }) => {
                             name="email"
                             value={formData.email}
                             onChange={handleChange}
-                            required
                             style={{ width: '100%', padding: '0.75rem', border: '1px solid #d1d5db', borderRadius: '0.5rem', boxSizing: 'border-box' }}
                             placeholder="example@hotmail.com"
                         />

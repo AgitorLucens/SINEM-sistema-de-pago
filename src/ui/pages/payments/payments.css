@@ -1,3 +1,7 @@
+.container-payment{
+    padding: 3rem 2rem;
+}
+
 .header-container {
     display: flex;
     flex-direction: column; /* Columna en móvil */
@@ -22,10 +26,50 @@
     margin-bottom: 0;
 }
 
+.header-container{
+    max-width: 800px;
+}
+
+.filter-card {
+    max-width: 800px;
+}
+
 /* Botón de Acción (Opcional, para el lado derecho) */
 .header-actions {
     display: flex;
     align-items: center;
+}
+
+.alert-delete {
+    background: #ffeff8;
+    border: 1px solid #fedbe1;
+    padding: 1rem;
+    border-radius: 0.75rem;
+    margin-top: 1rem;
+    margin-bottom: 1.5rem;
+}
+
+.alert-delete p {
+    font-size: 0.75rem;
+    color: #d81d4f;
+    margin: 0;
+}
+
+.btn-delete-confirm{
+    width: 100%;
+    background: #dc2626;
+    color: white;
+    font-weight: 500;
+    padding: 0.5rem;
+    border: none;
+    margin-top: 0.5rem;
+    cursor: pointer;
+    border-radius: 0.75rem;
+}
+
+.btn-delete-confirm:hover{
+    background: rgb(255, 216, 216);
+    color: #dc2626;
 }
 
 @media (min-width: 768px) {

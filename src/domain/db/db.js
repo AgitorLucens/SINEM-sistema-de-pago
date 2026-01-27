@@ -196,7 +196,7 @@ class AppDB {
                     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                 `);
 
-            insertStmt.run(
+            const result = insertStmt.run(
                 payment.date,
                 payment.amount,
                 payment.payment_method,
@@ -208,8 +208,14 @@ class AppDB {
                 payment.status,
                 payment.timestamp
             );
+            const insertedId = result.lastInsertRowid;
+            const createdPayment = db.prepare(`
+                SELECT *
+                FROM payments
+                WHERE id = ?
+            `).get(insertedId);
 
-            return { year, sequence: nextSeq };
+            return { year, sequence: nextSeq, createdPayment: createdPayment };
             });
 
         return {
@@ -267,22 +273,49 @@ class AppDB {
                     )
                     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
             `);
-            const data = sql.run(payment.date, 
-                                payment.amount,
-                                payment.receipt || "",
-                                payment.payment_method, 
-                                payment.concept_id, 
-                                payment.division_id,
-                                payment.student_id,  
-                                payment.year,
-                                payment.month || 0,
-                                payment.sequence,
-                                payment.status, 
-                                payment.timestamp);
-            return {
-                success: true,
-                data: data.lastInsertRowid
-            };
+        const data = sql.run(payment.date, 
+                             payment.amount,
+                             payment.receipt || "",
+                             payment.payment_method, 
+                             payment.concept_id, 
+                             payment.division_id,
+                             payment.student_id,  
+                             payment.year,
+                             payment.month || 0,
+                             payment.sequence,
+                             payment.status, 
+                             payment.timestamp);
+        const insertedId = data.lastInsertRowid;
+        const createdPayment = this.db.prepare(`
+            SELECT
+                p.id,
+                p.date,
+                s.name AS student_name,
+                p.student_id,
+                p.payment_method,
+                d.name AS division_name,
+                p.division_id,
+                c.type AS concept_type,
+                p.concept_id,
+                p.amount,
+                p.month,
+                p.year,
+                p.sequence,
+                p.receipt
+            FROM
+                payments p
+            INNER JOIN
+                payment_concepts c ON p.concept_id = c.id
+            INNER JOIN  
+                divisions d ON p.division_id = d.id
+            INNER JOIN
+                students s ON p.student_id = s.id
+            WHERE p.id = ?
+        `).get(insertedId);
+        return {
+            success: true,
+            payment: createdPayment
+        };
     }
 
     getAllPayments() {

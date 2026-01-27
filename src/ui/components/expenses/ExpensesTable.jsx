@@ -9,7 +9,10 @@ const ExpensesTable = ({expenses, minTableWidth = '700px', handleTableUpdate, on
 
     const minWidthValue = parseInt(minTableWidth, 10) || 600;
     
-    const [tableWidth, setTableWidth] = useState(minWidthValue);
+    const [tableWidth, setTableWidth] = useState(() => {
+        const saved = localStorage.getItem("expensesTableWidth");
+        return saved ? Number(saved) : minWidthValue;
+    });
 
     const dragState = useRef(null);
     const handleMouseDown = (e) => {
@@ -50,6 +53,7 @@ const ExpensesTable = ({expenses, minTableWidth = '700px', handleTableUpdate, on
         }
 
         setTableWidth(newWidth);
+        localStorage.setItem("expensesTableWidth", newWidth);
     };
 
     // Finaliza el proceso de redimensionamiento

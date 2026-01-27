@@ -1,125 +1,112 @@
-import * as Select from "@radix-ui/react-select";
 import {
-	MagnifyingGlassIcon
-} from "@radix-ui/react-icons";
-import { useMemo, useState, useRef, useEffect, useEffectEvent } from "react";
+  Combobox,
+  ComboboxItem,
+  ComboboxList,
+  ComboboxProvider,
+} from "@ariakit/react";
+import * as RadixSelect from "@radix-ui/react-select";
+import { matchSorter } from "match-sorter";
+import { startTransition, useMemo, useState } from "react";
+import { CheckIcon } from "@radix-ui/react-icons";
+import { ChevronUpDownIcon, SearchIcon } from "../../icons/Icons.jsx";
+
+import "./searchselectradix.css";
 
 const SearchSelectRadix = ({
   value,
   options,
+  onChange,
   valueKey = "value",
   labelKey = "label",
-  placeholder = "Seleccione",
-  onChange,
   open,
   onOpenChange,
 }) => {
-  const [search, setSearch] = useState("");
-  //rrecuperar foco cuando hay cambios en lista
-  const inputRef = useRef(null);
+  const [searchValue, setSearchValue] = useState("");
 
-  useEffect(()=>{
-    if (inputRef.current){
-      inputRef.current.focus();
-    }
-  }, [search]);
+  const matches = useMemo(() => {
+    if (!searchValue) return options;
 
-  const filteredOptions = useMemo(() => {
-    if (!search) return options;
+    const filtered = matchSorter(options, searchValue, {
+      keys: [labelKey, valueKey],
+    });
 
-    return options.filter(opt =>
-      String(opt[labelKey])
-        .toLowerCase()
-        .includes(search.toLowerCase())
+    const selected = options.find(
+      (opt) => String(opt[valueKey]) === String(value)
     );
-  }, [search, options, labelKey]);
 
-  const handleValueChange = (val) => {
-    if (search) return; // ⛔ no cambiar value mientras se busca
-    onChange(val);
-  };
+    if (selected && !filtered.includes(selected)) {
+      filtered.push(selected);
+    }
+
+    return filtered;
+  }, [searchValue, value, options, valueKey, labelKey]);
 
   return (
-    <Select.Root
-      value={value}
+    <RadixSelect.Root
+      value={String(value ?? "")}
+      onValueChange={onChange}
       open={open}
-      onValueChange={(val) => {
-        if (!search) onChange(val);
-      }}
-      onOpenChange={(o) => {
-        if (!o) setSearch("");
-        onOpenChange?.(o);
-      }}
+      onOpenChange={onOpenChange}
     >
-      <Select.Trigger className="SelectTrigger">
-        {!open && <Select.Value placeholder={placeholder} />}
-      </Select.Trigger>
+      <ComboboxProvider
+        open={open}
+        setOpen={onOpenChange}
+        resetValueOnHide
+        includesBaseElement={false}
+        setValue={(val) => {
+          startTransition(() => {
+            setSearchValue(val);
+          });
+        }}
+      >
+        <RadixSelect.Trigger className="select">
+          <RadixSelect.Value placeholder="Seleccionar..." />
+          <RadixSelect.Icon className="select-icon">
+            <ChevronUpDownIcon />
+          </RadixSelect.Icon>
+        </RadixSelect.Trigger>
 
-      <Select.Portal>
-        <Select.Content
-          className="SelectContent"
+        <RadixSelect.Content
+          role="dialog"
           position="popper"
+          className="popover"
           sideOffset={4}
         >
-          
-          {/* 🔍 Buscador */}
-          <div style={{ padding: "0.5rem" }}>
-            { search?.length === 0 && (
-              <MagnifyingGlassIcon
-                style={{
-                  position: "absolute",
-                  left: "0.5rem",
-                  top: "18%",
-                  transform: "translateY(-50%)",
-                  color: "#9ca3af",
-                  pointerEvents: "none",
-                }}
-              />
-            )}
-            
-            <input
-              ref={inputRef}
-              autoFocus
-              onKeyDownCapture={(e) => {
-                e.stopPropagation(); // 🔥 esto bloquea el typeahead de Radix
+          <div className="combobox-wrapper">
+            <SearchIcon />
+            <Combobox
+              autoSelect
+              placeholder="Buscar..."
+              className="combobox"
+              onBlurCapture={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
               }}
-              type="text"
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              placeholder="   Buscar..."
-              className="search-input"
             />
           </div>
 
-          <Select.Viewport>
-            {filteredOptions.length === 0 && (
-              <div
-                style={{
-                  padding: "0.75rem",
-                  textAlign: "center",
-                  color: "#9ca3af",
-                  fontSize: "0.875rem",
-                }}
-              >
-                Sin resultados
-              </div>
-            )}
-
-            {filteredOptions.map(opt => (
-              <Select.Item
+          <ComboboxList className="listbox">
+            {matches.map((opt) => (
+              <RadixSelect.Item
                 key={opt[valueKey]}
                 value={String(opt[valueKey])}
-                className="SelectItem"
+                asChild
+                className="item"
               >
-                <Select.ItemText>
-                  {opt[labelKey]}
-                </Select.ItemText>
-              </Select.Item>
+                <ComboboxItem>
+                  <RadixSelect.ItemText>
+                    {opt[labelKey]}
+                  </RadixSelect.ItemText>
+                  <RadixSelect.ItemIndicator className="item-indicator">
+                    <CheckIcon />
+                  </RadixSelect.ItemIndicator>
+                </ComboboxItem>
+              </RadixSelect.Item>
             ))}
-          </Select.Viewport>
-        </Select.Content>
-      </Select.Portal>
-    </Select.Root>
+          </ComboboxList>
+        </RadixSelect.Content>
+      </ComboboxProvider>
+    </RadixSelect.Root>
   );
 };
 
