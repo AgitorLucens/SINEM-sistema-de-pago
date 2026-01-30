@@ -1,4 +1,4 @@
-import ExcelJS from "@protobi/exceljs";
+import ExcelJS from "exceljs";
 import { dialog } from "electron";
 import path from "path";
 import { app } from 'electron';

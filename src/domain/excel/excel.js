@@ -144,10 +144,9 @@ export async function exportHistoric(data){
   const {payments,years,students,expenses} = data;
   const workbook = createWorkbook();
 
-  console.log(JSON.stringify(payments))
-
+  //console.log("Exportando histórico con datos:",  JSON.stringify({payments,years,students,expenses}));
   //students
-  if (years !== null && payments !== null && payments?.length === 0 && years?.length === 0 ){
+  if (years !== null && payments !== null && payments?.length > 0 && years?.length > 0 ){
     years.forEach(year => {
     const paymentsByStudent =
       groupPaymentsByStudentAndYear(payments, year);
@@ -221,7 +220,7 @@ export async function exportHistoric(data){
 export async function exportReportToExcel(
   payments
 ) {
-  if (!payments) return { success: false}
+  if (!payments) return {success: false}
   const safePayments = Array.isArray(payments) ? payments : [payments];
 
   

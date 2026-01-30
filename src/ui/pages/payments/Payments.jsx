@@ -421,7 +421,7 @@ const Payments = () => {
                         className={`btn btn-primary ${students.length === 0 ? " export-card--disabled" : " export-card--enable"}`}
                     >
                         <span> {students.length === 0 ? <InfoCircledIcon/> : <PlusCircledIcon/>}
-                        {payments.length === 0 ? "Agregue Estudiante" : "Registrar Nuevo Ingreso"}
+                        {students.length === 0 ? "Agregue Estudiante" : "Registrar Nuevo Ingreso"}
                         </span> 
                     </button>
                 </div>
