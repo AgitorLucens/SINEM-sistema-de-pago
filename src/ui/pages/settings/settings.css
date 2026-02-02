@@ -1,0 +1,25 @@
+
+.settings-page {
+    padding: 20px;
+    background-color: #fff;
+    min-height: 100vh;
+}
+
+.settings-section {
+    margin-top: 20px;
+    padding: 20px;
+    border: 1px solid #eee;
+    border-radius: 8px;
+}
+
+.settings-section h2 {
+    margin-top: 0;
+    margin-bottom: 10px;
+    font-size: 1.2rem;
+    color: #333;
+}
+
+.settings-section p {
+    margin-bottom: 20px;
+    color: #666;
+}

@@ -25,6 +25,13 @@ const ALLOWED_STUDENT_FIELDS = [
         "active",
 ];
 
+const ALLOWED_TEACHER_FIELDS = [
+        "name",
+        "division_id",
+        "amount",
+];
+
+
 export function validatePaymentsUpdate(data){
     const { fields } = data;
     const keys = Object.keys(fields).filter(k =>
@@ -51,6 +58,17 @@ export function validateStudentsUpdate(data){
     const { fields } = data;
     const keys = Object.keys(fields).filter(k =>
         ALLOWED_STUDENT_FIELDS.includes(k)
+    );
+    
+    if (!keys) return new Error("Intento de cambiar campo invalido");
+
+    return keys;
+}
+
+export function validateTeachersUpdate(data){
+    const { fields } = data;
+    const keys = Object.keys(fields).filter(k =>
+        ALLOWED_TEACHER_FIELDS.includes(k)
     );
     
     if (!keys) return new Error("Intento de cambiar campo invalido");

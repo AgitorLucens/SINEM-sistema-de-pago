@@ -169,7 +169,7 @@ const Payments = () => {
 
     }, [concepts, divisions, paymentMethods]);
 
-    // --- Lógica de Carga de Datos ---
+    // logica de carga de datos 
     const fetchPayments = useCallback(async () => {
         setIsLoading(true);
         setError("");
@@ -421,7 +421,7 @@ const Payments = () => {
                         className={`btn btn-primary ${students.length === 0 ? " export-card--disabled" : " export-card--enable"}`}
                     >
                         <span> {students.length === 0 ? <InfoCircledIcon/> : <PlusCircledIcon/>}
-                        {payments.length === 0 ? "Agregue Estudiante" : "Registrar Nuevo Ingreso"}
+                        {students.length === 0 ? "Agregue Estudiante" : "Registrar Nuevo Ingreso"}
                         </span> 
                     </button>
                 </div>

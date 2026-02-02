@@ -1,15 +1,40 @@
+import { useState, useEffect } from 'react';
+import { getCurrentImage } from '../../../constant/DBFunctions.jsx';
 import { Page } from '../../../constant/Pages.jsx'; 
 import Payments from '../../../pages/payments/Payments.jsx';
 import Expenses from '../../../pages/expenses/Expenses.jsx';
 import Students from '../../../pages/students/Students.jsx';
+import Teachers from '../../../pages/teachers/Teachers.jsx';
 import Pricing from  '../../../pages/pricing/Pricing.jsx';
 import Export from   '../../../pages/export/Export.jsx';
 import Report from '../../../pages/report/Report.jsx';
+import Settings from '../../../pages/settings/Settings.jsx';
 
 import sinem from "../../../assets/SINEM_home.png";
 
 import './page.css';
 const Content = ({ page }) => {
+  const [logo, setLogo] = useState(sinem);
+
+  useEffect(() => {
+    const fetchLogo = async () => {
+      const result = await getCurrentImage();
+      if (result && result.image) {
+        setLogo(result.image);
+      } else {
+        setLogo(sinem);
+      }
+    };
+    fetchLogo();
+
+    window.addEventListener("logo-updated", fetchLogo);
+
+    return () => {
+      window.removeEventListener("logo-updated", fetchLogo);
+    };
+
+  }, []);
+
   let title, description;
 
   switch (page) {
@@ -39,6 +64,18 @@ const Content = ({ page }) => {
             <Students />
           </div>
         );
+    case Page.EXPENSES_REGISTRY:
+        return (
+          <div className="expense-page-container">
+            <Expenses />
+          </div>
+        );
+    case Page.TEACHERS_REGISTRY:
+        return (
+          <div className="teacher-page-container">
+            <Teachers />
+          </div>
+        );
     case Page.PRICING_REGISTRY:
         return (
           <div className="pricing-page-container">
@@ -57,6 +94,12 @@ const Content = ({ page }) => {
             <Export />
           </div>
         );
+    case Page.SETTINGS_REGISTRY:
+      return (
+        <div className="settings-page-container">
+          <Settings />
+        </div>
+      );
     default:
       title = "Página No Encontrada";
       description = "Error de navegación. Por favor, selecciona un enlace del menú lateral.";
@@ -65,7 +108,7 @@ const Content = ({ page }) => {
   return (
     <div className="content-area">
       <h1 className="main-header">{title}</h1>
-      <img src={sinem} width={500} height={500} alt='sinem-logo' className="img" id="" />
+      <img src={logo} width={500} height={500} alt='sinem-logo' className="img" id="" />
       <div className="info-card">
         <h2 className="card-title">Pagina Inicial</h2>
         <p className="card-text">{description}</p>

@@ -34,18 +34,31 @@ const api = {
     getPaymentById: (paymentId) => ipcRenderer.invoke('get-payment-by-id', paymentId),
     deleteStudentById: (id) => ipcRenderer.invoke('delete-student-by-id', id),
 
+    // Pagina Profesores
+    getAllTeachers: () => ipcRenderer.invoke('get-all-teachers'),
+    addTeacher: (teacherData) => ipcRenderer.invoke('add-teacher', teacherData),
+    deleteTeacherById: (id) => ipcRenderer.invoke('delete-teacher-by-id', id),
+    updateTeacher: (teacherData) => ipcRenderer.invoke('update-teacher', teacherData),
+
     // Pagina Precios
     updatePriceConcept: (concept) => ipcRenderer.invoke('update-price-concept', concept),
 
     // Excel
     exportReceiptToExcel: (payment) => ipcRenderer.invoke('export-receipt-excel', payment),
-    exportReportToExcel: (data) => ipcRenderer.invoke('export-report-excel', data),
-        
+    exportReportToExcel: (data) => ipcRenderer.invoke('export-report-excel', data),     
     exportPaymentsByYearToExcel: (paymentData) => ipcRenderer.invoke('export-payments-by-year', paymentData),
     exportExpensesByYearToExcel: (expenseData) => ipcRenderer.invoke('export-expenses-by-year', expenseData),
     exportStudentsByActiveToExcel: (studentData) => ipcRenderer.invoke('export-students-by-active', studentData),
     exportHistoric: (data) => ipcRenderer.invoke('export-historic', data),
+
+    importStudentsFromExcel: () => ipcRenderer.invoke('import-student-from-excel'),
+    importStudents: (studentsData) => ipcRenderer.invoke('import-student', studentsData),
     // App functionality
+    addImage: (imageData) => ipcRenderer.invoke('add-image', imageData),
+    getImages: () => ipcRenderer.invoke('get-images'),
+    setImage: (imageState) => ipcRenderer.invoke('set-image', imageState),
+    getCurrentImage: () => ipcRenderer.invoke('get-current-image'),
+    deleteImageById: (id) => ipcRenderer.invoke('delete-image-by-id', id),
     quitApp: () => ipcRenderer.invoke("app:quit"),
 }
 

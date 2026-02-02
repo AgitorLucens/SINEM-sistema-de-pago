@@ -1,6 +1,7 @@
 import {app,ipcMain} from 'electron';
 import {exportReceiptToExcel,exportPaymentsByYearToExcel,exportExpensesByYearToExcel,
-        exportStudentsByActiveToExcel, exportReportToExcel, exportHistoric } from "../excel/excel.js"
+        exportStudentsByActiveToExcel, exportReportToExcel, exportHistoric,
+        importStudentsFromExcel } from "../excel/excel.js"
 
 export default function setUpHandlers(dbInstance) {
     /*
@@ -110,7 +111,26 @@ export default function setUpHandlers(dbInstance) {
 
     ipcMain.handle('delete-student-by-id', async ( _ , id) => {
         return dbInstance.deleteStudentById(id);
+    }); 
+
+    /*
+        Pagina Profesores
+    */
+    ipcMain.handle('get-all-teachers', async ( ) => {
+        return dbInstance.getAllTeachers();
     });
+    ipcMain.handle('add-teacher', async ( _ , teacherData) => {
+        return dbInstance.addTeacher(teacherData);
+    });
+
+    ipcMain.handle('delete-teacher-by-id', async ( _ , id) => {
+        return dbInstance.deleteTeacherById(id);
+    });
+
+    ipcMain.handle('update-teacher', async ( _ , teacherData) => {
+        return dbInstance.updateTeacher(teacherData);
+    });
+
 
     /*
         Pagina Precios
@@ -152,9 +172,38 @@ export default function setUpHandlers(dbInstance) {
         return exportHistoric(data);
     });
 
+
+    ipcMain.handle('import-student-from-excel', async ( ) => {
+        return importStudentsFromExcel();
+    });
+
+    ipcMain.handle('import-student', async ( _ , studentsData) => {
+        return dbInstance.importStudents(studentsData);
+    });
+
+    
     /*
         App functionality
     */
+    ipcMain.handle('add-image', async ( _ , imageData) => {
+        return dbInstance.addImage(imageData);
+    });
+
+    ipcMain.handle('get-images', async ( ) => {
+        return dbInstance.getImages();
+    });
+
+    ipcMain.handle('set-image', async ( _ , imageState) => {
+        return dbInstance.setImage(imageState);
+    });
+
+    ipcMain.handle('get-current-image', async ( ) => {
+        return dbInstance.getCurrentImage();
+    });
+
+    ipcMain.handle('delete-image-by-id', async ( _ , id) => {
+        return dbInstance.deleteImageById(id);
+    });
 
     ipcMain.handle('app:quit', async ( ) => {
         return app.quit();
