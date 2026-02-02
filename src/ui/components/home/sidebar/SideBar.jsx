@@ -1,9 +1,9 @@
 import NavLink from "../navlink/NavLink.jsx";
 import { Page } from '../../../constant/Pages.jsx';
-import { HomeIcon, IconArrowDownLeft, ColonIcon, TrendingUp} from "../../icons/Icons.jsx";
+import { HomeIcon, IconArrowDownLeft, TeacherIcon, TrendingUp} from "../../icons/Icons.jsx";
 import { ClipboardIcon, PersonIcon, ExitIcon, FileTextIcon, ArrowBottomLeftIcon,
          ChevronLeftIcon, ChevronRightIcon, Pencil2Icon,
-         ReaderIcon  } from "@radix-ui/react-icons";
+         ReaderIcon, GearIcon  } from "@radix-ui/react-icons";
 
 import {useState} from "react";
 import './sidebar.css';
@@ -69,6 +69,14 @@ const Sidebar = ({ currentPage, setCurrentPage, isOpen: externalIsOpen, setIsOpe
                         isOpen={isOpen}
                     />
                     <NavLink 
+                        icon={TeacherIcon} 
+                        title="Profesores" 
+                        page={Page.TEACHERS_REGISTRY} 
+                        currentPage={currentPage} 
+                        onClick={setCurrentPage}
+                        isOpen={isOpen}
+                    />
+                    <NavLink 
                         icon={Pencil2Icon} 
                         title="Precios" 
                         page={Page.PRICING_REGISTRY} 
@@ -96,6 +104,14 @@ const Sidebar = ({ currentPage, setCurrentPage, isOpen: externalIsOpen, setIsOpe
 
                 {/* Footer */}
                 <div className="mt-auto border-t pt-4">
+                    <NavLink 
+                        icon={GearIcon} 
+                        title="Configuración" 
+                        page={Page.SETTINGS_REGISTRY} 
+                        currentPage={currentPage} 
+                        onClick={setCurrentPage}
+                        isOpen={isOpen}
+                    />
                     <NavLink 
                         icon={ExitIcon} 
                         title="Salir" 

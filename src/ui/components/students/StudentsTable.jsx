@@ -1,9 +1,12 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useMemo } from 'react';
 import { formatPhone } from "../generic/function/Function.jsx"
 import { updateStudent } from "../../constant/DBFunctions.jsx"
 import { PersonIcon } from "@radix-ui/react-icons";
 import EditableCellDropdown from '../generic/table/EditableCellDropdown';
 import EditableCellInput from '../generic/table/EditableCellInput.jsx';
+import StudentsTableEdit from './StudentsTableEdit';
+import StudentsPagination from './StudentsPagination';
+import StudentsPaginationInput from './StudentsPaginationInput';
 
 import './studentstable.css';
 const StudentsTable = ({ students, loadStudent, minTableWidth = '700px', handleTableUpdate, onDeleteStudent, modalDetailOpen, onRowClick, confirmingId }) => {
@@ -14,6 +17,85 @@ const StudentsTable = ({ students, loadStudent, minTableWidth = '700px', handleT
         const saved = localStorage.getItem("studentsTableWidth");
         return saved ? Number(saved) : minWidthValue;
     });
+
+    const [visibleColumns, setVisibleColumns] = useState({
+        details: true,
+        name: true,
+        reference: true,
+        phone: true,
+        email: true,
+        active: true
+    });
+
+    // Pagination State
+    const [currentPage, setCurrentPage] = useState(1);
+    const [itemsPerPage] = useState(5);
+
+    // Sorting State
+    const [sortConfig, setSortConfig] = useState({ key: null, direction: 'default' });
+
+    const toggleColumn = (column) => {
+        setVisibleColumns(prev => ({
+            ...prev,
+            [column]: !prev[column]
+        }));
+    };
+
+    // Sorting Logic
+    const sortedStudents = useMemo(() => {
+        let sortableItems = [...(students || [])];
+        if (sortConfig.direction !== 'default' && sortConfig.key) {
+            sortableItems.sort((a, b) => {
+                let aValue = a[sortConfig.key];
+                let bValue = b[sortConfig.key];
+
+                // Handle active specifically if needed (assuming 1/0)
+                // Handle null/undefined values safely
+                if (aValue === null || aValue === undefined) aValue = '';
+                if (bValue === null || bValue === undefined) bValue = '';
+
+                if (aValue < bValue) {
+                    return sortConfig.direction === 'ascending' ? -1 : 1;
+                }
+                if (aValue > bValue) {
+                    return sortConfig.direction === 'ascending' ? 1 : -1;
+                }
+                return 0;
+            });
+        }
+        return sortableItems;
+    }, [students, sortConfig]);
+
+    const requestSort = (key) => {
+        let direction = 'ascending';
+        if (sortConfig.key === key && sortConfig.direction === 'ascending') {
+            direction = 'descending';
+        } else if (sortConfig.key === key && sortConfig.direction === 'descending') {
+            direction = 'default';
+        }
+        setSortConfig({ key, direction });
+    };
+
+    const getSortIndicator = (name) => {
+        if (sortConfig.key !== name) {
+            return null;
+        }
+        if (sortConfig.direction === 'ascending') {
+            return <span>&uarr;</span>;
+        }
+        if (sortConfig.direction === 'descending') {
+            return <span>&darr;</span>;
+        }
+        return null;
+    };
+
+    // Pagination Logic
+    const indexOfLastItem = currentPage * itemsPerPage;
+    const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+    const currentItems = sortedStudents.slice(indexOfFirstItem, indexOfLastItem);
+    const totalPages = sortedStudents.length ? Math.ceil(sortedStudents.length / itemsPerPage) : 0;
+
+    const paginate = (pageNumber) => setCurrentPage(pageNumber);
 
     const dragState = useRef(null);
     const handleMouseDown = (e) => {
@@ -79,99 +161,169 @@ const StudentsTable = ({ students, loadStudent, minTableWidth = '700px', handleT
             className='students-container'
             style={{ width: `${tableWidth}px` }}
         >
+             {/* Top Bar: Column Visibility and Pagination Input */}
+             <div className="table-top-bar">
+                
+                {students && students.length > 0 && (
+                    <StudentsPaginationInput
+                        currentPage={currentPage}
+                        totalPages={totalPages}
+                        onPageChange={paginate}
+                    />
+                )}
+
+                <StudentsTableEdit
+                    visibleColumns={visibleColumns}
+                    toggleColumn={toggleColumn}
+                />
+            </div>
+
             <div className="students-table-wrapper">
                 {/* Contenedor de la tabla: permite el scroll horizontal si el contenido de la tabla es > tableWidth */}
                 <div className="students-scroll-area"> 
                     <table className='students-table'>
                         <thead className='students-thead'>
                             <tr>
-                                <th className='students-th'>Detalles</th>
-                                <th className='students-th'>Nombre</th>
-                                <th className='students-th'>Referencia</th>
-                                <th className='students-th'>Tel.</th>
-                                <th className='students-th'>Correo</th>
-                                <th className='students-th'>Activo</th>
+                                {visibleColumns.details && <th className='students-th'>Detalles</th>}
+                                
+                                {visibleColumns.name && (
+                                    <th 
+                                        className='students-th'
+                                        onClick={() => requestSort('name')}
+                                        style={{ cursor: 'pointer' }}
+                                    >
+                                        Nombre {getSortIndicator('name')}
+                                    </th>
+                                )}
+                                {visibleColumns.reference && (
+                                    <th 
+                                        className='students-th'
+                                        onClick={() => requestSort('reference')}
+                                        style={{ cursor: 'pointer' }}
+                                    >
+                                        Referencia {getSortIndicator('reference')}
+                                    </th>
+                                )}
+                                {visibleColumns.phone && (
+                                    <th 
+                                        className='students-th'
+                                        onClick={() => requestSort('phone')}
+                                        style={{ cursor: 'pointer' }}
+                                    >
+                                        Tel. {getSortIndicator('phone')}
+                                    </th>
+                                )}
+                                {visibleColumns.email && (
+                                    <th 
+                                        className='students-th'
+                                        onClick={() => requestSort('email')}
+                                        style={{ cursor: 'pointer' }}
+                                    >
+                                        Correo {getSortIndicator('email')}
+                                    </th>
+                                )}
+                                {visibleColumns.active && (
+                                    <th 
+                                        className='students-th'
+                                        onClick={() => requestSort('active')}
+                                        style={{ cursor: 'pointer' }}
+                                    >
+                                        Activo {getSortIndicator('active')}
+                                    </th>
+                                )}
                             </tr>
                         </thead>
                         <tbody>
-                            {students.map((s, index) => (
+                            {currentItems.map((s, index) => (
                                 // Asegura que el ID sea único
                                 <tr key={s.id} className="studentrs-tr"
              
                                     style={{ backgroundColor: index % 2 === 0 ? 'white' : '#f9fafb' }}>
-                                    <td className={`students-td ${index % 2 === 0 ? 'cell-even' : 'cell-odd'}`} onClick={()=> {
-                                        modalDetailOpen(true)
-                                        loadStudent(s)
-                                    }}>
-                                        <div>
-                                            <PersonIcon size={15}/>
-                                        </div>
-                                    </td>
-                                    <td className='students-td'>
-                                        <EditableCellInput
-                                            value={s.name}
-                                            type="text"
-                                            onSave={(val) =>
-                                                handleTableUpdate(
-                                                    { id: s.id, fields: { name: val} },
-                                                    updateStudent
-                                                )
-                                            }
-                                        />
-                                    </td>
-                                    <td className='students-td'>
-                                        <EditableCellInput
-                                            value={s.reference}
-                                            type="text"
-                                            onSave={(val) =>
-                                                handleTableUpdate(
-                                                    { id: s.id, fields: { reference: val} },
-                                                    updateStudent
-                                                )
-                                            }
-                                        />
-                                    </td>
-                                    <td className='students-td'>
-                                        <EditableCellInput
-                                            value={formatPhone(s.phone)}
-                                            type="text"
-                                            pattern="^([0-9]{4}-[0-9]{4}|[0-9]{8})$"
-                                            onSave={(val) => {
-                                                const regex = new RegExp("^([0-9]{4}-[0-9]{4}|[0-9]{8})$");
-                                                if (!regex.test(val)) {
-                                                    return; 
+                                    {visibleColumns.details && (
+                                        <td className={`students-td ${index % 2 === 0 ? 'cell-even' : 'cell-odd'}`} onClick={()=> {
+                                            modalDetailOpen(true)
+                                            loadStudent(s)
+                                        }}>
+                                            <div>
+                                                <PersonIcon size={15}/>
+                                            </div>
+                                        </td>
+                                    )}
+                                    {visibleColumns.name && (
+                                        <td className='students-td'>
+                                            <EditableCellInput
+                                                value={s.name}
+                                                type="text"
+                                                onSave={(val) =>
+                                                    handleTableUpdate(
+                                                        { id: s.id, fields: { name: val} },
+                                                        updateStudent
+                                                    )
                                                 }
-                                                handleTableUpdate(
-                                                    { id: s.id, fields: { phone: val.replace(/\D/g, ""),} },
-                                                    updateStudent
-                                                )
-                                            }}
-                                        />    
-                                    </td>
-                                    <td className='students-td'>
-                                        <EditableCellInput
-                                            value={s.email}
-                                            type="text"
-                                            onSave={(val) =>
-                                                handleTableUpdate(
-                                                    { id: s.id, fields: { email: val} },
-                                                    updateStudent
-                                                )
-                                            }
-                                        />
-                                    </td>         
-                                    <td className='students-td'>
-                                        <EditableCellDropdown
-                                            options={[
-                                                {value: 1, label: "Activo"},
-                                                {value: 0, label: "Inactivo"}
-                                            ]}
-                                            value={s.active === 1 ? "Activo" : "Inactivo"}
-                                            valueKey='value'
-                                            labelKey='label'
-                                            onSave={(val) => handleTableUpdate({id: s.id, fields: {active: val}}, updateStudent)}
-                                        />
-                                    </td>
+                                            />
+                                        </td>
+                                    )}
+                                    {visibleColumns.reference && (
+                                        <td className='students-td'>
+                                            <EditableCellInput
+                                                value={s.reference}
+                                                type="text"
+                                                onSave={(val) =>
+                                                    handleTableUpdate(
+                                                        { id: s.id, fields: { reference: val} },
+                                                        updateStudent
+                                                    )
+                                                }
+                                            />
+                                        </td>
+                                    )}
+                                    {visibleColumns.phone && (
+                                        <td className='students-td'>
+                                            <EditableCellInput
+                                                value={formatPhone(s.phone)}
+                                                type="text"
+                                                pattern="^([0-9]{4}-[0-9]{4}|[0-9]{8})$"
+                                                onSave={(val) => {
+                                                    const regex = new RegExp("^([0-9]{4}-[0-9]{4}|[0-9]{8})$");
+                                                    if (!regex.test(val)) {
+                                                        return; 
+                                                    }
+                                                    handleTableUpdate(
+                                                        { id: s.id, fields: { phone: val.replace(/\D/g, ""),} },
+                                                        updateStudent
+                                                    )
+                                                }}
+                                            />    
+                                        </td>
+                                    )}
+                                    {visibleColumns.email && (
+                                        <td className='students-td'>
+                                            <EditableCellInput
+                                                value={s.email}
+                                                type="text"
+                                                onSave={(val) =>
+                                                    handleTableUpdate(
+                                                        { id: s.id, fields: { email: val} },
+                                                        updateStudent
+                                                    )
+                                                }
+                                            />
+                                        </td>
+                                    )}
+                                    {visibleColumns.active && (
+                                        <td className='students-td'>
+                                            <EditableCellDropdown
+                                                options={[
+                                                    {value: 1, label: "Activo"},
+                                                    {value: 0, label: "Inactivo"}
+                                                ]}
+                                                value={s.active === 1 ? "Activo" : "Inactivo"}
+                                                valueKey='value'
+                                                labelKey='label'
+                                                onSave={(val) => handleTableUpdate({id: s.id, fields: {active: val}}, updateStudent)}
+                                            />
+                                        </td>
+                                    )}
                                     {/* Boton Borrado  */}
                                     <td className="payments-td" style={{ textAlign: 'center' }}>
                                         <button 
@@ -219,8 +371,17 @@ const StudentsTable = ({ students, loadStudent, minTableWidth = '700px', handleT
                 }}
                 title="Arrastra para ajustar el ancho de la tabla"
             />
+
+            {/* Pagination Controls */}
+            {students && students.length > 0 && (
+                <StudentsPagination 
+                    currentPage={currentPage}
+                    totalPages={totalPages}
+                    onPageChange={paginate}
+                />
+            )}
         </div>
     );
-}
+};
 
 export default StudentsTable;

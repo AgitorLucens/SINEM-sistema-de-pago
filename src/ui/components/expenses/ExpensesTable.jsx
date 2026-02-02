@@ -1,8 +1,11 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useMemo } from 'react';
 import        { formatDate }           from "../generic/function/Function.jsx"
 import       { updateExpense }         from "../../constant/DBFunctions.jsx"
 import        EditableCellInput        from '../generic/table/EditableCellInput.jsx';
 import        EditableCellDate         from '../generic/table/EditableCellDate.jsx';
+import ExpensesTableEdit from './ExpensesTableEdit';
+import ExpensesPagination from './ExpensesPagination';
+import ExpensesPaginationInput from './ExpensesPaginationInput';
 
 import './expensestable.css';
 const ExpensesTable = ({expenses, minTableWidth = '700px', handleTableUpdate, onDeleteExpense, onRowClick, confirmingId}) => {
@@ -13,6 +16,83 @@ const ExpensesTable = ({expenses, minTableWidth = '700px', handleTableUpdate, on
         const saved = localStorage.getItem("expensesTableWidth");
         return saved ? Number(saved) : minWidthValue;
     });
+
+    const [visibleColumns, setVisibleColumns] = useState({
+        date: true,
+        description: true,
+        reference: true,
+        amount: true
+    });
+
+    // Pagination State
+    const [currentPage, setCurrentPage] = useState(1);
+    const [itemsPerPage] = useState(5);
+
+    // Sorting State
+    const [sortConfig, setSortConfig] = useState({ key: null, direction: 'default' });
+
+    const toggleColumn = (column) => {
+        setVisibleColumns(prev => ({
+            ...prev,
+            [column]: !prev[column]
+        }));
+    };
+
+    // Sorting Logic
+    const sortedExpenses = useMemo(() => {
+        let sortableItems = [...(expenses || [])];
+        if (sortConfig.direction !== 'default' && sortConfig.key) {
+            sortableItems.sort((a, b) => {
+                let aValue = a[sortConfig.key];
+                let bValue = b[sortConfig.key];
+
+                // Handle null/undefined values safely
+                if (aValue === null || aValue === undefined) aValue = '';
+                if (bValue === null || bValue === undefined) bValue = '';
+
+                if (aValue < bValue) {
+                    return sortConfig.direction === 'ascending' ? -1 : 1;
+                }
+                if (aValue > bValue) {
+                    return sortConfig.direction === 'ascending' ? 1 : -1;
+                }
+                return 0;
+            });
+        }
+        return sortableItems;
+    }, [expenses, sortConfig]);
+
+    const requestSort = (key) => {
+        let direction = 'ascending';
+        if (sortConfig.key === key && sortConfig.direction === 'ascending') {
+            direction = 'descending';
+        } else if (sortConfig.key === key && sortConfig.direction === 'descending') {
+            direction = 'default';
+        }
+        setSortConfig({ key, direction });
+    };
+
+    const getSortIndicator = (name) => {
+        if (sortConfig.key !== name) {
+            return null;
+        }
+        if (sortConfig.direction === 'ascending') {
+            return <span>&uarr;</span>;
+        }
+        if (sortConfig.direction === 'descending') {
+            return <span>&darr;</span>;
+        }
+        return null;
+    };
+
+    // Pagination Logic
+    const indexOfLastItem = currentPage * itemsPerPage;
+    const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+    const currentItems = sortedExpenses.slice(indexOfFirstItem, indexOfLastItem);
+    const totalPages = sortedExpenses.length ? Math.ceil(sortedExpenses.length / itemsPerPage) : 0;
+
+    const paginate = (pageNumber) => setCurrentPage(pageNumber);
+
 
     const dragState = useRef(null);
     const handleMouseDown = (e) => {
@@ -78,79 +158,136 @@ const ExpensesTable = ({expenses, minTableWidth = '700px', handleTableUpdate, on
             className='expenses-container'
             style={{width: `${tableWidth}px` }}
         >
+             {/* Top Bar: Column Visibility and Pagination Input */}
+             <div className="table-top-bar">
+                
+                {expenses && expenses.length > 0 && (
+                    <ExpensesPaginationInput 
+                        currentPage={currentPage}
+                        totalPages={totalPages}
+                        onPageChange={paginate}
+                    />
+                )}
+
+                <ExpensesTableEdit 
+                    visibleColumns={visibleColumns}
+                    toggleColumn={toggleColumn}
+                />
+            </div>
+
             <div className="expenses-table-wrapper">
                 {/* Contenedor de la tabla: permite el scroll horizontal si el contenido de la tabla es > tableWidth */}
                 <div className='expenses-scroll-area'> 
                     <table className='expenses-table'>
                         <thead className='expenses-thead'> {/* bg-indigo-50 */}
                             <tr>
-                                <th className='expenses-th'>Fecha</th>
-                                <th className='expenses-th'>Detalle</th>
-                                <th className='expenses-th'>Referencia</th>
-                                <th className='expenses-th'>Monto</th> 
+                                {visibleColumns.date && (
+                                    <th 
+                                        className='expenses-th'
+                                        onClick={() => requestSort('date')}
+                                        style={{ cursor: 'pointer' }}
+                                    >
+                                        Fecha {getSortIndicator('date')}
+                                    </th>
+                                )}
+                                {visibleColumns.description && (
+                                    <th 
+                                        className='expenses-th'
+                                        onClick={() => requestSort('description')}
+                                        style={{ cursor: 'pointer' }}
+                                    >
+                                        Detalle {getSortIndicator('description')}
+                                    </th>
+                                )}
+                                {visibleColumns.reference && (
+                                    <th 
+                                        className='expenses-th'
+                                        onClick={() => requestSort('reference')}
+                                        style={{ cursor: 'pointer' }}
+                                    >
+                                        Referencia {getSortIndicator('reference')}
+                                    </th>
+                                )}
+                                {visibleColumns.amount && (
+                                    <th 
+                                        className='expenses-th'
+                                        onClick={() => requestSort('amount')}
+                                        style={{ cursor: 'pointer' }}
+                                    >
+                                        Monto {getSortIndicator('amount')}
+                                    </th>
+                                )} 
                             </tr>
                         </thead>
                         <tbody>
-                            {expenses.map((ex, index) => (
+                            {currentItems.map((ex, index) => (
                                 // Asegura que el ID sea único
                                 <tr key={ex.id} className='expenses-tr'
                                     style={{ backgroundColor: index % 2 === 0 ? 'white' : '#f9fafb' }}>
-                                    <td className='expenses-td'>
-                                        <EditableCellDate
-                                            value={ex.date}
-                                            onSave={(val) =>
-                                                handleTableUpdate(
-                                                    { id: ex.id, fields: { date: val } },
-                                                    updateExpense
-                                                )
-                                            }
-                                        />
-                                        {/*formatDate(ex.date)*/}
-                                    </td>
-                                    <td className='expenses-td'>
-                                        <EditableCellInput
-                                            value={ex.description}
-                                            type="text"
-                                            onSave={(val) =>
-                                                handleTableUpdate(
-                                                    { id: ex.id, fields: { description: val} },
-                                                    updateExpense
-                                                )
-                                            }
-                                        />
-                                    </td>
-                                    <td className='expenses-td'>
-                                        <EditableCellInput
-                                            value={ex.reference}
-                                            type="text"
-                                            onSave={(val) =>
-                                                handleTableUpdate(
-                                                    { id: ex.id, fields: { reference: val} },
-                                                    updateExpense
-                                                )
-                                            }
-                                        />
-                                    </td>
+                                    {visibleColumns.date && (
+                                        <td className='expenses-td'>
+                                            <EditableCellDate
+                                                value={ex.date}
+                                                onSave={(val) =>
+                                                    handleTableUpdate(
+                                                        { id: ex.id, fields: { date: val } },
+                                                        updateExpense
+                                                    )
+                                                }
+                                            />
+                                            {/*formatDate(ex.date)*/}
+                                        </td>
+                                    )}
+                                    {visibleColumns.description && (
+                                        <td className='expenses-td'>
+                                            <EditableCellInput
+                                                value={ex.description}
+                                                type="text"
+                                                onSave={(val) =>
+                                                    handleTableUpdate(
+                                                        { id: ex.id, fields: { description: val} },
+                                                        updateExpense
+                                                    )
+                                                }
+                                            />
+                                        </td>
+                                    )}
+                                    {visibleColumns.reference && (
+                                        <td className='expenses-td'>
+                                            <EditableCellInput
+                                                value={ex.reference}
+                                                type="text"
+                                                onSave={(val) =>
+                                                    handleTableUpdate(
+                                                        { id: ex.id, fields: { reference: val} },
+                                                        updateExpense
+                                                    )
+                                                }
+                                            />
+                                        </td>
+                                    )}
                                     {/* Mostrar monto con dos decimales */}
-                                    <td className='expenses-td amount-column'>
-                                        <EditableCellInput
-                                            value={ex.amount}
-                                            type="number"
-                                            formatDisplay={(val) =>
-                                                new Intl.NumberFormat("es-CR", {
-                                                    style: "currency",
-                                                    currency: "CRC",
-                                                    minimumFractionDigits: 2,
-                                                }).format(val)
-                                            }
-                                            onSave={(val) =>
-                                                handleTableUpdate(
-                                                    { id: ex.id, fields: { total_amount: parseFloat(val) } },
-                                                    updateExpense
-                                                )
-                                            }
-                                        />
-                                    </td>         
+                                    {visibleColumns.amount && (
+                                        <td className='expenses-td amount-column'>
+                                            <EditableCellInput
+                                                value={ex.amount}
+                                                type="number"
+                                                formatDisplay={(val) =>
+                                                    new Intl.NumberFormat("es-CR", {
+                                                        style: "currency",
+                                                        currency: "CRC",
+                                                        minimumFractionDigits: 2,
+                                                    }).format(val)
+                                                }
+                                                onSave={(val) =>
+                                                    handleTableUpdate(
+                                                        { id: teacher.id, fields: { amount: parseFloat(val) } },
+                                                        updateExpense
+                                                    )
+                                                }
+                                            />
+                                        </td>
+                                    )}         
                                     {/* Boton Borrado  */}
                                     <td className="expenses-td" style={{ textAlign: 'center' }}>
                                         <button 
@@ -197,9 +334,18 @@ const ExpensesTable = ({expenses, minTableWidth = '700px', handleTableUpdate, on
                     opacity: 0.7,
                 }}
                 title="Arrastra para ajustar el ancho de la tabla"
-            />  
+            />
+            
+            {/* Pagination Controls */}
+            {expenses && expenses.length > 0 && (
+                <ExpensesPagination 
+                    currentPage={currentPage}
+                    totalPages={totalPages}
+                    onPageChange={paginate}
+                />
+            )}
         </div>
     );
-}
+};
 
 export default ExpensesTable;

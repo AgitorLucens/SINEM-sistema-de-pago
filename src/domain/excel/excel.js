@@ -138,6 +138,15 @@ export async function exportStudentsByActiveToExcel(students,payments,years) {
 }
 
 /*
+  Import Students
+*/
+
+export async function importStudentsFromExcel(){
+  console.log("Improtanto estudiantes");
+  return;
+}
+
+/*
   Export Historic
 */
 export async function exportHistoric(data){

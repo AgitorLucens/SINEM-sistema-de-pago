@@ -218,6 +218,39 @@ const Students = () => {
                     onMouseOut={(e) => e.currentTarget.style.backgroundColor = '#4f46e5'}
                 >
                     <PlusCircledIcon/> Registrar Nuevo Estudiante
+                </button><button
+                    onClick={() => setIsModalOpen(true)} // Abre el modal
+                    style={{
+                        backgroundColor: '#4f46e5', 
+                        color: 'white',
+                        padding: '0.5rem 1rem',
+                        borderRadius: '0.5rem',
+                        fontWeight: '600',
+                        border: 'none',
+                        cursor: 'pointer',
+                        transition: 'background-color 0.2s'
+                    }}
+                    onMouseOver={(e) => e.currentTarget.style.backgroundColor = '#4338ca'}
+                    onMouseOut={(e) => e.currentTarget.style.backgroundColor = '#4f46e5'}
+                >
+                    <PlusCircledIcon/> Importar Estudiantes
+                </button>
+                <button
+                    onClick={() => setIsModalOpen(true)} // Abre el modal
+                    style={{
+                        backgroundColor: '#4f46e5', 
+                        color: 'white',
+                        padding: '0.5rem 1rem',
+                        borderRadius: '0.5rem',
+                        fontWeight: '600',
+                        border: 'none',
+                        cursor: 'pointer',
+                        transition: 'background-color 0.2s'
+                    }}
+                    onMouseOver={(e) => e.currentTarget.style.backgroundColor = '#4338ca'}
+                    onMouseOut={(e) => e.currentTarget.style.backgroundColor = '#4f46e5'}
+                >
+                    <PlusCircledIcon/> Registrar Nuevo Estudiante
                 </button>
             </div>
 

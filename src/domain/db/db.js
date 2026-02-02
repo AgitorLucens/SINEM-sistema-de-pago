@@ -1,7 +1,7 @@
 import { app } from 'electron';
 import path from 'node:path';
 import Database from 'better-sqlite3';
-import {validatePaymentsUpdate,validateExpensesUpdate, validateStudentsUpdate} from "./validate.js";
+import {validatePaymentsUpdate,validateExpensesUpdate,validateStudentsUpdate,validateTeachersUpdate} from "./validate.js";
 
 class AppDB {
     constructor() {
@@ -26,7 +26,23 @@ class AppDB {
                 active INTEGER NOT NULL -- 1 para true, 0 para false
             );
         `;
+
         this.db.exec(createStudentsTable);
+
+        /*
+            Tabla Profesores
+        */
+        const createTeachersTable = `
+            CREATE TABLE IF NOT EXISTS teachers (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                name TEXT NOT NULL,
+                division_id INTEGER UNIQUE,
+                amount REAL,
+                FOREIGN KEY (division_id) REFERENCES divisions(id) ON DELETE SET NULL
+            );
+        `;
+
+        this.db.exec(createTeachersTable);
 
         /*
             Tabla Concepto de Pagos
@@ -135,6 +151,18 @@ class AppDB {
             );
         `;
         this.db.exec(createExpensesTable);
+
+        /*
+            Tabla Imagenes
+        */
+        const createImagesTable = `
+            CREATE TABLE IF NOT EXISTS images (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                image BLOB NOT NULL,
+                current_image INTEGER -- 1 si lo es, 0 si no
+            );
+        `;
+        this.db.exec(createImagesTable);
 
         /*
             Tabla Caja
@@ -320,13 +348,15 @@ class AppDB {
 
     getAllPayments() {
         
-        const sql = this.db.prepare(`SELECT
+        const sql = this.db.prepare(`
+                                    SELECT
                                         p.id,
                                         p.date,
                                         s.name AS student_name,
                                         p.student_id,
                                         p.payment_method,
                                         d.name AS division_name,
+                                        t.name AS teacher_name,
                                         p.division_id,
                                         c.type AS concept_type,
                                         p.concept_id,
@@ -335,16 +365,17 @@ class AppDB {
                                         p.year,
                                         p.sequence,
                                         p.receipt
-                                     FROM
+                                    FROM 
                                         payments p
-                                     INNER JOIN
+                                    INNER JOIN 
                                         payment_concepts c ON p.concept_id = c.id
-                                     INNER JOIN  
+                                    INNER JOIN 
                                         divisions d ON p.division_id = d.id
-                                     INNER JOIN
+                                    LEFT JOIN 
+                                        teachers t ON d.id = t.division_id
+                                    INNER JOIN 
                                         students s ON p.student_id = s.id
-                                     ORDER BY
-                                        p.id DESC;`
+                                    ORDER BY p.id DESC;`
                                     );
         const payments = sql.all();
         return payments;
@@ -702,6 +733,75 @@ class AppDB {
             return student;
     }
 
+    importStudents(studentsData){
+        if (!studentsData) return {error: "Datos Estudiantes no encontrados."}
+
+        return {
+            success: true,
+        }
+    }
+
+    /*
+        Profesores
+    */
+    getAllTeachers(){
+        const sql = this.db.prepare(`SELECT
+                                        t.id,
+                                        t.name,
+                                        t.division_id,
+                                        d.name AS division_name,
+                                        t.amount
+                                      FROM
+                                        teachers t  
+                                      INNER JOIN
+                                        divisions d ON t.division_id = d.id
+                                      ORDER BY
+                                        t.id DESC;
+                                    `);
+        const teachers = sql.all();
+        return teachers;    
+    }
+
+    addTeacher(teacherData){
+        const sql = this.db.prepare(`
+                INSERT INTO teachers (name, division_id, amount)
+                VALUES (?, ?, ?)
+            `);
+        const data = sql.run(teacherData.name,
+                            teacherData.division_id,
+                            teacherData.amount);
+
+        return data;
+    }
+
+    deleteTeacherById(id) {
+            const sql = this.db.prepare(`DELETE FROM teachers WHERE id = ?`);
+            const teacher = sql.run(id);
+            return teacher
+    }
+
+    updateTeacher(data){
+        const keys = validateTeachersUpdate(data);
+        if (!keys) return {
+            success: false,
+            transaction: null
+        } 
+
+        const setClause = keys.map(k => `${k} = ?`).join(", ");
+        const values = keys.map(k => data.fields[k]);
+
+        const stmt = this.db.prepare(`
+                UPDATE teachers
+                SET ${setClause}
+                WHERE id = ?
+        `);
+        const result = stmt.run(...values, data?.id);
+        return {
+            success: true,
+            result: result.changes
+        }
+    }
+
     /*
         Concepto de Pago
     */
@@ -716,6 +816,58 @@ class AppDB {
         const data = sql.run(concept.amount,
                              concept.id);
         return data.lastInsertRowid;
+    }
+    /*
+        Functionality
+    */
+    addImage(imageData){
+        const sql = this.db.prepare(`
+                INSERT INTO images (image,current_image)
+                VALUES (?,?)
+            `);
+        const data = sql.run(imageData.image,0);
+        return data.lastInsertRowid;
+    }
+
+    setImage(imageState){
+        const reset = this.db.prepare(`
+                UPDATE images
+                SET
+                    current_image = 0
+                WHERE
+                    current_image = 1;
+            `);
+        const res = reset.run();
+        //console.log("res "+JSON.stringify(imageState));
+
+        const sql = this.db.prepare(`
+                UPDATE images
+                SET
+                    current_image = ?
+                WHERE 
+                    id = ?;
+            `);
+        const data = sql.run(imageState.current_image,
+                             imageState.id);
+        return data.lastInsertRowid;
+    }
+
+    getImages(){
+        const sql = this.db.prepare(`SELECT * FROM images`);
+        const data = sql.all();
+        return data;
+    }   
+
+    getCurrentImage(){
+        const sql = this.db.prepare(`SELECT * FROM images WHERE current_image = 1`);
+        const data = sql.get();
+        return data;
+    }
+
+    deleteImageById(id) {
+            const sql = this.db.prepare(`DELETE FROM images WHERE id = ?`);
+            const image = sql.run(id);
+            return image;
     }
 
     close () {

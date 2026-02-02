@@ -101,6 +101,8 @@ const PaymentsTable = ({ concepts, divisions, payments, students, minTableWidth 
                                 <th className='payments-th'>Estudiante</th>
                                 <th className='payments-th'>Modo Pago</th>
                                 <th className='payments-th'>Curso</th>
+                                <th className='payments-th'>Profesor</th>
+                                
                                 <th className='payments-th text-center'>Tipo Pago</th>
                                 <th className='payments-th text-center'>Monto</th>
                                 <th className='payments-th text-center'># Comprobante</th>
@@ -109,7 +111,8 @@ const PaymentsTable = ({ concepts, divisions, payments, students, minTableWidth 
                         <tbody>
                             {payments.map((p, index) => (
                                 <tr key={p.id} className="payments-tr"
-                                    style={{ backgroundColor: index % 2 === 0 ? 'white' : '#f9fafb' }}>
+                                    style={{ backgroundColor: index % 2 === 0 ? 'white' : '#f9fafb' }}
+                                >
                                     <td onClick={() => onRowClick?.(p)}
                                         className="payments-td">
                                             <span className="badge-id">
@@ -163,6 +166,10 @@ const PaymentsTable = ({ concepts, divisions, payments, students, minTableWidth 
                                             onSave={(val) => handleTableUpdate({id: p.id, fields: {division_id: val}}, updatePayment)}
                                         />
                                     </td>
+                                    <td className="payments-td">
+                                        {p.teacher_name}
+                                    </td>
+                                    
                                     <td className="payments-td">
                                         <EditableCellDropdown
                                             options={concepts}

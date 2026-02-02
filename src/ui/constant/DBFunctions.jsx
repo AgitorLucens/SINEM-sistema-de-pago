@@ -244,6 +244,53 @@ export async function deleteStudentById(studentId) {
     }
 }
 
+/* 
+    Profesores
+*/
+export async function getAllTeachers() {
+    try {
+        return await window.api.getAllTeachers();
+    } catch (error) {
+        console.error('Error al obtener profesores:', error.message);
+        return {
+            error: "Error al obtener profesores.",
+        }; 
+    }
+}
+
+export async function addTeacher(teacherData) {
+    try {
+        return await window.api.addTeacher(teacherData);
+    } catch (error) {
+        console.error('Error al agregar profesor:', error.message);
+        return {
+            error: "Error al agregar profesor: " + error.message,
+        }; 
+    }
+}
+
+export async function deleteTeacherById(teacherId) {
+    try {
+        return await window.api.deleteTeacherById(teacherId);
+    } catch (error) {
+        console.error('Error al eliminar profesor por ID:', error.message);
+        return {
+            error: "Error al eliminar profesor. " + error.message,
+        }; 
+    }
+}
+
+export async function updateTeacher(teacherData) {
+    try {
+        return await window.api.updateTeacher(teacherData);
+    } catch (error) {
+        console.error('Error al cambiar profesor:', error.message);
+        return {
+            error: "Error al cambiar profesor: " + error.message,
+        }; 
+    }
+}
+
 /*
     Concepto de Pago
 */
@@ -325,6 +372,87 @@ export async function exportHistoric(data) {
     }
 }
 
+export async function importStudentsFromExcel() {
+    try {
+        return await window.api.importStudentsFromExcel();
+    } catch (error) {
+        console.error('Error al importar estudiantes desde el excel:', error.message);
+        return {
+            error: "Error al exportar respaldo por estado a excel.",
+        }; 
+    }
+}
+
+export async function importStudents(studentsData) {
+    try {
+        return await window.api.exportHistoric(studentsData);
+    } catch (error) {
+        console.error('Error al importar estudiantes hacia la base de datos:', error.message);
+        return {
+            error: "Error al exportar respaldo por estado a excel.",
+        }; 
+    }
+}
+
+/*
+    Functionality
+*/
+
+export async function addImage(imageData) {
+    try {
+        return await window.api.addImage(imageData);
+    } catch (error) {
+        console.error('Error al agregar imagen:', error.message);
+        return {
+            error: "Error al agregar imagen.",
+        }; 
+    }
+}
+
+export async function getImages() {
+    try {
+        return await window.api.getImages();
+    } catch (error) {
+        console.error('Error al obtener imagenes:', error.message);
+        return {
+            error: "Error al obtener imagenes.",
+        }; 
+    }
+}
+
+export async function setImage(imageState) {
+    try {
+        return await window.api.setImage(imageState);
+    } catch (error) {
+        console.error('Error al establecer imagen:', error.message);
+        return {
+            error: "Error al establecer imagen.",
+        }; 
+    }
+}
+
+export async function getCurrentImage() {
+    try {
+        return await window.api.getCurrentImage();
+    } catch (error) {
+        console.error('Error al obtener imagen:', error.message);
+        return {
+            error: "Error al obtener imagen.",
+        }; 
+    }
+}
+
+export async function deleteImageById(id) {
+    try {
+        return await window.api.deleteImageById(id);
+    } catch (error) {
+        console.error('Error al eliminar imagen:', error.message);
+        return {
+            error: "Error al eliminar imagen.",
+        }; 
+    }
+}
+
 export default {
     //Pagos
     addPayment,
@@ -346,6 +474,9 @@ export default {
     getAllStudents,
     getStudentsByActive,
     getStudentsActive,
+    //Profesores
+    getAllTeachers,
+    addTeacher,
     //Precios
     updatePriceConcept,
     //Exportar
@@ -353,5 +484,13 @@ export default {
     exportReportToExcel,
     exportPaymentsByYearToExcel,
     exportStudentsByActiveToExcel,
-    exportHistoric
+    exportHistoric,
+    importStudentsFromExcel,
+    importStudents,
+    //Functionality
+    addImage,
+    getImages,
+    setImage,
+    getCurrentImage,
+    deleteImageById,
 };

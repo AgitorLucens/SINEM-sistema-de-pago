@@ -169,7 +169,7 @@ const Payments = () => {
 
     }, [concepts, divisions, paymentMethods]);
 
-    // --- Lógica de Carga de Datos ---
+    // logica de carga de datos 
     const fetchPayments = useCallback(async () => {
         setIsLoading(true);
         setError("");
