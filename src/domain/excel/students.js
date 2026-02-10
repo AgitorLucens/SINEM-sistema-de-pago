@@ -120,6 +120,18 @@ export function getStudentColumns(year) {
   ];
 }
 
+export function getStudentColumnsTemplate() {
+  return [
+    { header: `NOMBRE MATRICULADO`, key: "nombre", width: 36 },
+    { header: "CORREO", key: "correo", width: 28 },
+    { header: "ACTIVO", key: "activo", width: 10 },
+    { header: "TELÉFONO", key: "telefono", width: 15 },
+    { header: "REFERENCIA", key: "referencia", width: 20 },
+    { header: "BECA", key: "scholarship", width: 10 },
+    { header: "MONTO BECA", key: "scholarship_amount", width: 10 },
+  ];
+}
+
 function pickMonths(all, keys) {
   return Object.fromEntries(keys.map(k => [k, all[k]]));
 }
@@ -138,6 +150,16 @@ export function styleStudentSheet(sheet) {
   highlightActivoColumns(sheet);
   highlightCorreoColumns(sheet);
   addSheetTitle(sheet, "Asociacion de Padres del Sinem");
+}
+
+export function styleStudentSheetTemplate(sheet) {
+  applyBaseStyle(sheet);
+  styleHeader(sheet);
+  applyTableBorders(sheet);
+  alignColumnsTemplate(sheet);
+  highlightActivoColumns(sheet);
+  highlightCorreoColumns(sheet);
+  addExample(sheet);
 }
 
 export function addSheetTitle(sheet, title) {
@@ -242,6 +264,13 @@ function alignColumns(sheet) {
   });
 }
 
+
+function alignColumnsTemplate(sheet) {
+  ["nombre", "correo", "referencia"].forEach(key => {
+    sheet.getColumn(key).alignment = { horizontal: "left" };
+  });
+}
+
 function highlightMatriculaColumns(sheet) {
   const matriculaKeys = ["matricula_1", "matricula_2"];
 
@@ -309,4 +338,59 @@ function highlightCorreoColumns(sheet) {
       underline: true,
     };
   });
+}
+
+/* 
+  Import Excel
+*/
+
+function addExample(sheet){
+  sheet.addRow({
+    nombre: "Ejemplo",
+    correo: "ejemplo@ejemplo.com",
+    activo: "Si",
+    telefono: "9999-9999",
+    referencia: "Ejemplo",
+    scholarship: "Si",
+    scholarship_amount: "2000"
+  })
+}
+
+export async function paseStudentFile(buffer,workbook){
+    const realBuffer = Buffer.from(Uint8Array.from(buffer.buffer));
+
+    await workbook.xlsx.load(realBuffer);
+
+    const sheet = workbook.worksheets[0];
+    
+    const students = [];
+    
+    const headerMap = {};
+
+    sheet.getRow(1).eachCell((cell, colNumber) => {
+      headerMap[cell.value] = colNumber;
+    });
+
+    sheet.eachRow((row, rowNumber) => {
+      if (rowNumber === 1) return;
+
+      const nombre = row.getCell(headerMap["NOMBRE MATRICULADO"])?.value;
+
+      if (!nombre) return;
+      
+      students.push({
+        nombre: nombre.toString().trim(),
+        correo: row.getCell(headerMap["CORREO"])?.value?.toString() || "",
+        activo: row.getCell(headerMap["ACTIVO"])?.value?.toString() || "Si",
+        telefono: row.getCell(headerMap["TELÉFONO"])?.value?.toString() || "",
+        referencia: row.getCell(headerMap["REFERENCIA"])?.value?.toString() || "",
+        scholarship: row.getCell(headerMap["BECA"])?.value?.toString() || "No",
+        scholarship_amount: Number(
+            row.getCell(headerMap["MONTO BECA"])?.value || 0
+        )    
+      });
+      //console.log("studs ", JSON.stringify(students));
+    });
+
+    return students;
 }

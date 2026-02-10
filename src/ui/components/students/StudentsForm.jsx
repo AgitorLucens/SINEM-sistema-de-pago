@@ -37,20 +37,21 @@ const ExpensesForm = ({ formData, handleChange, onSubmit, isLoading }) => {
                     />
                 </div>
                 <div>
-                    <SelectRadix label="Activo"
-                                 name="active"
-                                 placeholder="Seleccione estado de estudiante"
-                                 value={formData.active}
-                                 onChange={onRadixChange(handleChange,"active")}
-                                 valueKey="value"
-                                 labelKey="label"
-                                 options={[
+                    <SelectRadix 
+                                label="Activo"
+                                name="active"
+                                placeholder="Seleccione estado de estudiante"
+                                value={formData.active}
+                                onChange={onRadixChange(handleChange,"active")}
+                                valueKey="value"
+                                labelKey="label"
+                                options={[
                                     { value: "1", label: "Activo" },
                                     { value: "0", label: "No Activo" },
-                                 ]}/>
-
+                                ]}
+                    />
                 </div>
-                {/* Campo Monto y Fecha (en una fila) */}
+                {/* Campo Telefono y Email (en una fila) */}
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
                     <div>
                         <label htmlFor="phone" style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '500', fontSize: '0.875rem' }}>
@@ -83,8 +84,40 @@ const ExpensesForm = ({ formData, handleChange, onSubmit, isLoading }) => {
                         />
                     </div>
                 </div>
+                            
+                {/* Campo beca */}
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
+                    <div>
+                        <SelectRadix 
+                                label="Beca"
+                                name="scholarship"
+                                placeholder="Seleccione beca de estudiante"
+                                value={formData.scholarship}
+                                onChange={onRadixChange(handleChange,"active")}
+                                valueKey="value"
+                                labelKey="label"
+                                options={[
+                                    { value: "1", label: "Beca" },
+                                    { value: "0", label: "Sin Beca" },
+                                ]}
+                        />
+                    </div>
+                    <div>
+                        <label htmlFor="email" style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '500', fontSize: '0.875rem' }}>
+                            Monto Beca
+                        </label>
+                        <input
+                            type="text"
+                            id="email"
+                            name="email"
+                            value={formData.email}
+                            onChange={handleChange}
+                            style={{ width: '100%', padding: '0.75rem', border: '1px solid #d1d5db', borderRadius: '0.5rem', boxSizing: 'border-box' }}
+                            placeholder="example@hotmail.com"
+                        />
+                    </div>
+                </div>
 
-                {/* Campo Concepto y Método de Pago (en una fila) */}
 
                 <button
                     type="submit"
@@ -99,7 +132,7 @@ const ExpensesForm = ({ formData, handleChange, onSubmit, isLoading }) => {
                         cursor: 'pointer',
                         transition: 'background-color 0.2s'
                     }}
-                    onMouseOver={(e) => e.currentTarget.style.backgroundColor = '#059669'} // hover:bg-emerald-600
+                    onMouseOver={(e) => e.currentTarget.style.backgroundColor = '#059669'}
                     onMouseOut={(e) => e.currentTarget.style.backgroundColor = '#10b981'}
                 >
                     Guardar Estudiante

@@ -1,11 +1,11 @@
 import { app } from 'electron';
 import path from 'node:path';
 import Database from 'better-sqlite3';
-import {validatePaymentsUpdate,validateExpensesUpdate,validateStudentsUpdate,validateTeachersUpdate} from "./validate.js";
+import { validatePaymentsUpdate, validateExpensesUpdate, validateStudentsUpdate, validateTeachersUpdate } from "./validate.js";
 
 class AppDB {
     constructor() {
-        const dbPath = path.join(app.getPath('userData'),'sinem.sqlite');
+        const dbPath = path.join(app.getPath('userData'), 'sinem.sqlite');
         this.db = new Database(dbPath);
         this.db.pragma('journal_mode = WAL');
         this.setUpDatabase();
@@ -78,29 +78,44 @@ class AppDB {
         const seedDivisions = `
             INSERT OR IGNORE INTO divisions (name, description) VALUES
                 ('SINEM', 'Cursos a menores de edad'),
-                ('Talleres', 'Cursos dados a la poblacion en Comun'),
                 ('Ventas Accesorios', 'Ventas de accesorios para cursos'),
                 ('Ventas Varias', 'Ventas Varias');
             `;
         this.db.exec(seedDivisions);
 
-        /*
-            Tabla ----
-        */
-        const createInvoicesTable = `
-            CREATE TABLE IF NOT EXISTS invoices (
+        const createDivisionConceptTable = `
+            CREATE TABLE IF NOT EXISTS division_payment_concepts (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
-                invoice_number INTEGER NOT NULL UNIQUE,
-                date TEXT NOT NULL,
-                month_charged TEXT,
-                student_name TEXT NOT NULL, -- Desnormalizado del estudiante para la factura
-                course TEXT,
-                total_amount REAL NOT NULL
-                -- Nota: payment_id (UUID) será agregado al crear la tabla Payments,
-                -- ya que la factura depende del pago para la referencia.
+                division_id INTEGER, --NULL para Pago Otros
+                concept_id INTEGER NOT NULL,
+                amount REAL NOT NULL,
+
+                UNIQUE (division_id, concept_id),
+
+                FOREIGN KEY (division_id) REFERENCES divisions(id) ON DELETE CASCADE,
+                FOREIGN KEY (concept_id) REFERENCES payment_concepts(id) ON DELETE CASCADE
             );
         `;
-        this.db.exec(createInvoicesTable);
+        this.db.exec(createDivisionConceptTable);
+
+        // Seed division_payment_concepts
+        const divisions = this.db.prepare("SELECT id, name FROM divisions").all();
+        const concepts = this.db.prepare("SELECT id, type FROM payment_concepts WHERE type != 'Otros'").all();
+
+        const insertDivisionConcept = this.db.prepare(`
+            INSERT OR IGNORE INTO division_payment_concepts (division_id, concept_id, amount)
+            VALUES (@division_id, @concept_id, 0)
+        `);
+
+        const transaction = this.db.transaction(() => {
+            for (const div of divisions) {
+                for (const concept of concepts) {
+                    insertDivisionConcept.run({ division_id: div.id, concept_id: concept.id });
+                }
+            }
+        });
+
+        transaction();
 
         /*
             Tabla Pagos
@@ -117,6 +132,7 @@ class AppDB {
                 status TEXT NOT NULL, -- Corresponde a PaymentStatus (ACTIVE, CANCELED)
                 timestamp TEXT NOT NULL,
                 month INTEGER, -- Corresponde al mes al que se aplica el pago (1-12)
+                semester INTEGER, -- Corresponde aa Matricula 1 o Matricula 2
                 receipt TEXT,
                 -- consecutivo
                 year INTEGER NOT NULL, -- Corresponde al año para el concecutivo
@@ -135,6 +151,13 @@ class AppDB {
         `;
         this.db.exec(createIndexConcecutivePaymentsTable);
 
+        const createIndexSemesterPaymentsTable = `
+            CREATE UNIQUE INDEX IF NOT EXISTS idx_unique_matricula
+            ON payments(student_id, division_id, year, semester)
+            WHERE concept_id = 1;
+        `;
+        this.db.exec(createIndexSemesterPaymentsTable);
+
         /*
             Tabla Gastos
         */
@@ -144,10 +167,10 @@ class AppDB {
                 date TEXT NOT NULL,
                 description TEXT NOT NULL,
                 reference TEXT,
+                type TEXT NOT NULL, -- Corresponde Profesores, Administrativo, Otros Pagos
                 account_64 REAL,
                 account_19 REAL,
-                total_amount REAL NOT NULL,
-                pending_payment INTEGER -- 1 para true, 0 para false
+                total_amount REAL NOT NULL
             );
         `;
         this.db.exec(createExpensesTable);
@@ -244,7 +267,7 @@ class AppDB {
             `).get(insertedId);
 
             return { year, sequence: nextSeq, createdPayment: createdPayment };
-            });
+        });
 
         return {
             success: true,
@@ -252,12 +275,12 @@ class AppDB {
         }
     }
 
-    updatePayment(data){
+    updatePayment(data) {
         const keys = validatePaymentsUpdate(data);
         if (!keys) return {
             success: false,
             transaction: null
-        } 
+        }
 
         const setClause = keys.map(k => `${k} = ?`).join(", ");
         const values = keys.map(k => data.fields[k]);
@@ -271,7 +294,7 @@ class AppDB {
         return {
             success: true,
             result: result.changes
-        } 
+        }
     }
 
     getNextConsecutiveByYear(year) {
@@ -293,26 +316,28 @@ class AppDB {
                     concept_id,
                     division_id,
                     student_id,
+                    semester,
                     year,
                     month,
                     sequence,
                     status,
                     timestamp
                     )
-                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
             `);
-        const data = sql.run(payment.date, 
-                             payment.amount,
-                             payment.receipt || "",
-                             payment.payment_method, 
-                             payment.concept_id, 
-                             payment.division_id,
-                             payment.student_id,  
-                             payment.year,
-                             payment.month || 0,
-                             payment.sequence,
-                             payment.status, 
-                             payment.timestamp);
+        const data = sql.run(payment.date,
+            payment.amount,
+            payment.receipt || "",
+            payment.payment_method,
+            payment.concept_id,
+            payment.division_id,
+            payment.student_id,
+            payment.semester,
+            payment.year,
+            payment.month,
+            payment.sequence,
+            payment.status,
+            payment.timestamp);
         const insertedId = data.lastInsertRowid;
         const createdPayment = this.db.prepare(`
             SELECT
@@ -328,6 +353,7 @@ class AppDB {
                 p.amount,
                 p.month,
                 p.year,
+                p.semester,
                 p.sequence,
                 p.receipt
             FROM
@@ -347,7 +373,6 @@ class AppDB {
     }
 
     getAllPayments() {
-        
         const sql = this.db.prepare(`
                                     SELECT
                                         p.id,
@@ -369,20 +394,19 @@ class AppDB {
                                         payments p
                                     INNER JOIN 
                                         payment_concepts c ON p.concept_id = c.id
-                                    INNER JOIN 
+                                    LEFT JOIN 
                                         divisions d ON p.division_id = d.id
                                     LEFT JOIN 
                                         teachers t ON d.id = t.division_id
-                                    INNER JOIN 
+                                    LEFT JOIN 
                                         students s ON p.student_id = s.id
                                     ORDER BY p.id DESC;`
-                                    );
+        );
         const payments = sql.all();
         return payments;
     }
 
     getAllPaymentsByYear(year) {
-        
         const sql = this.db.prepare(`SELECT
                                         p.id,
                                         p.date,
@@ -402,13 +426,11 @@ class AppDB {
                                         students s ON p.student_id = s.id
                                      ORDER BY
                                         p.id DESC;`
-                                    );
+        );
         const payments = sql.all();
         return payments;
     }
 
-
-   
     getPaymentsByYear(year) {
         let sql = ``;
         let payments = [];
@@ -435,7 +457,7 @@ class AppDB {
                                     strftime('%Y', date) = ?
                                    ORDER BY 
                                     date ASC;`
-                                    );
+            );
             payments = sql.all(year);
         } else {
             sql = this.db.prepare(`SELECT *
@@ -443,13 +465,13 @@ class AppDB {
                                     payments
                                    ORDER BY 
                                     date ASC;`
-                                    );
-           payments = sql.all();                         
+            );
+            payments = sql.all();
         }
         return payments;
     }
 
-    getYearsOfPayments(){
+    getYearsOfPayments() {
         const sql = this.db.prepare(`SELECT DISTINCT 
                                         strftime('%Y', date) 
                                      AS 
@@ -458,12 +480,12 @@ class AppDB {
                                         payments
                                      ORDER BY 
                                         year;`
-                                    );
+        );
         const years = sql.all();
         return years;
     }
 
-    getDateOfPayments(){
+    getDateOfPayments() {
         const sql = this.db.prepare(`SELECT DISTINCT
                                         strftime('%d-%m-%Y', date) AS date_only
                                      FROM 
@@ -503,21 +525,143 @@ class AppDB {
     }
 
     deletePaymentById(id) {
-            const sql = this.db.prepare(`DELETE FROM payments WHERE id = ?`);
-            const payment = sql.run(id);
-            return payment
+        const sql = this.db.prepare(`DELETE FROM payments WHERE id = ?`);
+        const payment = sql.run(id);
+        return payment
     }
 
     getPaymentsConcepts() {
-        const sql = this.db.prepare('SELECT id, type AS name, amount  FROM payment_concepts ORDER BY id ASC');
-        const result =  sql.all(); 
-        return result; 
+        const sql = this.db.prepare('SELECT id, type AS name, amount FROM payment_concepts ORDER BY id ASC');
+        const result = sql.all();
+        return result;
     }
 
     getPaymentsDivisions() {
         const sql = this.db.prepare('SELECT id, name AS name FROM divisions ORDER BY id ASC');
-        const result =  sql.all(); 
-        return result; 
+        const result = sql.all();
+        return result;
+    }
+
+    getDelayPayments(years) {
+        if (!years) return new Error("falta años de Ingresos")
+
+        let yearFilter = '';
+        let params = [];
+
+        if (years.length > 0) {
+            yearFilter = `AND p.year IN (${years.map(() => '?').join(',')})`;
+            params = years;
+        }
+
+        const stmt = this.db.prepare(`
+                SELECT
+                    p.year,
+                    p.month,
+                    p.semester,
+                    c.type,
+                    SUM(p.amount) AS total
+                FROM payments p
+                INNER JOIN payment_concepts c ON p.concept_id = c.id
+                WHERE 1=1
+                ${yearFilter}
+                GROUP BY p.year, p.month, p.semester, c.type
+        `);
+
+        const rows = stmt.all(...params);
+
+        const report = {
+            matricula1: 0,
+            matricula2: 0,
+            months: {
+                1: 0,
+                2: 0,
+                3: 0,
+                4: 0,
+                5: 0,
+                6: 0,
+                7: 0,
+                8: 0,
+                9: 0,
+                10: 0,
+                11: 0,
+                12: 0
+            }
+        };
+
+        rows.forEach(r => {
+
+            // MATRÍCULAS
+            if (r.type === 'Matricula') {
+                if (r.semester === 1) {
+                    report.matricula1 += r.total;
+                }
+
+                if (r.semester === 2) {
+                    report.matricula2 += r.total;
+                }
+            }
+
+            // MENSUALIDADES
+            if (r.type === 'Mensualidad' && r.month) {
+                report.months[r.month] += r.total;
+            }
+
+        });
+
+        return report;
+    }
+
+    getExpectedIncome(years) {
+        if (!years || years.length === 0) return { matricula1: 0, matricula2: 0, monthly1: 0, monthly2: 0 };
+
+        const yearPlaceholders = years.map(() => '?').join(',');
+
+        const sql = this.db.prepare(`
+            SELECT
+                p.semester,
+                COUNT(*) as student_count,
+                SUM(dpc.amount) as monthly_total
+            FROM payments p
+            JOIN payment_concepts pc_matricula ON p.concept_id = pc_matricula.id 
+            LEFT JOIN division_payment_concepts dpc ON p.division_id = dpc.division_id
+            LEFT JOIN payment_concepts pc_monthly ON dpc.concept_id = pc_monthly.id 
+            WHERE 
+                pc_matricula.type = 'Matricula' 
+                AND pc_monthly.type = 'Mensualidad'
+                AND p.year IN (${yearPlaceholders})
+            GROUP BY p.semester
+        `);
+
+        const results = sql.all(...years);
+        const income = {
+            matricula1: 0,
+            matricula2: 0,
+            monthly1: 0,
+            monthly2: 0,
+            activeStudents: 0
+        };
+
+        // Active students check (global, as initially requested)
+        // Or should this be sum of student_sem1 + student_sem2? 
+        // User asked for "amount of student active in the system" previously.
+        // I will keep the previous global active check for the header, OR sum the unique students in the period?
+        // Let's keep the global active for the header if that's what "Active Students" means in context, 
+        // but for the report columns use the calculated values.
+        // Actually, let's just use the global count for the header as implemented before.
+        const activeCountStmt = this.db.prepare('SELECT COUNT(*) AS count FROM students WHERE active = 1');
+        income.activeStudents = activeCountStmt.get().count;
+
+        results.forEach(row => {
+            if (row.semester === 1) {
+                income.matricula1 = row.student_count * 10000;
+                income.monthly1 = row.monthly_total || 0;
+            } else if (row.semester === 2) {
+                income.matricula2 = row.student_count * 10000;
+                income.monthly2 = row.monthly_total || 0;
+            }
+        });
+
+        return income;
     }
 
     /*
@@ -555,7 +699,7 @@ class AppDB {
                                     strftime('%Y', date) = ?
                                    ORDER BY 
                                     date ASC;`
-                                    );
+            );
             expenses = sql.all(year);
         } else {
             sql = this.db.prepare(`SELECT
@@ -568,13 +712,13 @@ class AppDB {
                                     expenses
                                    ORDER BY 
                                     date ASC;`
-                                    );
-           expenses = sql.all();                         
+            );
+            expenses = sql.all();
         }
-        return expenses;   
+        return expenses;
     }
 
-    getYearsOfExpenses(){
+    getYearsOfExpenses() {
         const sql = this.db.prepare(`SELECT DISTINCT 
                                         strftime('%Y', date) 
                                      AS 
@@ -583,29 +727,30 @@ class AppDB {
                                         expenses
                                      ORDER BY 
                                         year;`
-                                    );
+        );
         const years = sql.all();
         return years;
     }
 
     addExpense(expenseData) {
-            const sql = this.db.prepare(`
-                INSERT INTO expenses (date, description, reference, total_amount)
-                VALUES (?, ?, ?, ?)
+        const sql = this.db.prepare(`
+                INSERT INTO expenses (date, description, reference, type, total_amount)
+                VALUES (?, ?, ?, ?, ?)
             `);
-            const data = sql.run(expenseData.date, 
-                                expenseData.description,    
-                                expenseData.reference,
-                                expenseData.amount);
-            return data.lastInsertRowid;
+        const data = sql.run(expenseData.date,
+            expenseData.description,
+            expenseData.reference,
+            expenseData.type,
+            expenseData.amount);
+        return data.lastInsertRowid;
     }
 
-    updateExpense(data){
+    updateExpense(data) {
         const keys = validateExpensesUpdate(data);
         if (!keys) return {
             success: false,
             transaction: null
-        } 
+        }
 
         const setClause = keys.map(k => `${k} = ?`).join(", ");
         const values = keys.map(k => data.fields[k]);
@@ -619,19 +764,19 @@ class AppDB {
         return {
             success: true,
             result: result.changes
-        } 
+        }
     }
 
     deleteExpenseById(id) {
-            const sql = this.db.prepare(`DELETE FROM expenses WHERE id = ?`);
-            const expense = sql.run(id);
-            return expense;
+        const sql = this.db.prepare(`DELETE FROM expenses WHERE id = ?`);
+        const expense = sql.run(id);
+        return expense;
     }
 
     /*
         Estudiantes
     */
-    getAllStudents(){
+    getAllStudents() {
         const sql = this.db.prepare(`SELECT
                                         s.id,
                                         s.name,
@@ -645,13 +790,13 @@ class AppDB {
                                         s.id DESC;
                                     `);
         const students = sql.all();
-        return students;    
+        return students;
     }
 
-    getStudentsByActive(active){
+    getStudentsByActive(active) {
         let sql = ``;
         let students = [];
-        if(active){
+        if (active) {
             sql = this.db.prepare(`SELECT 
                                     s.id,
                                     s.name,
@@ -663,7 +808,7 @@ class AppDB {
                                     students s
                                    WHERE
                                     active = ?;`
-                                    );
+            );
             students = sql.all(active);
         } else {
             sql = this.db.prepare(`SELECT
@@ -675,42 +820,75 @@ class AppDB {
                                     s.active
                                    FROM  
                                     students s;`
-                                    );
+            );
             students = sql.all();
         }
-        return students;    
+        return students;
     }
 
-    getStudentsActive(){
-        const sql = this.db.prepare(`SELECT DISTINCT 
-                                        active
-                                     FROM  
-                                        students;`
-                                    );
+    getStudentsActive() {
+        const sql = this.db.prepare(`
+                            SELECT DISTINCT 
+                                active
+                            FROM  
+                                students;`
+        );
         const students = sql.all();
-        return students;    
+        return students;
     }
 
 
-    addStudent(studentData){
+    getStudentCount() {
+        const sql = this.db.prepare(`
+                            SELECT COUNT(*) 
+                            FROM students 
+                            WHERE active = 1;
+                                `);
+        const students = sql.all();
+        return students;
+    }
+
+    getPaymentAmount(divisionId, conceptId) {
+        // First check if it's "Otros"
+        const conceptStmt = this.db.prepare('SELECT type, amount FROM payment_concepts WHERE id = ?');
+        const concept = conceptStmt.get(conceptId);
+
+        if (!concept) return 0;
+
+        if (concept.type === 'Otros') {
+            return concept.amount;
+        }
+
+        // If not "Otros", get from division_payment_concepts
+        const divisionStmt = this.db.prepare(`
+            SELECT amount 
+            FROM division_payment_concepts 
+            WHERE division_id = ? AND concept_id = ?
+        `);
+        const result = divisionStmt.get(divisionId, conceptId);
+
+        return result ? result.amount : 0;
+    }
+
+    addStudent(studentData) {
         const sql = this.db.prepare(`
                 INSERT INTO students (name, phone, email, reference, active)
                 VALUES (?, ?, ?, ?, ?)
             `);
-            const data = sql.run(studentData.name, 
-                                 studentData.phone,    
-                                 studentData.email,
-                                 studentData.reference,
-                                 studentData.active);
-            return data.lastInsertRowid;
+        const data = sql.run(studentData.name,
+            studentData.phone,
+            studentData.email,
+            studentData.reference,
+            studentData.active);
+        return data.lastInsertRowid;
     }
 
-    updateStudent(data){
+    updateStudent(data) {
         const keys = validateStudentsUpdate(data);
         if (!keys) return {
             success: false,
             transaction: null
-        } 
+        }
 
         const setClause = keys.map(k => `${k} = ?`).join(", ");
         const values = keys.map(k => data.fields[k]);
@@ -728,13 +906,13 @@ class AppDB {
     }
 
     deleteStudentById(id) {
-            const sql = this.db.prepare(`DELETE FROM students WHERE id = ?`);
-            const student = sql.run(id);
-            return student;
+        const sql = this.db.prepare(`DELETE FROM students WHERE id = ?`);
+        const student = sql.run(id);
+        return student;
     }
 
-    importStudents(studentsData){
-        if (!studentsData) return {error: "Datos Estudiantes no encontrados."}
+    importStudents(studentsData) {
+        if (!studentsData) return { error: "Datos Estudiantes no encontrados." }
 
         return {
             success: true,
@@ -744,7 +922,7 @@ class AppDB {
     /*
         Profesores
     */
-    getAllTeachers(){
+    getAllTeachers() {
         const sql = this.db.prepare(`SELECT
                                         t.id,
                                         t.name,
@@ -759,33 +937,33 @@ class AppDB {
                                         t.id DESC;
                                     `);
         const teachers = sql.all();
-        return teachers;    
+        return teachers;
     }
 
-    addTeacher(teacherData){
+    addTeacher(teacherData) {
         const sql = this.db.prepare(`
                 INSERT INTO teachers (name, division_id, amount)
                 VALUES (?, ?, ?)
             `);
         const data = sql.run(teacherData.name,
-                            teacherData.division_id,
-                            teacherData.amount);
+            teacherData.division_id,
+            teacherData.amount);
 
         return data;
     }
 
     deleteTeacherById(id) {
-            const sql = this.db.prepare(`DELETE FROM teachers WHERE id = ?`);
-            const teacher = sql.run(id);
-            return teacher
+        const sql = this.db.prepare(`DELETE FROM teachers WHERE id = ?`);
+        const teacher = sql.run(id);
+        return teacher
     }
 
-    updateTeacher(data){
+    updateTeacher(data) {
         const keys = validateTeachersUpdate(data);
         if (!keys) return {
             success: false,
             transaction: null
-        } 
+        }
 
         const setClause = keys.map(k => `${k} = ?`).join(", ");
         const values = keys.map(k => data.fields[k]);
@@ -802,10 +980,82 @@ class AppDB {
         }
     }
 
+
     /*
-        Concepto de Pago
+        Precio
     */
-    updatePriceConcept(concept){
+    addDivision(division) {
+        let result;
+        const transaction = this.db.transaction(() => {
+            const insertDivision = this.db.prepare(`
+                INSERT INTO divisions (name)
+                VALUES (?)
+            `);
+            result = insertDivision.run(division.name);
+            const newDivisionId = result.lastInsertRowid;
+
+            const concepts = this.db.prepare("SELECT id FROM payment_concepts WHERE type != 'Otros'").all();
+            const insertConcept = this.db.prepare(`
+                INSERT INTO division_payment_concepts (division_id, concept_id, amount)
+                VALUES (?, ?, 0)
+            `);
+
+            for (const concept of concepts) {
+                insertConcept.run(newDivisionId, concept.id);
+            }
+        });
+
+        transaction();
+        return result;
+    }
+
+
+    deleteDivision(id) {
+        const sql = this.db.prepare("DELETE FROM divisions WHERE id = ?");
+        return sql.run(id);
+    }
+
+    updateDivision(id, name) {
+        const sql = this.db.prepare("UPDATE divisions SET name = ? WHERE id = ?");
+        const result = sql.run(name, id);
+        return {
+            success: true,
+            result: result.changes
+        }
+    }
+
+    getAllDivisionPaymentConcepts() {
+        const sql = this.db.prepare(`
+            SELECT
+                dpc.id,
+                dpc.division_id,
+                d.name AS division_name,
+                dpc.concept_id,
+                c.type AS concept_name,
+                dpc.amount
+            FROM
+                division_payment_concepts dpc
+            JOIN
+                divisions d ON dpc.division_id = d.id
+            JOIN
+                payment_concepts c ON dpc.concept_id = c.id
+            ORDER BY
+                d.name, c.type
+        `);
+        return sql.all();
+    }
+
+    updateDivisionPaymentConcept(id, amount) {
+        const sql = this.db.prepare(`
+            UPDATE division_payment_concepts
+            SET amount = ?
+            WHERE id = ?
+        `);
+        const result = sql.run(amount, id);
+        return result.changes;
+    }
+
+    updatePriceConcept(concept) {
         const sql = this.db.prepare(`
                 UPDATE payment_concepts
                 SET
@@ -814,22 +1064,74 @@ class AppDB {
                     id = ?;
             `);
         const data = sql.run(concept.amount,
-                             concept.id);
+            concept.id);
         return data.lastInsertRowid;
     }
+
+
+    /* 
+        Reporte 
+    */
+
+    getCashRegister() {
+        const sql = this.db.prepare(`
+            SELECT
+                p.date AS date,
+                p.payment_method AS tipo,
+                'Ingreso' AS status,
+                p.year AS year,
+                p.sequence AS sequence,
+                s.name AS subject,
+                c.type AS concept,
+                p.amount AS amount,
+                'Ingreso' AS rubro,
+                p.receipt AS detail
+            FROM payments p
+            JOIN students s ON s.id = p.student_id
+            JOIN payment_concepts c ON c.id = p.concept_id
+
+        UNION ALL
+
+            SELECT
+                e.date AS date,
+                'Egreso' AS tipo,
+                e.type AS status,
+                NULL AS year,
+                e.id AS sequence,
+                e.description AS subject,
+                'Gasto' AS concept,
+                e.total_amount AS amount,
+                'Egreso' AS rubro,
+                e.description AS detail
+            FROM expenses e
+
+            ORDER BY date ASC
+        `);
+
+        return sql.all();
+    }
+
+
+    getDelayByTeacherReport() {
+        const sql = this.db.prepare(`
+            
+        `);
+        return sql.all();
+    }
+
     /*
         Functionality
     */
-    addImage(imageData){
+    addImage(imageData) {
         const sql = this.db.prepare(`
                 INSERT INTO images (image,current_image)
                 VALUES (?,?)
             `);
-        const data = sql.run(imageData.image,0);
+        const data = sql.run(imageData.image, 0);
         return data.lastInsertRowid;
     }
 
-    setImage(imageState){
+    setImage(imageState) {
         const reset = this.db.prepare(`
                 UPDATE images
                 SET
@@ -848,29 +1150,29 @@ class AppDB {
                     id = ?;
             `);
         const data = sql.run(imageState.current_image,
-                             imageState.id);
+            imageState.id);
         return data.lastInsertRowid;
     }
 
-    getImages(){
+    getImages() {
         const sql = this.db.prepare(`SELECT * FROM images`);
         const data = sql.all();
         return data;
-    }   
+    }
 
-    getCurrentImage(){
+    getCurrentImage() {
         const sql = this.db.prepare(`SELECT * FROM images WHERE current_image = 1`);
         const data = sql.get();
         return data;
     }
 
     deleteImageById(id) {
-            const sql = this.db.prepare(`DELETE FROM images WHERE id = ?`);
-            const image = sql.run(id);
-            return image;
+        const sql = this.db.prepare(`DELETE FROM images WHERE id = ?`);
+        const image = sql.run(id);
+        return image;
     }
 
-    close () {
+    close() {
         this.db.close();
     }
 }

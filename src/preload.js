@@ -16,6 +16,7 @@ const api = {
     deletePaymentById: (id) => ipcRenderer.invoke('delete-payment-by-id', id),
     getPaymentConcepts: () => ipcRenderer.invoke('get-payment-concepts'),
     getPaymentDivisions: () => ipcRenderer.invoke('get-payment-divisions'),
+    getDelayPayments: (year) => ipcRenderer.invoke('get-delay-payment', year),
 
     // Pagina Egresos
     getAllExpenses: () => ipcRenderer.invoke('get-all-expenses'),
@@ -29,6 +30,7 @@ const api = {
     getAllStudents: () => ipcRenderer.invoke('get-all-students'),
     getStudentsByActive: (active) => ipcRenderer.invoke('get-students-by-active', active),
     getStudentsActive: () => ipcRenderer.invoke('get-students-active'),
+    getStudentCount: () => ipcRenderer.invoke('get-students-count'),
     addStudent: (studentData) => ipcRenderer.invoke('add-student', studentData),
     updateStudent: (studentData) => ipcRenderer.invoke('update-student', studentData),
     getPaymentById: (paymentId) => ipcRenderer.invoke('get-payment-by-id', paymentId),
@@ -41,7 +43,17 @@ const api = {
     updateTeacher: (teacherData) => ipcRenderer.invoke('update-teacher', teacherData),
 
     // Pagina Precios
+    addDivision: (division) => ipcRenderer.invoke('add-division', division),
+    deleteDivision: (id) => ipcRenderer.invoke('delete-division', id),
+    updateDivision: (data) => ipcRenderer.invoke('update-division', data),
     updatePriceConcept: (concept) => ipcRenderer.invoke('update-price-concept', concept),
+    getAllDivisionPaymentConcepts: () => ipcRenderer.invoke('get-all-division-payment-concepts'),
+    updateDivisionPaymentConcept: (data) => ipcRenderer.invoke('update-division-payment-concept', data),
+    getPaymentAmount: (data) => ipcRenderer.invoke('get-payment-amount', data),
+
+    // Pagina Reporte
+    getCashRegister: () => ipcRenderer.invoke('get-cash-register'),
+    getExpectedIncome: (data) => ipcRenderer.invoke('get-expected-income',data),
 
     // Excel
     exportReceiptToExcel: (payment) => ipcRenderer.invoke('export-receipt-excel', payment),
@@ -49,10 +61,13 @@ const api = {
     exportPaymentsByYearToExcel: (paymentData) => ipcRenderer.invoke('export-payments-by-year', paymentData),
     exportExpensesByYearToExcel: (expenseData) => ipcRenderer.invoke('export-expenses-by-year', expenseData),
     exportStudentsByActiveToExcel: (studentData) => ipcRenderer.invoke('export-students-by-active', studentData),
+    exportTemplateStudents: () => ipcRenderer.invoke('export-students-template'),
     exportHistoric: (data) => ipcRenderer.invoke('export-historic', data),
+    exportCashRegisterReportToExcel: (data) => ipcRenderer.invoke('export-cash-register-report', data),
+    exportDelayByMonthReportToExcel: (data) => ipcRenderer.invoke('export-delay-by-month-report', data),
+    exportDelayByTeacherReportToExcel: (data) => ipcRenderer.invoke('export-delay-by-teacher-report', data),
 
-    importStudentsFromExcel: () => ipcRenderer.invoke('import-student-from-excel'),
-    importStudents: (studentsData) => ipcRenderer.invoke('import-student', studentsData),
+    importStudentsFromExcel: (studentsData) => ipcRenderer.invoke('import-student-from-excel', studentsData),
     // App functionality
     addImage: (imageData) => ipcRenderer.invoke('add-image', imageData),
     getImages: () => ipcRenderer.invoke('get-images'),

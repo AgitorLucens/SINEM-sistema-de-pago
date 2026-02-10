@@ -78,7 +78,7 @@ const Sidebar = ({ currentPage, setCurrentPage, isOpen: externalIsOpen, setIsOpe
                     />
                     <NavLink 
                         icon={Pencil2Icon} 
-                        title="Precios" 
+                        title="Cursos" 
                         page={Page.PRICING_REGISTRY} 
                         currentPage={currentPage} 
                         onClick={setCurrentPage}

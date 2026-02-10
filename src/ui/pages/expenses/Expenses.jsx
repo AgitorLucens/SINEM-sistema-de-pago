@@ -17,6 +17,7 @@ const Expenses = () => {
         date: null,
         description: '',
         reference: '',
+        type: '',
     };
     
     const [formData, setFormData] = useState(initialFormState);
@@ -34,7 +35,6 @@ const Expenses = () => {
     const fetchExpenses = useCallback(async () => {
         setIsLoading(true);
         try {
-            //console.log("Cargando egresos...");
             const fetchedExpenses = await getAllExpenses();
             setExpenses(Array.isArray(fetchedExpenses) ? fetchedExpenses : []);
         } catch (e) {
@@ -63,7 +63,6 @@ const Expenses = () => {
     // Lógica para registrar y añadir un nuevo pago
     const handleSubmit = async (e) => {
         e.preventDefault();
-        //console.log(JSON.stringify(formData));
         const amountNumber = parseFloat(formData.amount);
         if (isNaN(amountNumber) || amountNumber <= 0) {
             setError("Por favor, introduce un monto válido y positivo.");
@@ -93,6 +92,7 @@ const Expenses = () => {
             description: formData.description,
             reference: formData.reference,
             amount: amountNumber,
+            type: formData.type,
         };
 
         setIsLoading(true);
@@ -137,13 +137,6 @@ const Expenses = () => {
                     setIsLoading(false);
                     return
                 }
-                /*
-                if (!window.confirm("¿Estás seguro de que quieres eliminar este pago? Esta acción no se puede deshacer.")) {
-                    setIsLoading(false);
-                    setConfirmingId(null);
-                    return;
-                }
-                */
                 try {
                     await deleteExpenseById(expenseId);
                     setMessage('Gasto eliminado correctamente.');
@@ -175,7 +168,7 @@ const Expenses = () => {
         <div className='container-report'>
             {/* Encabezado y botón de registro */}
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
-                <h2 className="card-title" style={{ color: '#4f46e5', margin: 0 }}>Historial de Egresos</h2>
+                <h2 className="section-title" >Historial de Egresos</h2>
                 <button
                     onClick={() => setIsModalOpen(true)} // Abre el modal
                     style={{
@@ -221,7 +214,7 @@ const Expenses = () => {
                 <div>
                     <div className="alert-delete">
                         <p>
-                        <strong>¿Estás seguro de que quieres eliminar este pago?</strong> Esta accion no se puede deshacer.
+                        <strong>¿Estás seguro de que quieres eliminar este Egreso?</strong> Esta accion no se puede deshacer.
                         </p>
                     </div>
                     <button className="btn-delete-confirm"

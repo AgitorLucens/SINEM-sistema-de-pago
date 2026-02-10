@@ -2,9 +2,11 @@ import { app, BrowserWindow } from 'electron';
 import path from 'node:path';
 import started from 'electron-squirrel-startup';
 import AppDB from './domain/db/db.js';
+import AppExcel from './domain/excel/excel.js';
 import setUpHandlers from './domain/ipchandler/ipcHandlers';
 
 let db;
+let excel;
 
 // Handle creating/removing shortcuts on Windows when installing/uninstalling.
 if (started) {
@@ -40,7 +42,8 @@ const createWindow = () => {
 // Some APIs can only be used after this event occurs.
 app.whenReady().then(() => {
   db = new AppDB();
-  setUpHandlers(db);
+  excel = new AppExcel();
+  setUpHandlers(db,excel);
   createWindow();
   
   // On OS X it's common to re-create a window in the app when the

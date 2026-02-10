@@ -6,8 +6,8 @@ import Modal from '../../components/generic/modal/Modal.jsx';
 import SuccessMessage from '../../components/generic/message/SuccessMessage.jsx';
 import ErrorMessage from '../../components/generic/message/ErrorMessage.jsx';
 import {getPaymentConcepts, getPaymentDivisions, getAllPayments, getAllStudents,
-        deletePaymentById, addPaymentWithConsecutive,
-        getNextConsecutiveByYear, exportReceiptToExcel
+        deletePaymentById, addPaymentWithConsecutive, getPaymentAmount,
+        getNextConsecutiveByYear, exportReceiptToExcel, 
  } from "../../constant/DBFunctions.jsx";
 import { PlusCircledIcon, InfoCircledIcon, DownloadIcon } from "@radix-ui/react-icons";
 
@@ -21,7 +21,8 @@ const Payments = () => {
         student_id: '',
         amount: '',
         date: null,
-        month: '', 
+        month: '',
+        semester: "",
         year: 0,
         method: '',
         concept: '',
@@ -116,19 +117,45 @@ const Payments = () => {
         await fetchPayments(); 
     }
 
-    // --- Cuando usuario escoge Tipo de Pago
-    const handleConceptChange = (conceptId) => {
-        
-       const selectedConcept = concepts.find(
-            c => c.id === Number(conceptId)
-        );
 
+    // --cuando usuario escoge Tipo de Pago
+    const handleConceptChange = async (conceptId) => {
+        const cId = Number(conceptId);
+        
+        // Actualizar el concepto en el estado inmediatamente
         setFormData(prev => ({
             ...prev,
             concept: conceptId,
-            amount: selectedConcept?.amount ?? ""
         }));
+
+        // Si ya hay una division seleccionada, buscar el monto
+        if (formData.division) {
+            await fetchAndSetAmount(formData.division, cId);
+        }
     };
+
+    const handleDivisionChange = async (divisionId) => {
+        const dId = Number(divisionId);
+
+        // Actualizar la division en el estado inmediatamente
+        setFormData(prev => ({
+            ...prev,
+            division: divisionId,
+        }));
+
+        // Si ya hay un concepto seleccionado, buscar el monto
+        if (formData.concept) {
+            await fetchAndSetAmount(dId, formData.concept);
+        }
+    };
+
+    const fetchAndSetAmount = async (divisionId, conceptId) => {
+        const amount = await getPaymentAmount(divisionId, conceptId);
+        setFormData(prev => ({
+            ...prev,
+            amount: amount ?? ""
+        }));
+    }
 
     const handleAmountChange = (e) => {
         handleChange(e);
@@ -261,8 +288,10 @@ const Payments = () => {
             }
 
             // 2. Filtrar por División/Curso
-                
-            if (filterState.division.length > 0 && !filterState.division.includes(payment.division_name)) {
+            // si no tiene curso, igual lo muestra
+            if (filterState.division.length > 0 && 
+                payment.division_name &&
+                !filterState.division.includes(payment.division_name)) {
                 return false;
             }
 
@@ -323,6 +352,16 @@ const Payments = () => {
             return;
         }
 
+        if (formData.concept && formData.concept === "1" && !formData.semester) {
+            setError("Por favor, ingrese un semestre para la matricula");
+            return;
+        }
+
+        if (formData.concept && (formData.concept === "2" || formData.concept === "3") && !formData.month) {
+            setError("Por favor, ingrese un mes para la mensualidad");
+            return;
+        }
+
         setError("");
 
         const paymentDataToSend = {
@@ -334,18 +373,22 @@ const Payments = () => {
             division_id: parseInt(formData.division, 10),
             student_id: parseInt(formData.student_id,10),
             year: formData.year,
-            month: formData.month,
+            semester: formData.semester || null,
+            month: formData.month || null,
             sequence: formData.consecutive,
             status: 'ACTIVE',
             timestamp: new Date().toISOString(),
         };
 
-        setIsLoading(true);
-        //console.log(JSON.stringify(formData));
+        //setIsLoading(true);
         const err = await addPaymentWithConsecutive(paymentDataToSend);
-        //console.log(JSON.stringify(err));
         if (!err.success){
-            setError(err.error);
+            if (err.error.includes("payments.student_id") &&
+                err.error.includes("payments.semester")){
+                    setError("Ya existe una Matricula para este Semestre y Curso.");
+                    return
+                }
+            setError("Error al Agregar Ingreso.");
             return
         }
         setFormData(initialFormState);
@@ -358,7 +401,7 @@ const Payments = () => {
         */
         await fetchPayments(); 
         setIsModalOpen(false); 
-        setIsLoading(false);
+        //setIsLoading(false);
     }, [formData, fetchPayments, initialFormState]);
 
     const deletePayment = async (e, paymentId) => {
@@ -584,6 +627,7 @@ const Payments = () => {
                     formData={formData}
                     handleChange={handleChange}
                     handleConcept={handleConceptChange}
+                    handleDivision={handleDivisionChange}
                     handleAmount={handleAmountChange}
                     handleDate={handleDateChange}
                     onSubmit={handleSubmit}

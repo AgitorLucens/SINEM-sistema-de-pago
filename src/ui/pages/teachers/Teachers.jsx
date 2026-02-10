@@ -124,13 +124,6 @@ const Teachers = () => {
                         setIsLoading(false);
                         return
                     }
-                    /*
-                    if (!window.confirm("¿Estás seguro de que quieres eliminar este estudiante? Esta acción no se puede deshacer.")) {
-                        setIsLoading(false);
-                        setConfirmingId(null);
-                        return;
-                    }
-                    */
                     try {
                         const res = await deleteTeacherById(teacherId);
 
@@ -163,9 +156,7 @@ const Teachers = () => {
         <div className='container-student'>
             {/* Encabezado y botón de registro */}
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
-                <h2 className="card-title" style={{ color: '#4f46e5', margin: 0 }}>
-                    Profesores
-                </h2>
+                <h2 className="section-title">Profesores</h2>
                 <button
                     onClick={() => setIsModalOpen(true)} // Abre el modal (placeholder)
                     style={{
@@ -238,7 +229,7 @@ const Teachers = () => {
                 confirmingId={confirmingId}
 
             />
-            
+   
             {/* Renderiza el Modal que contiene el formulario (Placeholder) */}
             <Modal 
                 isOpen={isModalOpen} 

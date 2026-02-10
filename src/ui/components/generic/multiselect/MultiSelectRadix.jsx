@@ -12,7 +12,8 @@ const MultiSelectRadix = ({
                       options = [],
                       value = [],
                       onChange,
-                      placeholder = "Seleccionar"
+                      placeholder = "Seleccionar",
+                      allSelectedText = "Todas las fechas",
                     }) => {
   const toggleValue = (val) => {
     onChange(
@@ -27,7 +28,7 @@ const MultiSelectRadix = ({
       <DropdownMenu.Trigger asChild>
         <button className="MultiSelectTrigger">
           {value.length === options.length
-            ? "Todas las fechas"
+            ? allSelectedText
             : `${value.length} seleccionadas`}
             <ChevronDownIcon/>
         </button>

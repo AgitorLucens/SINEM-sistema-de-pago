@@ -1,28 +1,5 @@
-.container-report{
-    padding: 3rem 2rem;
+.report-page-container {
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
 }
-
-.header {
-    margin-bottom: 5px;
-    flex-direction: column;
-    
-}
-
-.header-report{
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    gap: 16px;
-}
-.header h1 {
-    margin: 0;
-    font-size: 20px;
-    color: #4f46e5;
-}
-
-.header p {
-    margin: 5px 0 0;
-    color: #64748b;
-}
-
-          

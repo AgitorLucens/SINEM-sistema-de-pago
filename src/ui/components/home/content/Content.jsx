@@ -48,55 +48,55 @@ const Content = ({ page }) => {
       break;
     case Page.PAYMENT_REGISTRY:
         return (
-          <div className="payment-page-container">
+          <div className="content-area payment-page-container">
             <Payments />
           </div>
         );
     case Page.EXPENSES_REGISTRY:
         return (
-          <div className="expense-page-container">
+          <div className="content-area expense-page-container">
             <Expenses />
           </div>
         );
     case Page.STUDENTS_REGISTRY:
         return (
-          <div className="student-page-container">
+          <div className="content-area student-page-container">
             <Students />
           </div>
         );
     case Page.EXPENSES_REGISTRY:
         return (
-          <div className="expense-page-container">
+          <div className="content-area expense-page-container">
             <Expenses />
           </div>
         );
     case Page.TEACHERS_REGISTRY:
         return (
-          <div className="teacher-page-container">
+          <div className="content-area teacher-page-container">
             <Teachers />
           </div>
         );
     case Page.PRICING_REGISTRY:
         return (
-          <div className="pricing-page-container">
+          <div className="content-area pricing-page-container">
             <Pricing />
           </div>
         );
     case Page.REPORT_REGISTRY:
         return (
-          <div className="report-page-container">
+          <div className="content-area report-page-container">
             <Report/>
           </div>
         );
     case Page.EXPORT_REGISTRY:
         return (
-          <div className="export-page-container">
+          <div className="content-area export-page-container">
             <Export />
           </div>
         );
     case Page.SETTINGS_REGISTRY:
       return (
-        <div className="settings-page-container">
+        <div className="content-area settings-page-container">
           <Settings />
         </div>
       );

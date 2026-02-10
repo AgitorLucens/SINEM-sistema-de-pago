@@ -1,0 +1,161 @@
+.drop-zone {
+    border: 2px dashed #e0e7ff;
+    border-radius: 1.25rem;
+    padding: 3rem 1.5rem;
+    text-align: center;
+    background-color: #fafafa;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    position: relative;
+    display: flex; flex-direction: column; align-items: center; gap: 1rem;
+}
+.drop-zone:hover, .drop-zone.drag-active {
+    border-color: #6366f1; 
+    background-color: #eef2ff; 
+    transform: translateY(-2px);
+}
+.drop-zone input { 
+    position: absolute; 
+    width: 100%; 
+    height: 100%; 
+    top: 0; 
+    left: 0; 
+    opacity: 0; 
+    cursor: pointer; 
+}
+    
+.drop-content h3 { 
+    margin: 0; 
+    font-size: 1rem; 
+    font-weight: 600; 
+    color: #374151; 
+}
+.drop-content p { 
+    margin: 4px 0 0 0; 
+    font-size: 0.8rem; 
+    color: #9ca3af; 
+}
+.icon-bg {
+    background: #eef2ff; width: 64px; height: 64px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    margin-bottom: 0.5rem;
+}
+
+/* File Preview */
+.file-preview {
+    background-color: #fff;
+    border: 1px solid #e2e8f0;
+    border-radius: 1rem;
+    padding: 1rem;
+    display: flex; align-items: center; gap: 1rem;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+}
+.file-details { 
+    flex: 1; 
+    min-width: 0; 
+}
+.file-name { 
+    font-size: 0.9rem; 
+    font-weight: 600; 
+    color: #1e293b; 
+    white-space: nowrap; 
+    overflow: hidden; 
+    text-overflow: ellipsis; 
+}
+.file-meta { 
+    font-size: 0.75rem; 
+    color: #64748b; 
+    margin-top: 2px; 
+}
+
+.info-block {
+    text-align: center; margin-bottom: 0.5rem;
+}
+.info-text { 
+    font-size: 0.95rem;
+    color: #6b7280;
+    margin: 0;
+    line-height: 1.5;
+}
+
+/* Template Card */
+.template-card {
+    background-color: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 1rem;
+    padding: 1rem 1.25rem;
+    display: flex; justify-content: space-between; align-items: center;
+    transition: border-color 0.2s;
+}
+.template-card:hover { 
+    border-color: #cbd5e1;
+}
+.template-left h4 { 
+    margin: 0;
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: #334155;
+}
+.template-left p { 
+    margin: 2px 0 0 0;
+    font-size: 0.75rem;
+    color: #94a3b8; 
+}
+
+.btn-download-link {
+    color: #4f46e5;
+    font-size: 0.85rem;
+    font-weight: 600;
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    cursor: pointer;
+    background: none;
+    border: none;
+}
+
+.btn-download-link:hover { 
+    text-decoration: underline;
+}
+
+.btn-primary-import{
+    width: 100%;
+    background: #10b981;
+    color: white;
+    font-weight: 700;
+    padding: 0.875rem;
+    border: none;
+    border-radius: 0.75rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    transition: background 0.2s;
+}
+
+.btn-primary-import:hover{
+    background: #059669;
+}
+
+.delete-btn-import {
+  padding: 6px;
+  border-radius: 6px;
+  border: none;
+  cursor: pointer;
+  background-color: transparent;
+  color: #9ca3af;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  margin: 0 auto;
+}
+
+.delete-btn-import:hover {
+  color: #d32f2f;
+  
+}
