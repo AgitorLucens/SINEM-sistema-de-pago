@@ -1,16 +1,16 @@
 import StudentsTable from '../../components/students/StudentsTable';
 import Modal from '../../components/generic/modal/Modal.jsx';
-import StudentsDetail from '../../components/students/StudentDetail.jsx';
+import StudentDetail from '../../components/students/StudentDetail.jsx';
 import SuccessMessage from '../../components/generic/message/SuccessMessage.jsx';
 import ErrorMessage from '../../components/generic/message/ErrorMessage.jsx';
 import StudentForm from '../../components/students/StudentsForm';
+import StudentImportCard from '../../components/students/StudentImportCard.jsx';
 import { getAllStudents, addStudent, deleteStudentById,
          getYearsOfPayments, getPaymentByStudentId
  } from '../../constant/DBFunctions.jsx'; 
-import { PlusCircledIcon } from "@radix-ui/react-icons";
+import { PlusCircledIcon, ArrowUpIcon } from "@radix-ui/react-icons";
 
 import { useState, useEffect, useCallback } from 'react';
-import StudentDetail from '../../components/students/StudentDetail.jsx';
 
 import './students.css';
 const Students = () => {
@@ -23,6 +23,9 @@ const Students = () => {
         active: '',
     };
         
+    //import students
+    const [file, setFile] = useState(null);
+
     const [formData, setFormData] = useState(initialFormState);
     const [students, setStudents] = useState([]);
     const [yearsPayments, setYearsPayments] = useState([]);
@@ -34,6 +37,8 @@ const Students = () => {
 
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [isModalDetailOpen, setIsModalDetailOpen] = useState(false);
+    const [isModalImportOpen, setIsModalImportOpen] = useState(false);
+
 
     const [selectedYear, setSelectedYear] = useState(null);
     const [selectedStudent, setSelectedStudent] = useState(null);
@@ -163,13 +168,6 @@ const Students = () => {
                     setIsLoading(false);
                     return
                 }
-                /*
-                if (!window.confirm("¿Estás seguro de que quieres eliminar este estudiante? Esta acción no se puede deshacer.")) {
-                    setIsLoading(false);
-                    setConfirmingId(null);
-                    return;
-                }
-                */
                 try {
                     await deleteStudentById(studentId);
                     setMessage('Estudiante eliminado correctamente.');
@@ -201,39 +199,13 @@ const Students = () => {
         <div className='container-student'>
             {/* Encabezado y botón de registro */}
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
-                <h2 className="card-title" style={{ color: '#4f46e5', margin: 0 }}>Estudiantes</h2>
-                <button
-                    onClick={() => setIsModalOpen(true)} // Abre el modal
-                    style={{
-                        backgroundColor: '#4f46e5', 
-                        color: 'white',
-                        padding: '0.5rem 1rem',
-                        borderRadius: '0.5rem',
-                        fontWeight: '600',
-                        border: 'none',
-                        cursor: 'pointer',
-                        transition: 'background-color 0.2s'
-                    }}
-                    onMouseOver={(e) => e.currentTarget.style.backgroundColor = '#4338ca'}
-                    onMouseOut={(e) => e.currentTarget.style.backgroundColor = '#4f46e5'}
+                <h2 className="section-title">Estudiantes</h2>
+                <div>
+                    <button
+                    onClick={() => setIsModalImportOpen(true)} // Abre el modal
+                    className='btn-primary-export'
                 >
-                    <PlusCircledIcon/> Registrar Nuevo Estudiante
-                </button><button
-                    onClick={() => setIsModalOpen(true)} // Abre el modal
-                    style={{
-                        backgroundColor: '#4f46e5', 
-                        color: 'white',
-                        padding: '0.5rem 1rem',
-                        borderRadius: '0.5rem',
-                        fontWeight: '600',
-                        border: 'none',
-                        cursor: 'pointer',
-                        transition: 'background-color 0.2s'
-                    }}
-                    onMouseOver={(e) => e.currentTarget.style.backgroundColor = '#4338ca'}
-                    onMouseOut={(e) => e.currentTarget.style.backgroundColor = '#4f46e5'}
-                >
-                    <PlusCircledIcon/> Importar Estudiantes
+                    <ArrowUpIcon/> Importar Estudiantes
                 </button>
                 <button
                     onClick={() => setIsModalOpen(true)} // Abre el modal
@@ -252,6 +224,8 @@ const Students = () => {
                 >
                     <PlusCircledIcon/> Registrar Nuevo Estudiante
                 </button>
+                </div>
+                
             </div>
 
             {/* Mensaje de confirmación/error */}
@@ -274,9 +248,30 @@ const Students = () => {
                            confirmingId={confirmingId}
                            handleTableUpdate={handleTableUpdate}
             />
+            {/* modal Importar Estudiantes */}
+            <Modal
+                isOpen={isModalImportOpen}
+                onClose={()=> {
+                        setIsModalImportOpen(false);
+                        setError("");
+                        setFile(null);
+                }}
+                title="Importar Estudiantes"
+            >
+                {error && (
+                    <ErrorMessage
+                        message={error}
+                    />
+                )}
+                <StudentImportCard
+                    file={file}
+                    setFile={setFile}
+                    setModal={setIsModalImportOpen}
+                    setError={setError}
+                />
+            </Modal>
 
             {/* Renderiza el Modal que contiene el formulario */}
-
             <Modal 
                 isOpen={isModalOpen} 
                 onClose={() => {
@@ -311,7 +306,7 @@ const Students = () => {
                 <div>
                     <div className="alert-delete">
                         <p>
-                        <strong>¿Estás seguro de que quieres eliminar este pago?</strong> Esta accion no se puede deshacer.
+                        <strong>¿Estás seguro de que quieres eliminar este estudiante?</strong> Esta accion no se puede deshacer.
                         </p>
                     </div>
                     <button className="btn-delete-confirm"

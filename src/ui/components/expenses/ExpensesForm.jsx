@@ -1,6 +1,7 @@
 import { useState } from "react";
 import DatePicker from "../generic/datepicker/DatePicker.jsx";
-import {handleFieldChange} from "../generic/function/Function.jsx"
+import SelectRadix from "../generic/select/SelectRadix.jsx";
+import {handleFieldChange, onRadixChange} from "../generic/function/Function.jsx"
 import { formatCRC } from "../generic/function/Function.jsx";
 
 const ExpensesForm = ({ formData, handleChange, onSubmit, isLoading }) => {
@@ -96,7 +97,25 @@ const ExpensesForm = ({ formData, handleChange, onSubmit, isLoading }) => {
                     </div>
                     
                 </div>
-
+                <div>
+                    <label htmlFor="type" style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '500', fontSize: '0.875rem' }}>
+                        Tipo de Egreso
+                    </label>
+                    <SelectRadix
+                        label=""
+                        name="type"
+                        placeholder="Seleccione tipo de egreso"
+                        value={formData.type}
+                        valueKey="value"
+                        labelKey="label"
+                        onChange={onRadixChange(handleChange,"type")}
+                        options={[
+                            { value: "PagoProfesor", label: "Pago Profesores" },
+                            { value: "PagoAdministrativo", label: "Pago Administrativo" },
+                            { value: "PagoOtros", label: "Otros Pagos" },
+                        ]}
+                    />   
+                </div>
                 <button
                     type="submit"
                     style={{

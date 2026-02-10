@@ -3,7 +3,7 @@
 
 ## Overview
 
-This module uses Go to generate advanced Excel reports with pivot tables, leveraging the Excelize library. Due to limitations in JavaScript-based libraries, Go was selected to handle the cdata processing requirements that the client specified, specifically the report that includes a pivot table with filters. The Go executable is compiled and invoked from the Electron application through IPC (Inter-Process Communication) handlers.
+This module uses Go to generate advanced Excel reports with pivot tables, leveraging the Excelize library. Due to limitations in JavaScript-based libraries, Go was selected to handle the data processing requirements that the client specified, specifically the report that includes a pivot table with filters. The Go executable is compiled and invoked from the Electron application through IPC (Inter-Process Communication) handlers.
 
 ## Prerequisites
 

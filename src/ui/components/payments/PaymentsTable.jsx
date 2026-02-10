@@ -167,7 +167,7 @@ const PaymentsTable = ({ concepts, divisions, payments, students, minTableWidth 
                                         />
                                     </td>
                                     <td className="payments-td">
-                                        {p.teacher_name}
+                                        {p.teacher_name ? p.teacher_name : "—"}
                                     </td>
                                     
                                     <td className="payments-td">

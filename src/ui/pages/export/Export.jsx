@@ -348,7 +348,6 @@ const Export = () => {
                 setStudentActive(Array.isArray(fetchedActiveStudents) ? fetchedActiveStudents : []);
                 setDivisions(Array.isArray(fetchedDivisions) ? fetchedDivisions : []);
                 setConcepts(Array.isArray(fetchedConcepts) ? fetchedConcepts : []);
-                //console.log(JSON.stringify(fetchedConcepts));
             } catch (e) {
                 console.error("Error al cargar datos a exportar:", e);
                 setError("Error al cargar datos desde la base de datos local: " + e.message);
@@ -432,11 +431,12 @@ const Export = () => {
     return (
         <div className="container-export">
             <div className="content-wrapper-export">
-                <div className="export-header">
-                    <h1>Exportación de Datos</h1>
-                    <p>Selecciona el módulo administrativo para generar el reporte en Excel.</p>
+                <div className="section-title">
+                    <h2>Exportación de Datos</h2> 
                 </div>
-
+                <div className="export-header">
+                    <p>Selecciona el módulo administrativo para generar el reporte en Excel.</p>
+                </div>    
             <div className="grid-export-card">
 
                 <ExportCard

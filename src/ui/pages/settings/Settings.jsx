@@ -37,9 +37,7 @@ const Settings = () => {
     };
 
     const handleSelectImage = (img) => {
-        //console.log("Selected image:", img);
         setImage(img);
-
         loadImages();
         window.dispatchEvent(new Event("logo-updated"));
     };
@@ -54,18 +52,32 @@ const Settings = () => {
 
     return (
         <div className="settings-page">
-            <h1>Settings Page</h1>
-            
-            <section className="settings-section">
-                <h2>Image Library</h2>
-                <p>Select an image or add a new one.</p>
-                <ImageSelector 
-                    images={images} 
-                    onAdd={handleAddImage} 
-                    onSelect={handleSelectImage} 
-                    onDelete={handleDeleteImages}
-                />
-            </section>
+            <div >
+                <div className="section-title">
+                    <h1 className="settings-title">Configuración</h1>
+                </div>
+                <div className="export-header">
+                    <p className="settings-subtitle">Personaliza la apariencia y configuración del sistema</p>
+                </div>
+            </div>
+            <div className="settings-content">
+                <section className="settings-section">
+                    <div className="section-header">
+                        <h2 className="section-title">Biblioteca de Imágenes</h2>
+                        <p className="section-description">
+                            Selecciona una imagen para usar como logo del sistema o agrega nuevas imágenes a tu biblioteca.
+                        </p>
+                    </div>
+                    <div className="section-body">
+                        <ImageSelector 
+                            images={images} 
+                            onAdd={handleAddImage} 
+                            onSelect={handleSelectImage} 
+                            onDelete={handleDeleteImages}
+                        />
+                    </div>
+                </section>
+            </div>
         </div>
     );
 };

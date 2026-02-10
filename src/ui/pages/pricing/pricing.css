@@ -19,8 +19,11 @@
     gap: 1rem;
 }
 
-.pricing-header h2 {
+.pricing-header .section-title {
     color: #4f46e5;
+    font-weight: 600;
+    font-size: 1.5rem;
+    font-family: 'Inter', sans-serif !important;
 }
 
 .title {

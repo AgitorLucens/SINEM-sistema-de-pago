@@ -37,6 +37,50 @@ export const ChevronUpDownIcon = () => (
     </svg>
 );
 
+export const FileExcel = () => (
+    <svg width="32" 
+         height="32" 
+         viewBox="0 0 24 24" 
+         fill="none" 
+         stroke="currentColor" 
+         strokeWidth="1.5" 
+         strokeLinecap="round" 
+         strokeLinejoin="round" 
+         style={{ color: '#10b981' }}
+    >
+      <path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/>
+      <polyline points="14 2 14 8 20 8"/>
+      <path d="M8 13h2"/>
+      <path d="M8 17h2"/>
+      <path d="M14 13h2"/>
+      <path d="M14 17h2"/>
+    </svg>
+);
+
+export const DataBaseUpload = () => (
+    <svg
+      width="52"
+      height="52"
+      viewBox="0 0 32 32"
+      style={{ color: '#4f46e5' }}
+    >
+      <ellipse 
+                cx="14" 
+                cy="8" 
+                rx="11" 
+                ry="6" 
+                fill="currentColor" 
+
+                stroke="currentColor" 
+                strokeWidth="1.5"
+            ></ellipse>
+            <path 
+                d="M14 24c-4.8 0-8.8-1.4-11-3.6V24c0 3.4 4.8 6 11 6 .9 0 1.8-.1 2.7-.2-1.5-1.5-2.4-3.6-2.7-5.8M3 12.4V16c0 3.4 4.8 6 11 6h.1c.2-2.4 1.4-4.6 3-6.2-1 .1-2 .2-3.1.2-4.8 0-8.8-1.4-11-3.6M24 15c-4.4 0-8 3.6-8 8 0 4.1 3.1 7.4 7 7.9v-8.5l-1.3 1.3c-.4.4-1 .4-1.4 0s-.4-1 0-1.4l3-3c.1-.1.2-.2.3-.2.2-.1.5-.1.8 0 .1.1.2.1.3.2l3 3c.4.4.4 1 0 1.4-.2.2-.4.3-.7.3s-.5-.1-.7-.3L25 22.4v8.5c3.9-.5 7-3.9 7-7.9 0-4.4-3.6-8-8-8" 
+                fill="currentColor"
+            ></path>
+        </svg>
+);
+
 export const SearchIcon = (props) => (
   <svg
     width="16"
@@ -298,3 +342,18 @@ export const TrashIcon = (props) => (
     <line x1="14" y1="11" x2="14" y2="17"></line>
   </IconBase>
 );
+
+export const PieDiagramIcon = () => (
+  <svg 
+      width="32"
+      height="32"
+      viewBox="0 0 24 24"
+      stroke= "#a78bfa"
+      strokeWidth= "1.5"
+      fill= "none"
+      strokeLinecap="round" 
+      strokeLinejoin="round">
+    <path d="M21.21 15.89A10 10 0 1 1 8 2.83"></path>
+    <path d="M22 12A10 10 0 0 0 12 2v10z"></path>
+  </svg>
+)

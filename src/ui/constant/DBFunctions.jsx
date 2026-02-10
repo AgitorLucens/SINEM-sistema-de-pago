@@ -29,7 +29,7 @@ export async function addPaymentWithConsecutive(payment) {
     } catch (error) {
         console.error('Error al agregar pago:', error.message);
         return {
-            error: "Error al agregar pago.",
+            error: "Error al agregar pago: " + error.message,
         }; 
     }
 }
@@ -114,11 +114,38 @@ export async function getPaymentConcepts() {
     }
 }
 
+export async function getExpectedIncome(years) {
+    try {
+        return await window.api.getExpectedIncome(years);
+    } catch (error) {
+        console.error('Error al obtener ingreso esperado:', error.message);
+        return { matricula: 0, monthly: 0 };
+    }
+}
+
+export async function getPaymentAmount(divisionId, conceptId) {
+    try {
+        return await window.api.getPaymentAmount({ divisionId, conceptId });
+    } catch (error) {
+        console.error('Error al obtener monto de pago:', error.message);
+        return 0;
+    }
+}
+
 export async function getPaymentDivisions() {
     try {
         return await window.api.getPaymentDivisions();
     } catch (error) {
         console.error('Error al obtener conceptos de pago:', error.message);
+        return []; 
+    }
+}
+
+export async function getDelayPayments(year) {
+    try {
+        return await window.api.getDelayPayments(year);
+    } catch (error) {
+        console.error('Error al morosidad por mes:', error.message);
         return []; 
     }
 }
@@ -214,6 +241,15 @@ export async function getStudentsActive() {
     }
 }
 
+export async function getStudentCount() {
+    try {
+        return await window.api.getStudentCount();
+    } catch (error) {
+        console.error('Error al obtener cantidad de estudiantes:', error.message);
+        return []; 
+    }
+}
+
 export async function addStudent(studentData) {
     try {
         return await window.api.addStudent(studentData);
@@ -292,16 +328,74 @@ export async function updateTeacher(teacherData) {
 }
 
 /*
-    Concepto de Pago
+    Precio
 */
+export async function addDivision(division) {
+    try {
+        return await window.api.addDivision(division);
+    } catch (error) {
+        console.error('Error al agregar curso:', error.message);
+        return []; 
+    }
+}
+
+export async function deleteDivision(id) {
+    try {
+        return await window.api.deleteDivision(id);
+    } catch (error) {
+        console.error('Error al eliminar curso:', error.message);
+        return [];
+    }
+}
+
+export async function updateDivision(data) {
+    try {
+        return await window.api.updateDivision(data);
+    } catch (error) {
+        console.error('Error al actualizar curso:', error.message);
+        return [];
+    }
+}
+
 export async function updatePriceConcept(paymentData) {
     try {
         return await window.api.updatePriceConcept(paymentData);
     } catch (error) {
-        console.error('Error al exportar pago a excel:', error.message);
+        console.error('Error al actualizar precio:', error.message);
         return []; 
     }
 }
+
+export async function getAllDivisionPaymentConcepts() {
+    try {
+        return await window.api.getAllDivisionPaymentConcepts();
+    } catch (error) {
+        console.error('Error al obtener conceptos de pago por división:', error.message);
+        return []; 
+    }
+}
+
+export async function updateDivisionPaymentConcept(data) {
+    try {
+        return await window.api.updateDivisionPaymentConcept(data);
+    } catch (error) {
+        console.error('Error al actualizar precio por división:', error.message);
+        return []; 
+    }
+}
+
+/*
+    Reporte
+*/
+export async function getCashRegister() {
+    try {
+        return await window.api.getCashRegister();
+    } catch (error) {
+        console.error('Error al adquirir estado de caja:', error.message);
+        return []; 
+    }
+}
+
 
 /*
     Excel
@@ -324,6 +418,18 @@ export async function exportReportToExcel(data) {
         console.error('Error al exportar reporte a excel:', error.message);
         return {
             error: "Error al exportar reporte a excel. Revise que no tengaa el archivo con el mismo nombre abierto.",
+        }; 
+    }
+}
+
+
+export async function exportCashRegisterReportToExcel(data) {
+    try {
+        return await window.api.exportCashRegisterReportToExcel(data);
+    } catch (error) {
+        console.error('Error al exportar reporte de caja a excel:', error.message);
+        return {
+            error: "Error al exportar reporte de caja a excel.",
         }; 
     }
 }
@@ -361,6 +467,17 @@ export async function exportStudentsByActiveToExcel(studentData) {
     }
 }
 
+export async function exportTemplateStudents() {
+    try {
+        return await window.api.exportTemplateStudents();
+    } catch (error) {
+        console.error('Error al generar plantilla excel estudiantes:', error.message);
+        return {
+            error: "Error al generar plantilla excel estudiantes.",
+        }; 
+    }
+}
+
 export async function exportHistoric(data) {
     try {
         return await window.api.exportHistoric(data);
@@ -372,22 +489,34 @@ export async function exportHistoric(data) {
     }
 }
 
-export async function importStudentsFromExcel() {
+export async function exportDelayByMonthReportToExcel(data) {
     try {
-        return await window.api.importStudentsFromExcel();
+        return await window.api.exportDelayByMonthReportToExcel(data);
     } catch (error) {
-        console.error('Error al importar estudiantes desde el excel:', error.message);
+        console.error('Error al exportar reporte de morosidad por mes a excel:', error.message);
         return {
-            error: "Error al exportar respaldo por estado a excel.",
+            error: "Error al exportar reporte de morosidad por mes a excel.",
         }; 
     }
 }
 
-export async function importStudents(studentsData) {
+
+export async function exportDelayByTeacherReportToExcel(data) {
     try {
-        return await window.api.exportHistoric(studentsData);
+        return await window.api.exportDelayByTeacherReportToExcel(data);
     } catch (error) {
-        console.error('Error al importar estudiantes hacia la base de datos:', error.message);
+        console.error('Error al exportar reporte de morosidad por profesor a excel:', error.message);
+        return {
+            error: "Error al exportar reporte de morosidad por profesor a excel.",
+        }; 
+    }
+}
+
+export async function importStudentsFromExcel(studentsData) {
+    try {
+        return await window.api.importStudentsFromExcel(studentsData);
+    } catch (error) {
+        console.error('Error al importar estudiantes desde el excel:', error.message);
         return {
             error: "Error al exportar respaldo por estado a excel.",
         }; 
@@ -479,18 +608,27 @@ export default {
     addTeacher,
     //Precios
     updatePriceConcept,
+    getAllDivisionPaymentConcepts,
+    getPaymentAmount,
+    addDivision,
+    deleteDivision,
+    updateDivision,
+    updateDivisionPaymentConcept,
     //Exportar
     exportReceiptToExcel,
     exportReportToExcel,
     exportPaymentsByYearToExcel,
     exportStudentsByActiveToExcel,
+    exportTemplateStudents,
     exportHistoric,
+    exportCashRegisterReportToExcel,
+    exportDelayByMonthReportToExcel,
     importStudentsFromExcel,
-    importStudents,
     //Functionality
     addImage,
     getImages,
     setImage,
     getCurrentImage,
     deleteImageById,
+    
 };
