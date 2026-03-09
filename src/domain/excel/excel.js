@@ -165,7 +165,7 @@ class AppExcel {
     const workbook = createWorkbook();
     const students = await paseStudentFile(file, workbook);
 
-    return { sucess: true, students: students };
+    return { success: true, students: students };
   }
 
   /*

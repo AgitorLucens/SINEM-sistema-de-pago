@@ -1,16 +1,27 @@
 
 import React, { useState, useEffect } from 'react';
 import ImageSelector from "../../components/settings/ImageSelector.jsx";
+import ErrorrMessage from "../../components/generic/message/ErrorMessage.jsx";
 import sinemLogo from '../../assets/SINEM.png';
 import { addImage, getImages, setImage, getCurrentImage } from '../../constant/DBFunctions.jsx';
-import './settings.css';
 
+import './settings.css';
 const Settings = () => {
-    const [images, setImages] = useState([{image: sinemLogo}]);
+    const [images, setImages] = useState([{ image: sinemLogo }]);
+    const [error, setError] = useState("");
+    
 
     const loadImages = async () => {
         const result = await getImages();
-        setImages([{image: sinemLogo}, ...result ]);
+
+        const existsCurrent = result.some(img => img.current_image === 1);
+
+        const defaultImage = {
+            image: sinemLogo,
+            current_image: existsCurrent ? 0 : 1
+        };
+
+        setImages([defaultImage, ...result]);
     };
 
     useEffect(() => {
@@ -18,6 +29,10 @@ const Settings = () => {
     }, []);
 
     const handleAddImage = () => {
+        if (images.length >= 11) {
+            setError("No puedes agregar más de 11 imágenes. Elimina algunas para agregar nuevas.");
+            return;
+        }
         const input = document.createElement('input');
         input.type = 'file';
         input.accept = 'image/*';
@@ -26,9 +41,9 @@ const Settings = () => {
             if (file) {
                 const reader = new FileReader();
                 reader.onload = async (event) => {
-                     const base64Image = event.target.result;
-                     await addImage({ image: base64Image });
-                     loadImages();
+                    const base64Image = event.target.result;
+                    await addImage({ image: base64Image });
+                    loadImages();
                 };
                 reader.readAsDataURL(file);
             }
@@ -68,11 +83,12 @@ const Settings = () => {
                             Selecciona una imagen para usar como logo del sistema o agrega nuevas imágenes a tu biblioteca.
                         </p>
                     </div>
+                    {error && <ErrorrMessage message={error} />}
                     <div className="section-body">
-                        <ImageSelector 
-                            images={images} 
-                            onAdd={handleAddImage} 
-                            onSelect={handleSelectImage} 
+                        <ImageSelector
+                            images={images}
+                            onAdd={handleAddImage}
+                            onSelect={handleSelectImage}
                             onDelete={handleDeleteImages}
                         />
                     </div>

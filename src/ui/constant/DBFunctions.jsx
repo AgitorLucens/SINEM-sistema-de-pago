@@ -366,6 +366,15 @@ export async function updatePriceConcept(paymentData) {
     }
 }
 
+export async function updatePriceDivision(paymentData) {
+    try {
+        return await window.api.updatePriceDivision(paymentData);
+    } catch (error) {
+        console.error('Error al actualizar precio:', error.message);
+        return [];
+    }
+}
+
 export async function getAllDivisionPaymentConcepts() {
     try {
         return await window.api.getAllDivisionPaymentConcepts();
@@ -520,6 +529,17 @@ export async function importStudentsFromExcel(studentsData) {
         return {
             error: "Error al exportar respaldo por estado a excel.",
         }; 
+    }
+}
+
+export async function importStudents(studentsData) {
+    try {
+        return await window.api.importStudents(studentsData);
+    } catch (error) {
+        console.error('Error al importar estudiantes:', error.message);
+        return {
+            error: "Error al importar estudiantes: " + error.message,
+        };
     }
 }
 

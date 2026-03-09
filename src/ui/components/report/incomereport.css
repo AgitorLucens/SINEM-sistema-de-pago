@@ -6,7 +6,11 @@
     gap: 2rem;
     padding: 2rem;
     overflow-y: auto;
-    background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+    /*  Color */
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    border: 1px solid #e2e8f0;
 }
 
 .header-income-report {
@@ -15,6 +19,11 @@
     align-items: center;
     flex-wrap: wrap;
     gap: 1rem;
+}
+
+.container-income-report .header-income-report-title {
+    flex-direction: column;
+    align-items: flex-start;
 }
 
 .header-income-report-title {

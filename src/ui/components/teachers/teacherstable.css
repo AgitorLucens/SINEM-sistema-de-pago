@@ -6,9 +6,19 @@
 
 
 .teachers-table-wrapper {
+    position: relative;
+    background-color: #ffffff;
+    border-radius: 12px;
+    border: 1px solid #e5e7eb;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    overflow: hidden;
+}
+
+.teachers-scroll-area {
+    max-height: 400px;
+    overflow-y: auto;
     overflow-x: auto;
-    border: 1px solid transparent;
-    border-radius: 0.5rem;
+    width: 100%;
 }
 
 /* Main table styles */
@@ -62,6 +72,10 @@
 .amount-column {
   font-weight: 700;
   color: #059669;
+  text-align: center;
+}
+
+.division-column {
   text-align: center;
 }
 

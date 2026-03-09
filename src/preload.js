@@ -47,6 +47,7 @@ const api = {
     deleteDivision: (id) => ipcRenderer.invoke('delete-division', id),
     updateDivision: (data) => ipcRenderer.invoke('update-division', data),
     updatePriceConcept: (concept) => ipcRenderer.invoke('update-price-concept', concept),
+    updatePriceDivision: (division) => ipcRenderer.invoke('update-price-division', division),
     getAllDivisionPaymentConcepts: () => ipcRenderer.invoke('get-all-division-payment-concepts'),
     updateDivisionPaymentConcept: (data) => ipcRenderer.invoke('update-division-payment-concept', data),
     getPaymentAmount: (data) => ipcRenderer.invoke('get-payment-amount', data),
@@ -68,6 +69,8 @@ const api = {
     exportDelayByTeacherReportToExcel: (data) => ipcRenderer.invoke('export-delay-by-teacher-report', data),
 
     importStudentsFromExcel: (studentsData) => ipcRenderer.invoke('import-student-from-excel', studentsData),
+    importStudents: (studentsData) => ipcRenderer.invoke('import-student', studentsData),
+    
     // App functionality
     addImage: (imageData) => ipcRenderer.invoke('add-image', imageData),
     getImages: () => ipcRenderer.invoke('get-images'),

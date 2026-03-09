@@ -37,9 +37,10 @@ const ReportTable = ({matrixData, totalGeneral, columnTotals,selectedCourses,sel
                     </tbody>
                     <tfoot>
                         <tr>
-                            <td style={{textAlign: 'left', paddingLeft: '15px', borderRight: '1px solid #334155'}}>TOTAL GENERAL</td>
+                            <td className='td-income'>TOTAL GENERAL</td>
                                 {selectedCourses.map(c => (
-                                    <td key={c.id}>
+                                    <td style={{ textAlign: 'right', color: '#34d399', fontSize: '16px' }}
+                                        key={c.id}>
                                         ₡{columnTotals[c.id].toLocaleString()}
                                     </td>
                                 ))}

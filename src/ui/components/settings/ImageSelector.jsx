@@ -65,7 +65,10 @@ const ImageSelector = ({ images = [], onAdd, onSelect, onDelete }) => {
                 );
             })}
             
-            <div className="image-item add-button" onClick={onAdd}>
+            <div className="image-item add-button" onClick={() => {
+                                                setIsDeleteMode(false);
+                                                onAdd();
+            }}>
                 <PlusIcon size={32} />
             </div>
 

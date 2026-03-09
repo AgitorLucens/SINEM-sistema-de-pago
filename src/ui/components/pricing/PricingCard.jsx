@@ -1,14 +1,14 @@
 import { BellIcon,Pencil1Icon } from '@radix-ui/react-icons';
 
 import './pricingcard.css';
-const PricingCard = ({ price, onClick}) => {
+const PricingCard = ({ price, onClick, id}) => {
   return (
     <div
       onClick={onClick}
-      className={`card card-${price.id}`}
+      className={`card card-${id}`}
     >
       <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-        <div className={`card-icon card-icon-${price.id}`}><BellIcon size={20} /></div>
+        <div className={`card-icon card-icon-${id}`}><BellIcon size={20} /></div>
         <div>
           <h4 className='card-title-price'>{price.name}</h4>
           <span className='card-category'>{price.name}</span>

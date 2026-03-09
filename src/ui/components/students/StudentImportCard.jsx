@@ -1,10 +1,10 @@
 import { useState } from "react";
-import {exportTemplateStudents,importStudentsFromExcel} from "../../constant/DBFunctions.jsx"
+import {exportTemplateStudents,importStudentsFromExcel,importStudents} from "../../constant/DBFunctions.jsx"
 import { DataBaseUpload, FileExcel, TrashIcon } from "../icons/Icons";
 import { ArrowDownIcon } from "@radix-ui/react-icons";
 
 import './studentimportcard.css';
-const StudentImportCard = ({file,setFile,setModal,setError}) => {
+const StudentImportCard = ({fetchData,file,setFile,setModal,setError,setMessage}) => {
     const [isDragging, setIsDragging] = useState(false);
 
 
@@ -56,13 +56,31 @@ const StudentImportCard = ({file,setFile,setModal,setError}) => {
         if (!file){
             setError("Falta archivo");
             setTimeout(setError(""),4000);
+            return
         }
         const buffer = await file.arrayBuffer();
-        const students = await importStudentsFromExcel({
+        const data = await importStudentsFromExcel({
             name: file.name,
             buffer: Array.from(new Uint8Array(buffer)),
         });
-        console.log(JSON.stringify(students));
+
+        if (!data.success) {
+            setError("Formato Erroneo");
+            setTimeout(setError(""), 4000);
+            return
+        }
+
+        const res = await importStudents(data.students);
+        if (!res.success){
+            setError("Formato Erroneo");
+            setTimeout(setError(""), 4000);
+            return
+        }
+        setModal(false);
+        setMessage("Estudiantes Importados Correctamente");
+        setTimeout(setMessage(""), 4000);
+        fetchData();
+        return
     };
 
 

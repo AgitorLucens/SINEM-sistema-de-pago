@@ -7,7 +7,6 @@ import { getPaymentConcepts, getPaymentDivisions, getAllPayments,
 import { DownloadIcon, InfoCircledIcon, ChevronLeftIcon } from "@radix-ui/react-icons";
 
 import './incomereport.css';
-
 const IncomeReport = ({ onBack }) => {
     const [error, setError] = useState("");
     const [payments, setPayments] = useState([]);
@@ -174,7 +173,6 @@ const IncomeReport = ({ onBack }) => {
                        {payments.length === 0 ? "Agregue Ingreso" : "Descargar Excel"}
                     </button>
                 </div>
-
             </div>
             <ReportFilters
                 toggleItem={toggleMethod}

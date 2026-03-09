@@ -23,6 +23,8 @@ const ALLOWED_STUDENT_FIELDS = [
         "phone",
         "email",
         "active",
+        "scholarship",
+        "scholarship_amount",
 ];
 
 const ALLOWED_TEACHER_FIELDS = [

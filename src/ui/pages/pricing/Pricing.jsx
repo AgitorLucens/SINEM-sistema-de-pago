@@ -6,12 +6,13 @@ import PricingForm from "../../components/pricing/PricingForm";
 import PricingTable from "../../components/pricing/PricingTable";
 import SuccessMessage from "../../components/generic/message/SuccessMessage.jsx"; // Fixed typos in import if any, original had Messaage/SuccessMessaage usage
 import ErrorMessage from "../../components/generic/message/ErrorMessage.jsx";
-import {getPaymentConcepts, updatePriceConcept} from "../../constant/DBFunctions.jsx"
+import { getPaymentConcepts, getPaymentDivisions, updatePriceConcept, updatePriceDivision } from "../../constant/DBFunctions.jsx"
 import './pricing.css';
 
 const Pricing = () => {
 
     const [concepts, setConcepts] = useState([]);
+    const [divisions, setDivisions] = useState([]);
     const [selectedPrice, setSelectedPrice] = useState(null);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [error, setError] = useState("");
@@ -41,29 +42,38 @@ const Pricing = () => {
 
 
     const fetchConcepts = useCallback(async () => {
-            setIsLoading(true);
-            setError(null);
-            try {
-                const loadedData = await getPaymentConcepts(); 
-                //const data = loadedData.find(c => c.name === "Otros")
-                setConcepts(Array.isArray(loadedData) ? loadedData : []);
-            } catch (e) {
-                console.error("Error al cargar pagos:", e);
-                setError("Error al cargar datos desde la base de datos local: " + e.message);
-            } finally {
-                setIsLoading(false);
-            }
+        setIsLoading(true);
+        setError(null);
+        try {
+            const [conc, divid] = await Promise.all([
+                getPaymentConcepts(),
+                getPaymentDivisions(),
+            ]
+            )
+            //const data = loadedData.find(c => c.name === "Otros")
+            setConcepts(Array.isArray(conc) ? conc : []);
+            setDivisions(Array.isArray(divid) ? divid : []);
+        } catch (e) {
+            console.error("Error al cargar pagos:", e);
+            setError("Error al cargar datos desde la base de datos local: " + e.message);
+        } finally {
+            setIsLoading(false);
+        }
     }, []);
 
-    useEffect(()=>{
+    useEffect(() => {
         fetchConcepts();
-    },[fetchConcepts]);
-    
+    }, [fetchConcepts]);
+
     if (view === 'table') {
         return <PricingTable onBack={() => setView('menu')} />;
     }
 
     const otrosConcept = concepts.find(c => c.name === 'Otros');
+    const salesDivisions = divisions.filter(d =>
+        d.name === 'Ventas Accesorios' ||
+        d.name === 'Ventas Varias'
+    );
 
     return (
         <div className="container">
@@ -72,66 +82,83 @@ const Pricing = () => {
                     <h2 className="section-title">Precios</h2>
                     <p className="subtitle">Configuración de costos y conceptos de pago.</p>
                 </div>
-            {isLoading ? (
-                <div style={{ textAlign: 'center', padding: '3rem', color: '#6b7280' }}>Cargando datos...</div>
-            ) : (
-                <div>
-                    {message && (
-                        <SuccessMessage
-                            message={message}
-                        />
-                    )}
-                <div className="grid">
-                 
-                 {/* Card for Curso/Tipo de Pago */}
-                 <div
-                    className="card"
-                    onClick={() => setView('table')}
-                    style={{ cursor: 'pointer' }}
-                 >
-                     <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-                        <div className="card-icon"><TableIcon size={20} /></div>
-                        <div>
-                            <h4 className='card-title-price'>Curso / Tipo de Pago</h4>
-                            <span className='card-category'>Configurar precios por curso</span>
-                        </div>
-                     </div>
-                 </div>
+                {isLoading ? (
+                    <div style={{ textAlign: 'center', padding: '3rem', color: '#6b7280' }}>Cargando datos...</div>
+                ) : (
+                    <div>
+                        {message && (
+                            <SuccessMessage
+                                message={message}
+                            />
+                        )}
+                        <div className="grid">
 
-                 {/* Card for Otros */}
-                 {otrosConcept && (
-                    <PricingCard
-                        key={otrosConcept.id}
-                        price={otrosConcept}
-                        onClick={() => {
-                            setIsModalOpen(true)
-                            setSelectedPrice(otrosConcept)
-                        }}
-                    />
-                 )}
-            
-            <Modal
-                isOpen={isModalOpen}
-                onClose={() => setIsModalOpen(false)}
-                title="Actualizar Precio"
-            >
-                {error &&(
-                    <ErrorMessage
-                        message={error}
-                    />
+                            {/* Card for Curso/Tipo de Pago */}
+                            <div
+                                className="card card-1"
+                                onClick={() => setView('table')}
+                                style={{ cursor: 'pointer' }}
+                            >
+                                <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+                                    <div className="card-icon"><TableIcon size={20} /></div>
+                                    <div>
+                                        <h4 className='card-title-price'>Curso / Tipo de Pago</h4>
+                                        <span className='card-category'>Configurar precios por curso</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            {/* Card for Otros */}
+                            {otrosConcept && (
+                                <PricingCard
+                                    key={otrosConcept.id}
+                                    id={otrosConcept.id}
+                                    price={otrosConcept}
+                                    onClick={() => {
+                                        setIsModalOpen(true)
+                                        setSelectedPrice(otrosConcept)
+                                    }}
+                                />
+                            )}
+                            {/* 
+                            {salesDivisions && (
+
+                                salesDivisions.map(s => (
+                                    <PricingCard
+                                        key={s.id}
+                                        id={s.id-1}
+                                        price={s}
+                                        onClick={() => {
+                                            setIsModalOpen(true)
+                                            setSelectedPrice(s.name)
+                                        }}
+                                    />
+                                ))
+
+                            )}
+                            */}
+                            <Modal
+                                isOpen={isModalOpen}
+                                onClose={() => setIsModalOpen(false)}
+                                title="Actualizar Precio"
+                            >
+                                {error && (
+                                    <ErrorMessage
+                                        message={error}
+                                    />
+                                )}
+                                <PricingForm
+                                    price={selectedPrice}
+                                    onClose={() => setIsModalOpen(false)}
+                                    onSave={handleSave}
+                                />
+                            </Modal>
+                        </div>
+                    </div>
                 )}
-                <PricingForm
-                    price={selectedPrice}
-                    onClose={() => setIsModalOpen(false)}
-                    onSave={handleSave}
-                />
-            </Modal>
-                </div>
-                </div>
-            )}
             </div>
         </div>
-  );
+    );
 };
 
 export default Pricing;

@@ -1,17 +1,17 @@
 import { useState, useEffect, useRef, useMemo } from 'react';
-import        { formatDate }           from "../generic/function/Function.jsx"
-import       { updateExpense }         from "../../constant/DBFunctions.jsx"
-import        EditableCellInput        from '../generic/table/EditableCellInput.jsx';
-import        EditableCellDate         from '../generic/table/EditableCellDate.jsx';
-import ExpensesTableEdit from './ExpensesTableEdit';
+import { formatDate } from "../generic/function/Function.jsx"
+import { updateExpense } from "../../constant/DBFunctions.jsx"
+import EditableCellInput from '../generic/table/EditableCellInput.jsx';
+import EditableCellDate from '../generic/table/EditableCellDate.jsx';
+import ColumnToggleMenu from '../generic/table/ColumnToggleMenu';
 import ExpensesPagination from './ExpensesPagination';
 import ExpensesPaginationInput from './ExpensesPaginationInput';
 
 import './expensestable.css';
-const ExpensesTable = ({expenses, minTableWidth = '700px', handleTableUpdate, onDeleteExpense, onRowClick, confirmingId}) => {
+const ExpensesTable = ({ expenses, minTableWidth = '700px', handleTableUpdate, onDeleteExpense, onRowClick, confirmingId }) => {
 
     const minWidthValue = parseInt(minTableWidth, 10) || 600;
-    
+
     const [tableWidth, setTableWidth] = useState(() => {
         const saved = localStorage.getItem("expensesTableWidth");
         return saved ? Number(saved) : minWidthValue;
@@ -37,6 +37,13 @@ const ExpensesTable = ({expenses, minTableWidth = '700px', handleTableUpdate, on
             [column]: !prev[column]
         }));
     };
+
+    const expenseColumns = [
+        { key: 'date', label: 'Fecha' },
+        { key: 'description', label: 'Detalle' },
+        { key: 'reference', label: 'Referencia' },
+        { key: 'amount', label: 'Monto' },
+    ];
 
     // Sorting Logic
     const sortedExpenses = useMemo(() => {
@@ -96,19 +103,19 @@ const ExpensesTable = ({expenses, minTableWidth = '700px', handleTableUpdate, on
 
     const dragState = useRef(null);
     const handleMouseDown = (e) => {
-        e.preventDefault(); 
-        
+        e.preventDefault();
+
         // Almacenar el estado inicial para el cálculo de movimiento
         dragState.current = {
             startX: e.clientX,
             startWidth: tableWidth,
         };
-        
+
         // Adjuntar listeners globales al objeto window para capturar el movimiento
         // incluso si el cursor se sale del resizer.
         window.addEventListener('mousemove', handleMouseMove);
         window.addEventListener('mouseup', handleMouseUp);
-        
+
         // Evitar la selección de texto durante el arrastre
         document.body.style.userSelect = 'none';
         document.body.style.cursor = 'col-resize';
@@ -117,7 +124,7 @@ const ExpensesTable = ({expenses, minTableWidth = '700px', handleTableUpdate, on
     // Actualiza el ancho de la tabla mientras se arrastra
     const handleMouseMove = (e) => {
         if (!dragState.current) return;
-        
+
         const deltaX = e.clientX - dragState.current.startX;
         let newWidth = dragState.current.startWidth + deltaX;
 
@@ -129,7 +136,7 @@ const ExpensesTable = ({expenses, minTableWidth = '700px', handleTableUpdate, on
         // Aplicar la restricción de ancho máximo (no exceder el ancho del viewport)
         const maxAllowedWidth = window.innerWidth * 0.95; // 95% del ancho de la ventana
         if (newWidth > maxAllowedWidth) {
-             newWidth = maxAllowedWidth;
+            newWidth = maxAllowedWidth;
         }
 
         setTableWidth(newWidth);
@@ -151,38 +158,42 @@ const ExpensesTable = ({expenses, minTableWidth = '700px', handleTableUpdate, on
             window.removeEventListener('mousemove', handleMouseMove);
             window.removeEventListener('mouseup', handleMouseUp);
         };
-    }, []); 
+    }, []);
 
     return (
-        <div 
+        <div
             className='expenses-container'
-            style={{width: `${tableWidth}px` }}
+            style={{ width: `${tableWidth}px` }}
         >
-             {/* Top Bar: Column Visibility and Pagination Input */}
-             <div className="table-top-bar">
-                
+            {/* Top Bar: Column Visibility and Pagination Input */}
+            <div className="table-top-bar">
+
+                <ColumnToggleMenu
+                    visibleColumns={visibleColumns}
+                    toggleColumn={toggleColumn}
+                    columns={expenseColumns}
+                    buttonLabel="Columnas"
+                />
+
                 {expenses && expenses.length > 0 && (
-                    <ExpensesPaginationInput 
+                    <ExpensesPaginationInput
                         currentPage={currentPage}
                         totalPages={totalPages}
                         onPageChange={paginate}
                     />
                 )}
 
-                <ExpensesTableEdit 
-                    visibleColumns={visibleColumns}
-                    toggleColumn={toggleColumn}
-                />
+
             </div>
 
             <div className="expenses-table-wrapper">
                 {/* Contenedor de la tabla: permite el scroll horizontal si el contenido de la tabla es > tableWidth */}
-                <div className='expenses-scroll-area'> 
+                <div className='expenses-scroll-area'>
                     <table className='expenses-table'>
                         <thead className='expenses-thead'> {/* bg-indigo-50 */}
                             <tr>
                                 {visibleColumns.date && (
-                                    <th 
+                                    <th
                                         className='expenses-th'
                                         onClick={() => requestSort('date')}
                                         style={{ cursor: 'pointer' }}
@@ -191,7 +202,7 @@ const ExpensesTable = ({expenses, minTableWidth = '700px', handleTableUpdate, on
                                     </th>
                                 )}
                                 {visibleColumns.description && (
-                                    <th 
+                                    <th
                                         className='expenses-th'
                                         onClick={() => requestSort('description')}
                                         style={{ cursor: 'pointer' }}
@@ -200,7 +211,7 @@ const ExpensesTable = ({expenses, minTableWidth = '700px', handleTableUpdate, on
                                     </th>
                                 )}
                                 {visibleColumns.reference && (
-                                    <th 
+                                    <th
                                         className='expenses-th'
                                         onClick={() => requestSort('reference')}
                                         style={{ cursor: 'pointer' }}
@@ -209,14 +220,14 @@ const ExpensesTable = ({expenses, minTableWidth = '700px', handleTableUpdate, on
                                     </th>
                                 )}
                                 {visibleColumns.amount && (
-                                    <th 
+                                    <th
                                         className='expenses-th'
                                         onClick={() => requestSort('amount')}
                                         style={{ cursor: 'pointer' }}
                                     >
                                         Monto {getSortIndicator('amount')}
                                     </th>
-                                )} 
+                                )}
                             </tr>
                         </thead>
                         <tbody>
@@ -235,7 +246,6 @@ const ExpensesTable = ({expenses, minTableWidth = '700px', handleTableUpdate, on
                                                     )
                                                 }
                                             />
-                                            {/*formatDate(ex.date)*/}
                                         </td>
                                     )}
                                     {visibleColumns.description && (
@@ -245,7 +255,7 @@ const ExpensesTable = ({expenses, minTableWidth = '700px', handleTableUpdate, on
                                                 type="text"
                                                 onSave={(val) =>
                                                     handleTableUpdate(
-                                                        { id: ex.id, fields: { description: val} },
+                                                        { id: ex.id, fields: { description: val } },
                                                         updateExpense
                                                     )
                                                 }
@@ -259,7 +269,7 @@ const ExpensesTable = ({expenses, minTableWidth = '700px', handleTableUpdate, on
                                                 type="text"
                                                 onSave={(val) =>
                                                     handleTableUpdate(
-                                                        { id: ex.id, fields: { reference: val} },
+                                                        { id: ex.id, fields: { reference: val } },
                                                         updateExpense
                                                     )
                                                 }
@@ -287,10 +297,10 @@ const ExpensesTable = ({expenses, minTableWidth = '700px', handleTableUpdate, on
                                                 }
                                             />
                                         </td>
-                                    )}         
+                                    )}
                                     {/* Boton Borrado  */}
                                     <td className="expenses-td" style={{ textAlign: 'center' }}>
-                                        <button 
+                                        <button
                                             onClick={(e) => onDeleteExpense(e, ex.id)}
                                             className={`delete-btn ${confirmingId === ex.id ? 'confirming' : ''}`}
                                         >
@@ -306,7 +316,7 @@ const ExpensesTable = ({expenses, minTableWidth = '700px', handleTableUpdate, on
                                                 </svg>
                                             )}
                                         </button>
-                                    </td>   
+                                    </td>
                                 </tr>
                             ))}
                             {expenses.length === 0 && (
@@ -317,28 +327,28 @@ const ExpensesTable = ({expenses, minTableWidth = '700px', handleTableUpdate, on
                         </tbody>
                     </table>
                 </div>
-            </div>   
-            {/* Handle de Redimensionamiento (Barra arrastrable) */}
-            <div
-                onMouseDown={handleMouseDown}
-                style={{
-                    width: '10px',
-                    cursor: 'col-resize',
-                    backgroundColor: '#4f46e5', // Color visible
-                    height: '100%',
-                    position: 'absolute',
-                    right: '-5px', // Se superpone ligeramente al borde para ser más fácil de arrastrar
-                    top: 0,
-                    zIndex: 10,
-                    borderRadius: '0.25rem',
-                    opacity: 0.7,
-                }}
-                title="Arrastra para ajustar el ancho de la tabla"
-            />
-            
+                {/* Handle de Redimensionamiento (Barra arrastrable) */}
+                <div
+                    onMouseDown={handleMouseDown}
+                    style={{
+                        width: '10px',
+                        cursor: 'col-resize',
+                        backgroundColor: '#4f46e5', // Color visible
+                        height: '100%',
+                        position: 'absolute',
+                        right: '-5px', // Se superpone ligeramente al borde para ser más fácil de arrastrar
+                        top: 0,
+                        zIndex: 10,
+                        borderRadius: '0.25rem',
+                        opacity: 0.7,
+                    }}
+                    title="Arrastra para ajustar el ancho de la tabla"
+                />
+
+            </div>
             {/* Pagination Controls */}
             {expenses && expenses.length > 0 && (
-                <ExpensesPagination 
+                <ExpensesPagination
                     currentPage={currentPage}
                     totalPages={totalPages}
                     onPageChange={paginate}
@@ -349,3 +359,6 @@ const ExpensesTable = ({expenses, minTableWidth = '700px', handleTableUpdate, on
 };
 
 export default ExpensesTable;
+
+
+

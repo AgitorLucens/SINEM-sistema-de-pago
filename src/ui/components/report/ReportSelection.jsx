@@ -2,13 +2,16 @@ import ReportCard from "./ReportCard.jsx";
 import { Users, FileText, TrendingUp, TrendingDown, PieDiagramIcon } from "../icons/Icons.jsx";
 
 import './reportsection.css';
-
 const ReportSelection = ({ onSelectReport }) => {
   return (
     <div className="container-report-selection">
       <div className="content-wrapper-report-selection">
+        <div className="section-title">
+          <h1 style={{textAlign: "center"}}>Reportes</h1>
+        </div>
         <div className="report-selection-header">
-          <h1>Reportes</h1>
+
+
           <p>Selecciona el tipo de reporte que deseas visualizar.</p>
         </div>
 
