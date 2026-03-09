@@ -272,12 +272,15 @@ src/
 
 ---
 
-## Roadmap
+## Database
 
-- Basic reporting and summaries
-- Export data to CSV/PDF
-- Role-based access control
-- Optional cloud sync
+The application uses a local SQLite database for storing student, payment, and expense data. The database is accessed through IPC handlers defined in the `src/domain/db` directory, ensuring that the renderer process does not have direct access to the database. The location of the database inside the computer is in in this direction `C:\Users\{username}\AppData\Roaming\sinem\sinem.sqlite` for Windows, and `~/Library/Application Support/SINEM/database.sqlite` for macOS.
+
+## Technical Debt
+
+- Better management of database changes on schema updates
+- Implementing a more robust error handling strategy for database operations
+- Only manual testing done, unit and integration tests are needed
 
 ---
 

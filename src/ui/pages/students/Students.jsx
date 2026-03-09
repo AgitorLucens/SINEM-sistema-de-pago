@@ -21,6 +21,8 @@ const Students = () => {
         phone: '',
         email: '',
         active: '',
+        scholarship: '',
+        scholarship_amount: '',
     };
         
     //import students
@@ -136,6 +138,8 @@ const Students = () => {
                 phone: formData.phone,
                 email: formData.email,
                 active: formData.active,
+                scholarship: formData.scholarship,
+                scholarship_amount: formData.scholarship_amount,
             };
 
             setIsLoading(true);
@@ -264,10 +268,12 @@ const Students = () => {
                     />
                 )}
                 <StudentImportCard
+                    fetchData={fetchData}
                     file={file}
                     setFile={setFile}
                     setModal={setIsModalImportOpen}
                     setError={setError}
+                    setMessage={setMessage}
                 />
             </Modal>
 

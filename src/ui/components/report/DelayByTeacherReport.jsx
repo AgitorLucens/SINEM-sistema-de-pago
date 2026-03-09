@@ -1,8 +1,9 @@
 import { useState, useEffect, useMemo } from 'react';
 import { DownloadIcon, InfoCircledIcon, ChevronLeftIcon } from "@radix-ui/react-icons";
-import { getAllTeachers, getAllStudents, getAllPayments } from '../../constant/DBFunctions.jsx';
+import { getAllTeachers, getAllStudents, getAllPayments, getYearsOfPayments } from '../../constant/DBFunctions.jsx';
 import SelectRadix from '../generic/select/SelectRadix.jsx';
-import {formatMonth} from '../generic/function/Function.jsx';
+import MultiSelectRadix from "../generic/multiselect/MultiSelectRadix.jsx";
+import { formatMonth } from '../generic/function/Function.jsx';
 import { exportDelayByTeacherReportToExcel } from '../../constant/DBFunctions.jsx';
 import './delaybyteacherreport.css';
 
@@ -12,6 +13,8 @@ const DelayByTeacherReport = ({ onBack }) => {
     const [payments, setPayments] = useState([]);
     const [teachers, setTeachers] = useState([]);
     const [selectedMonth, setSelectedMonth] = useState('1'); // Default to January
+    const [yearsPayments, setYearsPayments] = useState([]);
+    const [selectedYears, setSelectedYears] = useState([]);
 
     // Month options for the dropdown (all 12 months)
     const monthOptions = useMemo(() => {
@@ -26,8 +29,6 @@ const DelayByTeacherReport = ({ onBack }) => {
     }, []);
 
     const report = useMemo(() => {
-        const teacherMap = {};
-
         // Create a map of division_id to teacher name
         const divisionToTeacher = {};
         teachers.forEach(t => {
@@ -35,6 +36,10 @@ const DelayByTeacherReport = ({ onBack }) => {
                 divisionToTeacher[t.division_id] = t.name;
             }
         });
+
+        // Normalize selectedYears to numbers for consistent comparison
+        const selectedYearsNum = selectedYears.map(y => Number(y));
+        const selectedMonthNum = Number(selectedMonth);
 
         // Track unique students per teacher (based on their payments)
         const teacherStudents = {};
@@ -50,12 +55,14 @@ const DelayByTeacherReport = ({ onBack }) => {
                     teacherPayments[teacherName] = new Set();
                 }
 
-                // Add student to this teacher's list
-                teacherStudents[teacherName].add(p.student_id);
+                // Only count students enrolled in the selected year(s)
+                if (p.concept_type === "Mensualidad" && selectedYearsNum.includes(Number(p.year))) {
+                    teacherStudents[teacherName].add(p.student_id);
 
-                // Track students who paid in selected month for "Mensualidad"
-                if (p.month === parseInt(selectedMonth) && p.concept_type === "Mensualidad") {
-                    teacherPayments[teacherName].add(p.student_id);
+                    // Check if they paid for the selected month
+                    if (Number(p.month) === selectedMonthNum) {
+                        teacherPayments[teacherName].add(p.student_id);
+                    }
                 }
             }
         });
@@ -75,19 +82,23 @@ const DelayByTeacherReport = ({ onBack }) => {
                 porcentaje: percentage
             };
         });
-    }, [students, payments, teachers, selectedMonth]);
+    }, [payments, teachers, selectedMonth, selectedYears]);
 
     useEffect(() => {
         const fetchTeacherData = async () => {
             try {
-                const [teachers, students, payments] = await Promise.all([
+                const [teachers, students, payments, years] = await Promise.all([
                     getAllTeachers(),
                     getAllStudents(),
-                    getAllPayments()
+                    getAllPayments(),
+                    getYearsOfPayments()
                 ]);
                 setTeachers(teachers);
                 setStudents(students);
                 setPayments(payments);
+                setYearsPayments(years);
+                // Initialize with all years selected by default
+                setSelectedYears(years?.map(y => y.year) || []);
             } catch (error) {
                 console.error('Error fetching teacher data:', error);
             }
@@ -97,11 +108,12 @@ const DelayByTeacherReport = ({ onBack }) => {
     }, []);
 
     const handleExport = async () => {
-        const result = await exportDelayByTeacherReportToExcel({ 
-            teachers: teachers, 
-            students: students, 
-            payments: payments, 
-            selectedMonth: selectedMonth });
+        const result = await exportDelayByTeacherReportToExcel({
+            teachers: teachers,
+            students: students,
+            payments: payments,
+            selectedMonth: selectedMonth
+        });
         if (result.success) {
             console.log("Export successful");
         } else {
@@ -111,21 +123,29 @@ const DelayByTeacherReport = ({ onBack }) => {
 
     return (
         <div className="delay-teacher-report-container">
-            <div className="report-header-section">
-                <button
-                    onClick={onBack}
-                    className="btn-back-report"
-                    title="Volver a selección de reportes"
-                >
-                    <ChevronLeftIcon />
-                    Volver
-                </button>
-                <div className="report-title-section">
-                    <h1 className="report-main-title">Reportes Administrativos</h1>
-                    <p className="report-subtitle">Sistema de gestión y seguimiento de morosidad</p>
+            <div className="header-income-report">
+                <div className="header-income-report-title">
+                    <button
+                        onClick={onBack}
+                        className="btn-back-report"
+                        title="Volver a selección de reportes"
+                    >
+                        <ChevronLeftIcon />
+                        Volver
+                    </button>
+                    <h1>Reporte de Morosidad por Profesor</h1>
+                </div>
+                <div className="download-button">
+                    <button
+                        onClick={() => handleExport()}
+                        disabled={payments.length === 0 ? true : false}
+                        className={`btn btn-primary${payments.length === 0 ? " export-card--disabled" : "-export"}`}
+                    >
+                        {payments.length === 0 ? <InfoCircledIcon /> : <DownloadIcon />}
+                        {payments.length === 0 ? "Agregue Ingreso" : "Descargar Excel"}
+                    </button>
                 </div>
             </div>
-
             <div className="filter-section">
                 <SelectRadix
                     label="Filtrar por mes:"
@@ -134,16 +154,22 @@ const DelayByTeacherReport = ({ onBack }) => {
                     onChange={setSelectedMonth}
                     placeholder="Seleccionar mes"
                 />
-            </div>
-            <div className="download-button">
-                <button
-                    onClick={() => handleExport()}
-                    disabled={payments.length === 0 ? true : false}
-                    className={`btn btn-primary${payments.length === 0 ? " export-card--disabled" : "-export"}`}
-                >
-                    {payments.length === 0 ? <InfoCircledIcon /> : <DownloadIcon />}
-                    {payments.length === 0 ? "Agregue Ingreso" : "Descargar Excel"}
-                </button>
+                <div>
+                    <label htmlFor="">
+                        Seleccionar años
+                    </label>
+                    <MultiSelectRadix
+                        options={yearsPayments?.map(y => ({ value: y.year, label: y.year }))}
+                        value={selectedYears}
+                        allSelectedText="Todos los años"
+                        onChange={(years) => {
+                            if (years?.length < 1) return;
+                            setSelectedYears(years);
+                        }}
+                        placeholder="Escoger Años"
+                    />
+                </div>
+
             </div>
             <div className="report-content">
                 <div className="teacher-table-wrapper">

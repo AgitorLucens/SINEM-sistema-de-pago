@@ -19,11 +19,11 @@ function resolveMatricula(payments = []) {
 
   payments.forEach(p => {
     if (p.concept_type !== "Matricula") return;
-    if (!p.month) return;
+    if (!p.semester) return;
 
-    if (p.month <= 6) {
+    if (p.semester === 1) {
       first = Number(p.amount);
-    } else {
+    } else if (p.semester === 2) {
       second = Number(p.amount);
     }
   });
@@ -375,12 +375,21 @@ export async function paseStudentFile(buffer,workbook){
       if (rowNumber === 1) return;
 
       const nombre = row.getCell(headerMap["NOMBRE MATRICULADO"])?.value;
-
       if (!nombre) return;
+
+      const cellValue = row.getCell(headerMap["CORREO"])?.value;
+
+      const correo =
+        typeof cellValue === "string"
+          ? cellValue
+          : cellValue?.text ||
+          cellValue?.result ||
+          cellValue?.hyperlink ||
+          "";
       
       students.push({
         nombre: nombre.toString().trim(),
-        correo: row.getCell(headerMap["CORREO"])?.value?.toString() || "",
+        correo: correo,
         activo: row.getCell(headerMap["ACTIVO"])?.value?.toString() || "Si",
         telefono: row.getCell(headerMap["TELÉFONO"])?.value?.toString() || "",
         referencia: row.getCell(headerMap["REFERENCIA"])?.value?.toString() || "",

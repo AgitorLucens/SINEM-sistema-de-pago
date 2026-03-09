@@ -14,8 +14,7 @@ module.exports = {
   rebuildConfig: {},
   hooks: {
     /**
-     * ESTE HOOK ES LA CLAVE
-     * Copia better-sqlite3 (y deps) DENTRO del build
+     * copia better-sqlite3 DENTRO del build
      * antes de que se genere app.asar
      */
     async packageAfterCopy(_config, buildPath) {

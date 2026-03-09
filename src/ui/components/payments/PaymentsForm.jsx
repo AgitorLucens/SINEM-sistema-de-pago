@@ -1,9 +1,9 @@
 import { useEffect, useState } from "react";
 import SelectRadix from "../generic/select/SelectRadix.jsx";
 import DatePicker from "../generic/datepicker/DatePicker.jsx";
-import {onRadixChange,handleFieldChange, formatConsecutive, formatCRC} from "../generic/function/Function.jsx";
+import { onRadixChange, handleFieldChange, formatConsecutive, formatCRC } from "../generic/function/Function.jsx";
 
-const PaymentsForm = ({ formData, handleChange, handleConcept, handleDivision, handleAmount, handleDate, onSubmit, isLoading, concepts, divisions, students, months }) => {
+const PaymentsForm = ({ formData, handleChange, handleStudent, handleConcept, handleDivision, handleAmount, handleDate, onSubmit, isLoading, concepts, divisions, students, months }) => {
     const [value, setValue] = useState(formData.amount);
     const [isEditing, setIsEditing] = useState(false);
     let displayValue = isEditing
@@ -27,7 +27,7 @@ const PaymentsForm = ({ formData, handleChange, handleConcept, handleDivision, h
         handleAmount({ target: { name: 'amount', value: raw } });
     };
 
-    useEffect(()=>{
+    useEffect(() => {
         setValue(formData.amount ?? "");
     }, [formData.amount])
 
@@ -35,7 +35,7 @@ const PaymentsForm = ({ formData, handleChange, handleConcept, handleDivision, h
         <div style={{ padding: '0.5rem' }}>
             <p className="card-text" style={{ color: '#4b5563' }}>Ingrese los detalles del pago recibido.</p>
 
-            <form onSubmit={onSubmit} style={{ display: 'grid', gap: '1rem' }}>              
+            <form onSubmit={onSubmit} style={{ display: 'grid', gap: '1rem' }}>
 
                 {/* Campo Estudiantes y Mes */}
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
@@ -50,9 +50,9 @@ const PaymentsForm = ({ formData, handleChange, handleConcept, handleDivision, h
                             value={formData.student_id}
                             valueKey="id"
                             labelKey="name"
-                            onChange={onRadixChange(handleChange,"student_id")}
+                            onChange={handleStudent}
                             options={students}
-                        /> 
+                        />
                     </div>
                     <div>
                         <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '500', fontSize: '0.875rem' }}>
@@ -66,14 +66,14 @@ const PaymentsForm = ({ formData, handleChange, handleConcept, handleDivision, h
                             value={formData.method}
                             valueKey="value"
                             labelKey="label"
-                            onChange={onRadixChange(handleChange,"method")}
+                            onChange={onRadixChange(handleChange, "method")}
                             options={[
                                 { value: "Efectivo", label: "Efectivo" },
                                 { value: "Transferencia", label: "Transferencia" },
                             ]}
                         />
                     </div>
-                    
+
                 </div>
                 {/* Campo Concepto y Método de Pago (en una fila) */}
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
@@ -82,56 +82,56 @@ const PaymentsForm = ({ formData, handleChange, handleConcept, handleDivision, h
                             Tipo de Pago
                         </label>
                         <SelectRadix
-                                 label=""
-                                 name="concept"
-                                 placeholder="Seleccione concepto de pago"
-                                 value={formData.concept}
-                                 valueKey="id"
-                                 labelKey="name"
-                                 onChange={handleConcept}
-                                 options={concepts}
-                        />   
+                            label=""
+                            name="concept"
+                            placeholder="Seleccione concepto de pago"
+                            value={formData.concept}
+                            valueKey="id"
+                            labelKey="name"
+                            onChange={handleConcept}
+                            options={concepts}
+                        />
                     </div>
-                
+
                     {/* Campo Método de Pago */}
                     <div>
                         {(formData && (formData.concept === "2" || formData.concept === "3")) && (
                             <>
                                 <label htmlFor="month" style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '500', fontSize: '0.875rem' }}>
-                                Mes
+                                    Mes
                                 </label>
                                 <SelectRadix
-                                 label=""
-                                 name="month"
-                                 placeholder="Selecciones un mes"
-                                 value={formData.month}
-                                 valueKey="value"
-                                 labelKey="label"
-                                 onChange={onRadixChange(handleChange,"month")}
-                                 options={months}
-                                />  
-                            </>   
+                                    label=""
+                                    name="month"
+                                    placeholder="Selecciones un mes"
+                                    value={formData.month}
+                                    valueKey="value"
+                                    labelKey="label"
+                                    onChange={onRadixChange(handleChange, "month")}
+                                    options={months}
+                                />
+                            </>
                         )}
-                                            
+
                         {(formData && formData.concept === "1") && (
                             <>
                                 <label htmlFor="month" style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '500', fontSize: '0.875rem' }}>
-                                Matricula
+                                    Matricula
                                 </label>
                                 <SelectRadix
-                                 label=""
-                                 name="month"
-                                 placeholder="Selecciones un semestre"
-                                 value={formData.semester}
-                                 valueKey="value"
-                                 labelKey="label"
-                                 onChange={onRadixChange(handleChange,"semester")}
-                                 options={[
-                                    { value: "1", label: "Matricula 1" },
-                                    { value: "2", label: "Matricula 2" },
-                                 ]}  
-                                /> 
-                            </>   
+                                    label=""
+                                    name="month"
+                                    placeholder="Selecciones un semestre"
+                                    value={formData.semester}
+                                    valueKey="value"
+                                    labelKey="label"
+                                    onChange={onRadixChange(handleChange, "semester")}
+                                    options={[
+                                        { value: "1", label: "Matricula 1" },
+                                        { value: "2", label: "Matricula 2" },
+                                    ]}
+                                />
+                            </>
                         )}
                     </div>
                 </div>
@@ -158,8 +158,8 @@ const PaymentsForm = ({ formData, handleChange, handleConcept, handleDivision, h
                             Fecha del Pago
                         </label>
                         <DatePicker
-                             value={formData.date}
-                             onChange={handleDate}
+                            value={formData.date}
+                            onChange={handleDate}
                         />
                     </div>
                 </div>
@@ -185,7 +185,7 @@ const PaymentsForm = ({ formData, handleChange, handleConcept, handleDivision, h
                             required
                             style={{ width: '100%', padding: '0.75rem', border: '1px solid #d1d5db', borderRadius: '0.5rem', boxSizing: 'border-box' }}
                             placeholder="Ej: 50.00"
-                        />      
+                        />
                     </div>
                     <div>
                         <label htmlFor="consecutive" style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '500', fontSize: '0.875rem' }}>

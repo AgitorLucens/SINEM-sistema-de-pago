@@ -1,5 +1,5 @@
 import SelectRadix from "../generic/select/SelectRadix.jsx"
-import {onRadixChange} from "../generic/function/Function.jsx"
+import { onRadixChange } from "../generic/function/Function.jsx"
 
 const ExpensesForm = ({ formData, handleChange, onSubmit, isLoading }) => {
     return (
@@ -37,18 +37,18 @@ const ExpensesForm = ({ formData, handleChange, onSubmit, isLoading }) => {
                     />
                 </div>
                 <div>
-                    <SelectRadix 
-                                label="Activo"
-                                name="active"
-                                placeholder="Seleccione estado de estudiante"
-                                value={formData.active}
-                                onChange={onRadixChange(handleChange,"active")}
-                                valueKey="value"
-                                labelKey="label"
-                                options={[
-                                    { value: "1", label: "Activo" },
-                                    { value: "0", label: "No Activo" },
-                                ]}
+                    <SelectRadix
+                        label="Activo"
+                        name="active"
+                        placeholder="Seleccione estado de estudiante"
+                        value={formData.active}
+                        onChange={onRadixChange(handleChange, "active")}
+                        valueKey="value"
+                        labelKey="label"
+                        options={[
+                            { value: "1", label: "Activo" },
+                            { value: "0", label: "No Activo" },
+                        ]}
                     />
                 </div>
                 {/* Campo Telefono y Email (en una fila) */}
@@ -84,38 +84,40 @@ const ExpensesForm = ({ formData, handleChange, onSubmit, isLoading }) => {
                         />
                     </div>
                 </div>
-                            
+
                 {/* Campo beca */}
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
                     <div>
-                        <SelectRadix 
-                                label="Beca"
-                                name="scholarship"
-                                placeholder="Seleccione beca de estudiante"
-                                value={formData.scholarship}
-                                onChange={onRadixChange(handleChange,"active")}
-                                valueKey="value"
-                                labelKey="label"
-                                options={[
-                                    { value: "1", label: "Beca" },
-                                    { value: "0", label: "Sin Beca" },
-                                ]}
+                        <SelectRadix
+                            label="Beca"
+                            name="scholarship"
+                            placeholder="Seleccione beca de estudiante"
+                            value={formData.scholarship}
+                            onChange={onRadixChange(handleChange, "scholarship")}
+                            valueKey="value"
+                            labelKey="label"
+                            options={[
+                                { value: "1", label: "Beca" },
+                                { value: "0", label: "Sin Beca" },
+                            ]}
                         />
                     </div>
-                    <div>
-                        <label htmlFor="email" style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '500', fontSize: '0.875rem' }}>
-                            Monto Beca
-                        </label>
-                        <input
-                            type="text"
-                            id="email"
-                            name="email"
-                            value={formData.email}
-                            onChange={handleChange}
-                            style={{ width: '100%', padding: '0.75rem', border: '1px solid #d1d5db', borderRadius: '0.5rem', boxSizing: 'border-box' }}
-                            placeholder="example@hotmail.com"
-                        />
-                    </div>
+                    {formData.scholarship === "1" && (
+                        <div>
+                            <label htmlFor="scholarship_amount" style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '500', fontSize: '0.875rem' }}>
+                                Monto Beca
+                            </label>
+                            <input
+                                type="text"
+                                id="scholarship_amount"
+                                name="scholarship_amount"
+                                value={formData.scholarship_amount}
+                                onChange={handleChange}
+                                style={{ width: '100%', padding: '0.75rem', border: '1px solid #d1d5db', borderRadius: '0.5rem', boxSizing: 'border-box' }}
+                                placeholder="Monto de la beca"
+                            />
+                        </div>
+                    )}
                 </div>
 
 

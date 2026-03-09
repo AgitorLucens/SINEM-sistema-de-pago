@@ -172,6 +172,10 @@ export default function setUpHandlers(dbInstance, excelInstance) {
         return dbInstance.updatePriceConcept(concept);
     });
 
+    ipcMain.handle('update-price-division', async (_, division) => {
+        return dbInstance.updatePriceDivision(division);
+    });
+
     ipcMain.handle('get-all-division-payment-concepts', async () => {
         return dbInstance.getAllDivisionPaymentConcepts();
     });

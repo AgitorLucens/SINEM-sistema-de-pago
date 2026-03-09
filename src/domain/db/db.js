@@ -23,7 +23,9 @@ class AppDB {
                 reference TEXT,
                 phone TEXT,
                 email TEXT,
-                active INTEGER NOT NULL -- 1 para true, 0 para false
+                active INTEGER NOT NULL, -- 1 para true, 0 para false
+                scholarship INTEGER NOT NULL DEFAULT 0, -- 1 para beca, 0 no beca
+                scholarship_amount REAL DEFAULT 0
             );
         `;
 
@@ -71,6 +73,7 @@ class AppDB {
             CREATE TABLE IF NOT EXISTS divisions (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
                 name TEXT NOT NULL UNIQUE, -- Corresponde a DivisionType (SINEM, Taller, etc.)
+                amount REAL,
                 description TEXT
             );
         `;
@@ -387,6 +390,7 @@ class AppDB {
                                         p.concept_id,
                                         p.amount,
                                         p.month,
+                                        p.semester,
                                         p.year,
                                         p.sequence,
                                         p.receipt
@@ -509,6 +513,7 @@ class AppDB {
                                         p.year,
                                         p.sequence,
                                         p.month,
+                                        p.semester,
                                         p.status
                                      FROM 
                                         payments p
@@ -537,7 +542,7 @@ class AppDB {
     }
 
     getPaymentsDivisions() {
-        const sql = this.db.prepare('SELECT id, name AS name FROM divisions ORDER BY id ASC');
+        const sql = this.db.prepare('SELECT id,amount, name AS name FROM divisions ORDER BY id ASC');
         const result = sql.all();
         return result;
     }
@@ -783,7 +788,9 @@ class AppDB {
                                         s.phone,
                                         s.email,
                                         s.reference,
-                                        s.active
+                                        s.active,
+                                        s.scholarship,
+                                        s.scholarship_amount
                                      FROM
                                         students s
                                      ORDER BY
@@ -872,14 +879,16 @@ class AppDB {
 
     addStudent(studentData) {
         const sql = this.db.prepare(`
-                INSERT INTO students (name, phone, email, reference, active)
-                VALUES (?, ?, ?, ?, ?)
+                INSERT INTO students (name, phone, email, reference, active, scholarship, scholarship_amount)
+                VALUES (?, ?, ?, ?, ?, ?, ?)
             `);
         const data = sql.run(studentData.name,
             studentData.phone,
             studentData.email,
             studentData.reference,
-            studentData.active);
+            studentData.active,
+            studentData.scholarship,
+            studentData.scholarship_amount);
         return data.lastInsertRowid;
     }
 
@@ -913,6 +922,21 @@ class AppDB {
 
     importStudents(studentsData) {
         if (!studentsData) return { error: "Datos Estudiantes no encontrados." }
+
+        studentsData.forEach(s => {
+            const sql = this.db.prepare(`
+                INSERT INTO students (name, phone, email, reference, active, scholarship, scholarship_amount)
+                VALUES (?, ?, ?, ?, ?, ?, ?)
+            `);
+            const data = sql.run(
+                s.nombre || "",
+                s.telefono || "",
+                s.correo || "",
+                s.referencia || "",
+                s.activo.toLowerCase() === "si" ? 1 : 0,
+                s.scholarship.toLowerCase() === "si" ? 1 : 0,
+                s.scholarship_amount || "");
+        })
 
         return {
             success: true,
@@ -1068,6 +1092,18 @@ class AppDB {
         return data.lastInsertRowid;
     }
 
+    updatePriceDivision(division) {
+        const sql = this.db.prepare(`
+                UPDATE divisions
+                SET
+                    amount = ?
+                WHERE 
+                    id = ?;
+            `);
+        const data = sql.run(division.amount,
+            division.id);
+        return data.lastInsertRowid;
+    }
 
     /* 
         Reporte 

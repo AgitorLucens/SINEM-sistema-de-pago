@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { ArrowLeftIcon, PlusIcon } from "@radix-ui/react-icons";
+import { ArrowLeftIcon, PlusIcon,PlusCircledIcon } from "@radix-ui/react-icons";
 import { getAllDivisionPaymentConcepts, updateDivisionPaymentConcept, addDivision, deleteDivision, updateDivision } from "../../constant/DBFunctions";
 import Modal from "../../components/generic/modal/Modal";
 import SuccessMessage from '../../components/generic/message/SuccessMessage.jsx';
@@ -75,11 +75,11 @@ const PricingTable = ({ onBack }) => {
     const res = await updateDivision({ id, name: name });
     if (!res.success) {
       setError(res.error);
-      setTimeout(() => { setError("");}, 4000);
+      setTimeout(() => { setError(""); }, 4000);
       return
     }
     setMessage("Curso actualizado exitosamente");
-    setTimeout(() => { setMessage("");}, 4000);
+    setTimeout(() => { setMessage(""); }, 4000);
     fetchData();
   }
 
@@ -96,8 +96,22 @@ const PricingTable = ({ onBack }) => {
           </button>
           <h2 className="section-title">Precios por Curso y Tipo de Pago</h2>
         </div>
-        <button className="add-button" onClick={() => setIsAddModalOpen(true)}>
-          <PlusIcon /> Agregar Curso
+        <button
+          onClick={() => setIsAddModalOpen(true)} // Abre el modal
+          style={{
+            backgroundColor: '#4f46e5',
+            color: 'white',
+            padding: '0.5rem 1rem',
+            borderRadius: '0.5rem',
+            fontWeight: '600',
+            border: 'none',
+            cursor: 'pointer',
+            transition: 'background-color 0.2s'
+          }}
+          onMouseOver={(e) => e.currentTarget.style.backgroundColor = '#4338ca'}
+          onMouseOut={(e) => e.currentTarget.style.backgroundColor = '#4f46e5'}
+        >
+          <PlusCircledIcon /> Agregar Curso
         </button>
       </div>
       {message && (
@@ -135,15 +149,15 @@ const PricingTable = ({ onBack }) => {
                     <tr key={division} className="pricing-tr">
                       <td className="pricing-td division-cell">
                         {divisionId ? (
-                             <EditableCellInput
-                                value={division}
-                                type="text"
-                                onSave={(val) => handleTableUpdate(divisionId, val)}
-                            />
+                          <EditableCellInput
+                            value={division}
+                            type="text"
+                            onSave={(val) => handleTableUpdate(divisionId, val)}
+                          />
                         ) : (
-                            division
+                          division
                         )}
-                    </td>
+                      </td>
                       {concepts.map(concept => {
                         const item = data.find(d => d.division_name === division && d.concept_name === concept);
                         return (

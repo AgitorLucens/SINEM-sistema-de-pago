@@ -1,4 +1,3 @@
-/* Main container for the controls */
 .table-controls {
     margin-bottom: 1rem;
     display: flex;
@@ -6,7 +5,6 @@
     position: relative;
 }
 
-/* Button to toggle the menu */
 .column-toggle-btn {
     padding: 0.5rem 1rem;
     background-color: transparent;
@@ -23,7 +21,6 @@
     box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
 }
 
-/* Dropdown menu container */
 .column-menu {
     position: absolute;
     top: 100%;
@@ -39,7 +36,6 @@
     overflow: hidden;
 }
 
-/* Individual checkbox items wrapper */
 .column-menu-item {
     display: flex;
     align-items: center;
@@ -58,7 +54,6 @@
     background-color: #f1f5f9;
 }
 
-/* Label for the checkbox */
 .column-menu-label {
     display: flex;
     align-items: center;

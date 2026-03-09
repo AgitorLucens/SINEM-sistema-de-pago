@@ -33,8 +33,13 @@ const createWindow = () => {
     mainWindow.loadFile(path.join(__dirname, `../renderer/${MAIN_WINDOW_VITE_NAME}/index.html`));
   }
 
-  // Open the DevTools.
-  mainWindow.webContents.openDevTools();
+  
+  if (!app.isPackaged) {
+    // desarrollo
+    // devtools
+    mainWindow.webContents.openDevTools();
+  }
+
 };
 
 // This method will be called when Electron has finished
@@ -43,9 +48,9 @@ const createWindow = () => {
 app.whenReady().then(() => {
   db = new AppDB();
   excel = new AppExcel();
-  setUpHandlers(db,excel);
+  setUpHandlers(db, excel);
   createWindow();
-  
+
   // On OS X it's common to re-create a window in the app when the
   // dock icon is clicked and there are no other windows open.
   app.on('activate', () => {
@@ -60,7 +65,7 @@ app.whenReady().then(() => {
 // explicitly with Cmd + Q.
 app.on('window-all-closed', () => {
   if (db) {
-    db.close();  
+    db.close();
   }
   if (process.platform !== 'darwin') {
     app.quit();

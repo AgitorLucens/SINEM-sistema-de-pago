@@ -4,7 +4,7 @@ import { updateStudent } from "../../constant/DBFunctions.jsx"
 import { PersonIcon } from "@radix-ui/react-icons";
 import EditableCellDropdown from '../generic/table/EditableCellDropdown';
 import EditableCellInput from '../generic/table/EditableCellInput.jsx';
-import StudentsTableEdit from './StudentsTableEdit';
+import ColumnToggleMenu from '../generic/table/ColumnToggleMenu';
 import StudentsPagination from './StudentsPagination';
 import StudentsPaginationInput from './StudentsPaginationInput';
 
@@ -24,7 +24,9 @@ const StudentsTable = ({ students, loadStudent, minTableWidth = '700px', handleT
         reference: true,
         phone: true,
         email: true,
-        active: true
+        active: true,
+        scholarship: true,
+        scholarship_amount: true,
     });
 
     // Pagination State
@@ -40,6 +42,17 @@ const StudentsTable = ({ students, loadStudent, minTableWidth = '700px', handleT
             [column]: !prev[column]
         }));
     };
+
+    const studentColumns = [
+        { key: 'details', label: 'Detalles' },
+        { key: 'name', label: 'Nombre' },
+        { key: 'reference', label: 'Referencia' },
+        { key: 'phone', label: 'Tel.' },
+        { key: 'email', label: 'Correo' },
+        { key: 'active', label: 'Activo' },
+        { key: 'scholarship', label: 'Beca' },
+        { key: 'scholarship_amount', label: 'Monto Beca' },
+    ];
 
     // Sorting Logic
     const sortedStudents = useMemo(() => {
@@ -136,7 +149,7 @@ const StudentsTable = ({ students, loadStudent, minTableWidth = '700px', handleT
         }
 
         setTableWidth(newWidth);
-        localStorage.setItem("expensesTableWidth", newWidth);
+        localStorage.setItem("studentsTableWidth", newWidth);
     };
 
     // Finaliza el proceso de redimensionamiento
@@ -159,11 +172,18 @@ const StudentsTable = ({ students, loadStudent, minTableWidth = '700px', handleT
     return (
         <div 
             className='students-container'
-            style={{ width: `${tableWidth}px` }}
+            style={{ width: '100%', maxWidth: `${tableWidth}px` }}
         >
              {/* Top Bar: Column Visibility and Pagination Input */}
              <div className="table-top-bar">
                 
+                <ColumnToggleMenu
+                    visibleColumns={visibleColumns}
+                    toggleColumn={toggleColumn}
+                    columns={studentColumns}
+                    buttonLabel="Columnas"
+                />
+
                 {students && students.length > 0 && (
                     <StudentsPaginationInput
                         currentPage={currentPage}
@@ -172,10 +192,7 @@ const StudentsTable = ({ students, loadStudent, minTableWidth = '700px', handleT
                     />
                 )}
 
-                <StudentsTableEdit
-                    visibleColumns={visibleColumns}
-                    toggleColumn={toggleColumn}
-                />
+                
             </div>
 
             <div className="students-table-wrapper">
@@ -229,6 +246,24 @@ const StudentsTable = ({ students, loadStudent, minTableWidth = '700px', handleT
                                         style={{ cursor: 'pointer' }}
                                     >
                                         Activo {getSortIndicator('active')}
+                                    </th>
+                                )}
+                                {visibleColumns.scholarship && (
+                                    <th 
+                                        className='students-th'
+                                        onClick={() => requestSort('scholarship')}
+                                        style={{ cursor: 'pointer' }}
+                                    >
+                                        Beca {getSortIndicator('scholarship')}
+                                    </th>
+                                )}
+                                {visibleColumns.scholarship_amount && (
+                                    <th 
+                                        className='students-th'
+                                        onClick={() => requestSort('scholarship_amount')}
+                                        style={{ cursor: 'pointer' }}
+                                    >
+                                        Monto Beca {getSortIndicator('scholarship_amount')}
                                     </th>
                                 )}
                             </tr>
@@ -324,6 +359,29 @@ const StudentsTable = ({ students, loadStudent, minTableWidth = '700px', handleT
                                             />
                                         </td>
                                     )}
+                                    {visibleColumns.scholarship && (
+                                        <td className='students-td'>
+                                            <EditableCellDropdown
+                                                options={[
+                                                    {value: 1, label: "Beca"},
+                                                    {value: 0, label: "No Beca"}
+                                                ]}
+                                                value={s.scholarship === 1 ? "Beca" : "No Beca"}
+                                                valueKey='value'
+                                                labelKey='label'
+                                                onSave={(val) => handleTableUpdate({id: s.id, fields: {scholarship: val}}, updateStudent)}
+                                            />
+                                        </td>
+                                    )}
+                                    {visibleColumns.scholarship_amount && (
+                                        <td className='students-td'>
+                                            <EditableCellInput
+                                                value={s.scholarship_amount}
+                                                type="number"
+                                                onSave={(val) => handleTableUpdate({id: s.id, fields: {scholarship_amount: val}}, updateStudent)}
+                                            />
+                                        </td>
+                                    )}
                                     {/* Boton Borrado  */}
                                     <td className="payments-td" style={{ textAlign: 'center' }}>
                                         <button 
@@ -353,25 +411,24 @@ const StudentsTable = ({ students, loadStudent, minTableWidth = '700px', handleT
                         </tbody>
                     </table>
                 </div>
+                {/* Handle de Redimensionamiento (Barra arrastrable) */}
+                <div
+                    onMouseDown={handleMouseDown}
+                    style={{
+                        width: '10px',
+                        cursor: 'col-resize',
+                        backgroundColor: '#4f46e5', // Color visible
+                        height: '100%',
+                        position: 'absolute',
+                        right: '-5px', // Se superpone ligeramente al borde para ser mas facil de arrastrar
+                        top: 0,
+                        zIndex: 10,
+                        borderRadius: '0.25rem',
+                        opacity: 0.7,
+                    }}
+                    title="Arrastra para ajustar el ancho de la tabla"
+                />
             </div>
-            {/* Handle de Redimensionamiento (Barra arrastrable) */}
-            <div
-                onMouseDown={handleMouseDown}
-                style={{
-                    width: '10px',
-                    cursor: 'col-resize',
-                    backgroundColor: '#4f46e5', // Color visible
-                    height: '100%',
-                    position: 'absolute',
-                    right: '-5px', // Se superpone ligeramente al borde para ser más fácil de arrastrar
-                    top: 0,
-                    zIndex: 10,
-                    borderRadius: '0.25rem',
-                    opacity: 0.7,
-                }}
-                title="Arrastra para ajustar el ancho de la tabla"
-            />
-
             {/* Pagination Controls */}
             {students && students.length > 0 && (
                 <StudentsPagination 
@@ -385,3 +442,4 @@ const StudentsTable = ({ students, loadStudent, minTableWidth = '700px', handleT
 };
 
 export default StudentsTable;
+
