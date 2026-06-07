@@ -2,13 +2,14 @@
     position: relative;
     margin-bottom: 2rem;
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    max-width: 100%;
 }
 
 .pricing-table-wrapper {
-    background-color: #ffffff;
+    background-color: var(--color-bg-primary);
     border-radius: 12px;
-    border: 1px solid #e5e7eb;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    border: 1px solid var(--color-border-light);
+    box-shadow: var(--shadow-sm);
     overflow: hidden;
 }
 
@@ -38,12 +39,12 @@
     margin: 0;
     font-size: 1.25rem;
     font-weight: 600;
-    color: #111827;
+    color: var(--color-gray-900);
 }
 
 .pricing-thead {
-    background-color: #eef2ff;
-    border-bottom: 1px solid #e5e7eb;
+    background-color: var(--color-indigo-50);
+    border-bottom: 1px solid var(--color-border-light);
     position: sticky;
     top: 0;
     z-index: 10;
@@ -52,13 +53,13 @@
 .pricing-th {
     padding: 12px 16px;
     font-weight: 600;
-    color: #4f46e5; /* Using TeachersTable highlight color */
+    color: var(--color-indigo-600);
     white-space: nowrap;
-    background-color: #eef2ff; /* Ensure sticky header has background */
+    background-color: var(--color-indigo-50);
 }
 
 .pricing-tr {
-    border-bottom: 1px solid #f3f4f6;
+    border-bottom: 1px solid var(--color-gray-100);
     transition: background-color 0.2s ease;
 }
 
@@ -68,18 +69,18 @@
 
 .pricing-td {
     padding: 12px 16px;
-    color: #4b5563;
-    border-bottom: 1px solid #f3f4f6;
+    color: var(--color-text-secondary);
+    border-bottom: 1px solid var(--color-gray-100);
 }
 
 .division-cell {
     font-weight: 500;
-    color: #111827;
-    background-color: #f9fafb; /* Slight grey for row headers */
+    color: var(--color-gray-900);
+    background-color: var(--color-bg-secondary);
     position: sticky;
     left: 0;
     z-index: 5;
-    border-right: 1px solid #e5e7eb;
+    border-right: 1px solid var(--color-border-light);
 }
 
 .amount-cell {
@@ -89,13 +90,13 @@
 }
 
 .amount-cell:hover {
-    background-color: #eff6ff;
-    color: #1d4ed8;
+    background-color: var(--color-blue-50);
+    color: var(--color-blue-700);
 }
 
 .price-value {
     font-weight: 500;
-    color: #059669; /* Green for money, matches Expenses/Teachers */
+    color: var(--color-emerald-600);
 }
 
 /* Buttons */
@@ -103,41 +104,41 @@
     display: flex;
     align-items: center;
     gap: 0.5rem;
-    background: white;
-    border: 1px solid #d1d5db;
+    background: var(--color-bg-primary);
+    border: 1px solid var(--color-border);
     padding: 0.5rem 1rem;
     border-radius: 6px;
     cursor: pointer;
     font-size: 0.875rem;
-    color: #374151;
+    color: var(--color-gray-700);
     transition: all 0.2s;
     font-weight: 500;
 }
 
 .back-button:hover {
-    background: #f3f4f6;
-    color: #111827;
-    border-color: #9ca3af;
+    background: var(--color-gray-100);
+    color: var(--color-gray-900);
+    border-color: var(--color-gray-400);
 }
 
 .add-button {
     display: flex;
     align-items: center;
     gap: 0.5rem;
-    background: #4f46e5;
+    background: var(--color-indigo-600);
     border: none;
     padding: 0.5rem 1rem;
     border-radius: 6px;
     cursor: pointer;
     font-size: 0.875rem;
-    color: white;
+    color: var(--color-bg-primary);
     transition: all 0.2s;
     font-weight: 500;
-    box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+    box-shadow: var(--shadow-sm);
 }
 
 .add-button:hover {
-    background: #4338ca;
+    background: var(--color-indigo-700);
 }
 
 /* Delete Button */
@@ -147,7 +148,7 @@
     border: none;
     cursor: pointer;
     background-color: transparent;
-    color: #9ca3af;
+    color: var(--color-text-muted);
     transition: all 0.2s ease;
     display: flex;
     align-items: center;
@@ -158,18 +159,18 @@
 }
 
 .delete-btn:hover {
-    background-color: #fee2e2;
-    color: #ef4444;
+    background-color: var(--color-red-100);
+    color: var(--color-red-600);
 }
 
 .delete-btn.confirming {
-    background-color: #dc2626;
-    color: #ffffff;
+    background-color: var(--color-red-700);
+    color: var(--color-bg-primary);
 }
 
 /* Form inputs in Modal */
 .add-course-form input:focus {
     outline: none;
-    border-color: #4f46e5 !important;
-    box-shadow: 0 0 0 1px #4f46e5;
+    border-color: var(--color-indigo-600) !important;
+    box-shadow: 0 0 0 1px var(--color-indigo-600);
 }

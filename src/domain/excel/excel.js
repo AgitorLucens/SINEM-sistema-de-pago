@@ -275,6 +275,7 @@ class AppExcel {
 
         if (error) {
           console.error("Error al ejecutar el .exe:", error)
+          reject(error)
         } else resolve({ success: true })
 
 

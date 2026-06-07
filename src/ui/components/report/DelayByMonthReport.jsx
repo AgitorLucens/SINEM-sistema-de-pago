@@ -102,7 +102,7 @@ const DelayByMonthReport = ({ onBack }) => {
   };
 
   return (
-    <div className="report-card">
+    <div className="delay-month-report">
       <div className="header-income-report">
         <div className="header-income-report-title">
           <button

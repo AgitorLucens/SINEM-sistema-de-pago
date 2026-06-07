@@ -35,14 +35,14 @@
 }
 
 .add-button {
-    border: 3px dashed #d1d5db;
-    background: linear-gradient(135deg, #f9fafb 0%, #f3f4f6 100%);
-    color: #9ca3af;
+    border: 3px dashed var(--color-border);
+    background: linear-gradient(135deg, var(--color-bg-secondary) 0%, var(--color-gray-100) 100%);
+    color: var(--color-text-muted);
 }
 
 .add-button:hover {
-    border-color: #8b5cf6;
-    color: #8b5cf6;
+    border-color: var(--color-purple-600);
+    color: var(--color-purple-600);
     background: linear-gradient(135deg, #faf5ff 0%, #f3e8ff 100%);
 }
 
@@ -52,7 +52,7 @@
 }
 
 .image-item.selected {
-    border-color: #8b5cf6;
+    border-color: var(--color-purple-600);
     box-shadow: 0 0 0 4px rgba(139, 92, 246, 0.25);
     transform: translateY(-4px);
 }
@@ -62,23 +62,23 @@
 
 .delete-button {
     border: 3px solid transparent;
-    background: linear-gradient(135deg, #fef2f2 0%, #fee2e2 100%);
-    color: #dc2626;
+    background: linear-gradient(135deg, var(--color-red-50) 0%, var(--color-red-100) 100%);
+    color: var(--color-red-700);
 }
 
 .delete-button:hover {
-    background: linear-gradient(135deg, #fee2e2 0%, #fecaca 100%);
-    border-color: #dc2626;
+    background: linear-gradient(135deg, var(--color-red-100) 0%, #fecaca 100%);
+    border-color: var(--color-red-700);
 }
 
 .delete-button.active {
-    background: linear-gradient(135deg, #fee2e2 0%, #fecaca 100%);
-    border-color: #dc2626;
+    background: linear-gradient(135deg, var(--color-red-100) 0%, #fecaca 100%);
+    border-color: var(--color-red-700);
     box-shadow: 0 0 0 4px rgba(220, 38, 38, 0.2);
 }
 
 .image-item.delete-selected {
-    border-color: #dc2626;
+    border-color: var(--color-red-700);
     box-shadow: 0 0 0 4px rgba(220, 38, 38, 0.25);
 }
 
@@ -98,8 +98,8 @@
 .delete-check {
     width: 36px;
     height: 36px;
-    background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
-    color: white;
+    background: linear-gradient(135deg, var(--color-red-700) 0%, var(--color-red-800) 100%);
+    color: var(--color-bg-primary);
     border-radius: 50%;
     display: flex;
     align-items: center;
@@ -125,7 +125,7 @@
 }
 
 .modal-content {
-    background: white;
+    background: var(--color-bg-primary);
     padding: 2rem;
     border-radius: 1rem;
     width: 90%;
@@ -137,13 +137,13 @@
 .modal-content h3 {
     margin-top: 0;
     margin-bottom: 0.75rem;
-    color: #1f2937;
+    color: var(--color-text-primary);
     font-size: 1.5rem;
     font-weight: 600;
 }
 
 .modal-content p {
-    color: #6b7280;
+    color: var(--color-gray-500);
     margin-bottom: 1.5rem;
     font-size: 1rem;
     line-height: 1.5;
@@ -167,23 +167,23 @@
 }
 
 .modal-actions button:first-child {
-    background-color: #f3f4f6;
-    color: #374151;
+    background-color: var(--color-gray-100);
+    color: var(--color-gray-700);
 }
 
 .modal-actions button:first-child:hover {
-    background-color: #e5e7eb;
+    background-color: var(--color-border-light);
     transform: translateY(-1px);
 }
 
 .modal-actions .confirm-delete-btn {
-    background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
-    color: white;
+    background: linear-gradient(135deg, var(--color-red-700) 0%, var(--color-red-800) 100%);
+    color: var(--color-bg-primary);
     box-shadow: 0 2px 4px rgba(220, 38, 38, 0.3);
 }
 
 .modal-actions .confirm-delete-btn:hover {
-    background: linear-gradient(135deg, #b91c1c 0%, #991b1b 100%);
+    background: linear-gradient(135deg, var(--color-red-800) 0%, #991b1b 100%);
     transform: translateY(-1px);
     box-shadow: 0 4px 8px rgba(220, 38, 38, 0.4);
 }

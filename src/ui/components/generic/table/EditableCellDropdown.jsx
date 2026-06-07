@@ -1,8 +1,8 @@
-import { useState } from "react";
+import { useState, memo } from "react";
 import SelectRadix from "../select/SelectRadix.jsx";
 
 import './editabletable.css';
-const EditableCellDropdown = ({
+const EditableCellDropdown = memo(({
   value,
   options,
   valueKey = "value",
@@ -53,12 +53,21 @@ const EditableCellDropdown = ({
   return (
     <div
       onDoubleClick={startEditing}
+      onKeyDown={(e) => {
+        if (e.key === "Enter" || e.key === " ") {
+          e.preventDefault();
+          startEditing();
+        }
+      }}
+      tabIndex={0}
+      role="button"
+      aria-label={value ? `Editar: ${value}` : "Editar celda vacía"}
       style={{ cursor: "pointer" }}
-      title="Doble click para editar"
+      title="Doble click o Enter para editar"
     >
       {value || "—"}
     </div>
   );
-};
+});
 
 export default EditableCellDropdown;

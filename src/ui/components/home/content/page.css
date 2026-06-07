@@ -28,3 +28,27 @@
     padding-left: 20px;
     overflow-y: auto;
 }
+
+@media (max-width: 768px) {
+    .payment-page-container,
+    .expense-page-container,
+    .student-page-container,
+    .pricing-page-container,
+    .report-page-container,
+    .export-page-container,
+    .settings-page-container {
+        padding-left: 12px;
+    }
+}
+
+@media (max-width: 480px) {
+    .payment-page-container,
+    .expense-page-container,
+    .student-page-container,
+    .pricing-page-container,
+    .report-page-container,
+    .export-page-container,
+    .settings-page-container {
+        padding-left: 8px;
+    }
+}

@@ -185,7 +185,7 @@ export async function addExpense(expenseData) {
         return await window.api.addExpense(expenseData);
     } catch (error) {
         return {
-            error: error.messsage,
+            error: error.message,
         }
     }
 }
@@ -602,53 +602,3 @@ export async function deleteImageById(id) {
     }
 }
 
-export default {
-    //Pagos
-    addPayment,
-    addPaymentWithConsecutive,
-    getYearsOfPayments,
-    getNextConsecutiveByYear,
-    getDateOfPayments,
-    getPaymentsByYear,
-    getPaymentConcepts,
-    getPaymentDivisions,
-    getPaymentByStudentId,
-    deletePaymentById,
-    //Gastos
-    getAllExpenses,
-    getExpensesByYear,
-    getYearsOfExpenses,
-    addExpense,
-    //Estudiantes
-    getAllStudents,
-    getStudentsByActive,
-    getStudentsActive,
-    //Profesores
-    getAllTeachers,
-    addTeacher,
-    //Precios
-    updatePriceConcept,
-    getAllDivisionPaymentConcepts,
-    getPaymentAmount,
-    addDivision,
-    deleteDivision,
-    updateDivision,
-    updateDivisionPaymentConcept,
-    //Exportar
-    exportReceiptToExcel,
-    exportReportToExcel,
-    exportPaymentsByYearToExcel,
-    exportStudentsByActiveToExcel,
-    exportTemplateStudents,
-    exportHistoric,
-    exportCashRegisterReportToExcel,
-    exportDelayByMonthReportToExcel,
-    importStudentsFromExcel,
-    //Functionality
-    addImage,
-    getImages,
-    setImage,
-    getCurrentImage,
-    deleteImageById,
-    
-};

@@ -93,3 +93,6 @@ out/
 release-builds/
 *.xlsx
 *.exe
+
+.agents
+skills-lock.json

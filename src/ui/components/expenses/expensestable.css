@@ -2,14 +2,21 @@
   position: relative;
   margin-bottom: 2rem;
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  max-width: 100%;
+}
+
+@media (max-width: 768px) {
+  .expenses-container {
+    margin-bottom: 1rem;
+  }
 }
 
 .expenses-table-wrapper {
   position: relative;
-  background-color: #ffffff;
+  background-color: var(--color-bg-primary);
   border-radius: 12px;
-  border: 1px solid #e5e7eb;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+  border: 1px solid var(--color-border-light);
+  box-shadow: var(--shadow-sm);
   overflow: hidden;
 }
 
@@ -32,22 +39,24 @@
     justify-content: space-between;
     align-items: center;
     margin-bottom: 1rem;
+    flex-wrap: wrap;
+    gap: 0.5rem;
 }
 
 .expenses-thead {
-  background-color: #eef2ff;
-  border-bottom: 1px solid #e5e7eb;
+  background-color: var(--color-indigo-50);
+  border-bottom: 1px solid var(--color-border-light);
 }
 
 .expenses-th {
   padding: 12px 16px;
   font-weight: 600;
-  color: #374151;
+  color: var(--color-gray-700);
   white-space: nowrap;
 }
 
 .expenses-tr {
-  border-bottom: 1px solid #f3f4f6;
+  border-bottom: 1px solid var(--color-gray-100);
   cursor: pointer;
   transition: background-color 0.2s ease;
 }
@@ -58,15 +67,15 @@
 
 .expenses-td {
   padding: 12px 16px;
-  color: #4b5563;
+  color: var(--color-text-secondary);
 }
 
 .badge-id {
   display: inline-block;
   padding: 2px 6px;
   border-radius: 4px;
-  background-color: #f3f4f6;
-  color: #6b7280;
+  background-color: var(--color-gray-100);
+  color: var(--color-gray-500);
   font-size: 11px;
   font-family: monospace;
   font-weight: bold;
@@ -83,20 +92,20 @@
 }
 
 .method-transfer {
-  background-color: #eff6ff;
-  color: #1d4ed8;
-  border-color: #dbeafe;
+  background-color: var(--color-blue-50);
+  color: var(--color-blue-700);
+  border-color: var(--color-blue-100);
 }
 
 .method-other {
-  background-color: #fff7ed;
-  color: #c2410c;
-  border-color: #ffedd5;
+  background-color: var(--color-orange-50);
+  color: var(--color-orange-600);
+  border-color: var(--color-orange-100);
 }
 
 .amount-column {
   font-weight: 700;
-  color: #059669;
+  color: var(--color-emerald-600);
   text-align: right;
 }
 
@@ -106,7 +115,7 @@
   border: none;
   cursor: pointer;
   background-color: transparent;
-  color: #9ca3af;
+  color: var(--color-text-muted);
   transition: all 0.2s ease;
   display: flex;
   align-items: center;
@@ -117,8 +126,8 @@
 }
 
 .delete-btn.confirming {
-  background-color: #dc2626;
-  color: #ffffff;
+  background-color: var(--color-red-700);
+  color: var(--color-bg-primary);
 }
 
 .table-resizer {
@@ -134,7 +143,7 @@
 .resizer-line {
   width: 2px;
   height: 100%;
-  background-color: #6366f1;
+  background-color: var(--color-indigo-500);
   margin: 0 auto;
   opacity: 0;
   transition: opacity 0.3s;
@@ -155,18 +164,18 @@
 
 .footer-brand {
   font-size: 10px;
-  color: #9ca3af;
+  color: var(--color-text-muted);
   font-weight: 700;
   letter-spacing: 1px;
 }
 
 .footer-stats {
   font-size: 10px;
-  color: #9ca3af;
+  color: var(--color-text-muted);
 }
 
 .empty-state {
   text-align: center;
   padding: 40px;
-  color: #9ca3af;
+  color: var(--color-text-muted);
 }

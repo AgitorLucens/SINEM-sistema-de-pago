@@ -10,6 +10,18 @@
     padding: 3rem 2rem;
 }
 
+@media (max-width: 768px) {
+    .content-wrapper-report-selection {
+        padding: 2rem 1rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .content-wrapper-report-selection {
+        padding: 1.5rem 0.75rem;
+    }
+}
+
 .report-selection-header {
     margin-bottom: 3rem;
     text-align: center;
@@ -18,12 +30,10 @@
 .report-selection-header h1 {
     font-size: 2.5rem;
     font-weight: 800;
-    color: #1e293b;
-    margin-bottom: 0.75rem;
+    color: var(--color-slate-800);
 }
 
-.report-selection-header p {
-    font-size: 1.125rem;
+.p-section-description {
     color: #64748b;
     max-width: 600px;
     margin: 0 auto;

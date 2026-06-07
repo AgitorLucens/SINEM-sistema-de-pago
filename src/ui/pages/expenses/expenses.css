@@ -1,3 +1,21 @@
 .container-report{
     padding: 3rem 2rem;
 }
+
+@media (max-width: 1100px) {
+    .container-report {
+        padding: 2rem 1.5rem;
+    }
+}
+
+@media (max-width: 768px) {
+    .container-report {
+        padding: 1.5rem 1rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .container-report {
+        padding: 1rem 0.75rem;
+    }
+}

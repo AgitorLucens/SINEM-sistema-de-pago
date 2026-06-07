@@ -6,9 +6,9 @@
 }
 
 .settings-header {
-    background: linear-gradient(135deg, #8b5cf6 0%, #6366f1 100%);
+    background: linear-gradient(135deg, var(--color-purple-600) 0%, var(--color-indigo-500) 100%);
     padding: 3rem 2rem;
-    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    box-shadow: var(--shadow-lg);
 }
 
 .settings-header-content {
@@ -19,7 +19,7 @@
 .settings-title {
     font-size: 2.5rem;
     font-weight: 700;
-    color: white;
+    color: var(--color-white);
     margin: 0 0 0.5rem 0;
     text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
@@ -38,25 +38,25 @@
 }
 
 .settings-section {
-    background: white;
+    background: var(--color-bg-primary);
     border-radius: 1rem;
-    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    box-shadow: var(--shadow-lg);
     overflow: hidden;
     margin-bottom: 2rem;
 }
 
 .section-header {
     padding: 2rem;
-    border-bottom: 2px solid #f3f4f6;
-    background: linear-gradient(to bottom, #fafbfc 0%, #ffffff 100%);
+    border-bottom: 2px solid var(--color-gray-100);
+    background: linear-gradient(to bottom, #fafbfc 0%, var(--color-bg-primary) 100%);
 }
 
 .section-title {
     font-size: 1.5rem;
     font-weight: 600;
-    color: #1f2937;
+    color: var(--color-text-primary);
     margin: 0 0 0.5rem 0;
-    background: linear-gradient(135deg, #8b5cf6 0%, #6366f1 100%);
+    background: linear-gradient(135deg, var(--color-purple-600) 0%, var(--color-indigo-500) 100%);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
@@ -64,7 +64,7 @@
 
 .section-description {
     font-size: 0.95rem;
-    color: #6b7280;
+    color: var(--color-gray-500);
     margin: 0;
     line-height: 1.5;
 }

@@ -1,7 +1,7 @@
-import { useState } from "react";
+import { useState, memo } from "react";
 import DatePicker from "../datepicker/DatePicker";
 
-const EditableCellDate = ({ value, onSave }) => {
+const EditableCellDate = memo(({ value, onSave }) => {
   const [isEditing, setIsEditing] = useState(false);
 
   const startEditing = () => {
@@ -25,6 +25,15 @@ const EditableCellDate = ({ value, onSave }) => {
       ) : (
         <div
           onDoubleClick={startEditing}
+          onKeyDown={(e) => {
+            if (e.key === "Enter" || e.key === " ") {
+              e.preventDefault();
+              startEditing();
+            }
+          }}
+          tabIndex={0}
+          role="button"
+          aria-label={value ? `Editar fecha: ${new Date(value).toLocaleDateString("es-CR")}` : "Editar celda vacía"}
           style={{ cursor: "pointer" }}
         >
           {value
@@ -34,6 +43,6 @@ const EditableCellDate = ({ value, onSave }) => {
       )}
     </>
   );
-};
+});
 
 export default EditableCellDate;

@@ -190,8 +190,7 @@ const ExpensesTable = ({ expenses, minTableWidth = '700px', handleTableUpdate, o
                 {/* Contenedor de la tabla: permite el scroll horizontal si el contenido de la tabla es > tableWidth */}
                 <div className='expenses-scroll-area'>
                     <table className='expenses-table'>
-                        <thead className='expenses-thead'> {/* bg-indigo-50 */}
-                            <tr>
+                        <thead className='expenses-thead'>{/* bg-indigo-50 */}<tr>
                                 {visibleColumns.date && (
                                     <th
                                         className='expenses-th'

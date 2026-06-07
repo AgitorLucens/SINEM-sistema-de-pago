@@ -8,9 +8,9 @@
 }
 
 .student-payment-card{
-    background-color: #ffffff;
-    border-radius: 20px;
-    padding: 20px;
+    background-color: var(--color-bg-primary);
+    border-radius: 0.75rem;
+    padding: 2rem;
     border: 1px solid #e2e8f0;
     display: flex;
     flex-direction: column;
@@ -25,17 +25,16 @@
   padding: 4px 8px;
   border-radius: 20px;
   text-transform: uppercase;
-  color: #fff;
-  display: inline-block;
+  color: var(--color-bg-primary);
+  font-weight: 600;
 }
 
-/* Estados */
-.student-badge-ACTIVE {
-  background-color: #10b981;
+.s-detail-badge.active {
+  background-color: var(--color-green-600);
 }
 
-.student-badge-INACTIVE {
-  background-color: #ef4444;
+.s-detail-badge.inactive {
+  background-color: var(--color-red-600);
 }
 
 .student-badge-date {
@@ -70,13 +69,13 @@
 .student-year-btn.inactive {
   background-color: #ffffff;
   color: #94a3b8;
-  box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+  box-shadow: var(--shadow-sm);
   
 }
 
 .student-year-btn.active {
   background-color: transparent;
-  color: #4f46e5;
+    color: var(--color-indigo-600);
   box-shadow: none;
 }
 

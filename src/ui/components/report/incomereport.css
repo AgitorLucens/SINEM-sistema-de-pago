@@ -9,7 +9,7 @@
     /*  Color */
     background: white;
     border-radius: 8px;
-    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    box-shadow: var(--shadow-lg);
     border: 1px solid #e2e8f0;
 }
 
@@ -35,7 +35,7 @@
 .header-income-report-title h1 {
     font-size: 2rem;
     font-weight: 800;
-    color: #1e293b;
+    color: var(--color-slate-800);
     margin: 0;
 }
 
@@ -44,7 +44,7 @@
     align-items: center;
     gap: 0.5rem;
     padding: 0.625rem 1.25rem;
-    background-color: #ffffff;
+    background-color: var(--color-bg-primary);
     border: 1px solid #e2e8f0;
     border-radius: 0.75rem;
     color: #475569;
@@ -52,14 +52,14 @@
     font-weight: 600;
     cursor: pointer;
     transition: all 0.2s ease;
-    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+    box-shadow: var(--shadow-sm);
 }
 
 .btn-back-report:hover {
     background-color: #f8fafc;
     border-color: #cbd5e1;
     transform: translateX(-2px);
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    box-shadow: var(--shadow-lg);
 }
 
 .btn-back-report:active {

@@ -1,9 +1,9 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState, memo } from 'react';
 import { ArchiveIcon, ChevronDownIcon, ChevronUpIcon } from "@radix-ui/react-icons";
 
 import './columntogglemenu.css';
 
-const ColumnToggleMenu = ({
+const ColumnToggleMenu = memo(({
     visibleColumns,
     toggleColumn,
     columns = [],
@@ -54,6 +54,6 @@ const ColumnToggleMenu = ({
             )}
         </div>
     );
-};
+});
 
 export default ColumnToggleMenu;

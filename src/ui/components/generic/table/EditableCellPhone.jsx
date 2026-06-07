@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, memo } from "react";
 import "./editablecellinput.css";
 
 const sanitizePhone = (val) =>
@@ -11,7 +11,7 @@ const formatPhone = (val) => {
     : val;
 };
 
-const EditableCellPhone = ({
+const EditableCellPhone = memo(({
   value,
   onSave,
   width = "100%",
@@ -69,12 +69,21 @@ const EditableCellPhone = ({
   return (
     <div
       onDoubleClick={startEditing}
+      onKeyDown={(e) => {
+        if (e.key === "Enter" || e.key === " ") {
+          e.preventDefault();
+          startEditing();
+        }
+      }}
+      tabIndex={0}
+      role="button"
+      aria-label={value ? `Editar teléfono: ${value}` : "Editar celda vacía"}
       style={{ cursor: "pointer", width }}
-      title="Doble click para editar"
+      title="Doble click o Enter para editar"
     >
       {value ? formatPhone(value) : placeholder}
     </div>
   );
-};
+});
 
 export default EditableCellPhone;

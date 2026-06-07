@@ -8,7 +8,7 @@
     overflow-y: auto;
     background: white;
     border-radius: 8px;
-    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    box-shadow: var(--shadow-lg);
     border: 1px solid #e2e8f0;
 }
 
@@ -35,7 +35,7 @@
 .header-income-report-title h1 {
     font-size: 2rem;
     font-weight: 800;
-    color: #1e293b;
+    color: var(--color-slate-800);
     margin: 0;
 }
 
@@ -44,7 +44,7 @@
     align-items: center;
     gap: 0.5rem;
     padding: 0.625rem 1.25rem;
-    background-color: #ffffff;
+    background-color: var(--color-bg-primary);
     border: 1px solid #e2e8f0;
     border-radius: 0.75rem;
     color: #475569;
@@ -52,14 +52,14 @@
     font-weight: 600;
     cursor: pointer;
     transition: all 0.2s ease;
-    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+    box-shadow: var(--shadow-sm);
 }
 
 .btn-back-report:hover {
     background-color: #f8fafc;
     border-color: #cbd5e1;
     transform: translateX(-2px);
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    box-shadow: var(--shadow-lg);
 }
 
 .btn-back-report:active {
@@ -119,7 +119,7 @@
     padding: 0.75rem 1.5rem;
     background: transparent;
     border: none;
-    color: #6b7280;
+    color: var(--color-gray-500);
     font-size: 0.875rem;
     font-weight: 500;
     cursor: pointer;
@@ -129,11 +129,11 @@
 }
 
 .tab-button:hover {
-    color: #374151;
+    color: var(--color-gray-700);
 }
 
 .tab-button.active {
-    background: #8b5cf6;
+    background: var(--color-purple-600);
     color: white;
     box-shadow: 0 2px 4px rgba(139, 92, 246, 0.3);
 }
@@ -148,7 +148,7 @@
     height: 0;
     border-left: 6px solid transparent;
     border-right: 6px solid transparent;
-    border-top: 6px solid #8b5cf6;
+    border-top: 6px solid var(--color-purple-600);
 }
 
 .filter-section {
@@ -161,13 +161,13 @@
     background: white;
     border-radius: 0.5rem;
     border: 1px solid #e2e8f0;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    box-shadow: var(--shadow-sm);
 }
 
 .filter-label {
     font-size: 0.875rem;
     font-weight: 600;
-    color: #4b5563;
+    color: var(--color-text-secondary);
     white-space: nowrap;
 }
 
@@ -177,7 +177,7 @@
     margin: 0 auto;
     background: white;
     border-radius: 1rem;
-    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    box-shadow: var(--shadow-lg);
     overflow: hidden;
 }
 
@@ -191,7 +191,7 @@
 }
 
 .teacher-report-table thead {
-    background: linear-gradient(135deg, #f3f4f6 0%, #e5e7eb 100%);
+    background: linear-gradient(135deg, var(--color-gray-100) 0%, var(--color-border-light) 100%);
 }
 
 .teacher-report-table th {
@@ -199,10 +199,10 @@
     text-align: left;
     font-size: 0.75rem;
     font-weight: 700;
-    color: #6b7280;
+    color: var(--color-gray-500);
     text-transform: uppercase;
     letter-spacing: 0.05em;
-    border-bottom: 2px solid #e5e7eb;
+    border-bottom: 2px solid var(--color-border-light);
 }
 
 .teacher-report-table td {
@@ -216,12 +216,12 @@
 }
 
 .teacher-report-table tbody tr:hover {
-    background-color: #f9fafb;
+    background-color: var(--color-bg-secondary);
 }
 
 .teacher-name {
     font-weight: 600;
-    color: #1f2937;
+    color: var(--color-text-primary);
 }
 
 .text-center {
@@ -230,7 +230,7 @@
 
 .number-cell {
     font-weight: 600;
-    color: #4b5563;
+    color: var(--color-text-secondary);
 }
 
 .text-muted {
@@ -240,7 +240,7 @@
 .compliance-cell {
     font-weight: 700;
     font-size: 1rem;
-    background: linear-gradient(135deg, #8b5cf6 0%, #6366f1 100%);
+    background: linear-gradient(135deg, var(--color-purple-600) 0%, var(--color-indigo-500) 100%);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
@@ -249,7 +249,7 @@
 .placeholder-content {
     padding: 4rem 2rem;
     text-align: center;
-    color: #9ca3af;
+    color: var(--color-text-muted);
     font-size: 1.125rem;
 }
 

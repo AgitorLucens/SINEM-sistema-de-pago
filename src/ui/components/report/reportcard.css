@@ -1,14 +1,14 @@
-.color-ingresos { background-color: #f0fdf4; color: #16a34a; }
-.color-egresos { background-color: #fef2f2; color: #dc2626; }
-.color-estudiantes { background-color: #eff6ff; color: #2563eb; }
-.color-general { background-color: #faf5ff; color: #7c3aed; }
-.card-color-ingresos:hover{border-left: 2px solid #16a34a; }
-.card-color-egresos:hover{border-left: 2px solid #dc2626; }
-.card-color-estudiantes:hover{border-left: 2px solid #2563eb; }
-.card-color-general:hover{border-left: 2px solid #7c3aed; }
+.color-ingresos { background-color: var(--color-green-50); color: var(--color-green-600); }
+.color-egresos { background-color: var(--color-red-50); color: var(--color-red-700); }
+.color-estudiantes { background-color: var(--color-blue-50); color: var(--color-blue-600); }
+.color-general { background-color: #faf5ff; color: var(--color-purple-700); }
+.card-color-ingresos:hover{border-left: 2px solid var(--color-green-600); }
+.card-color-egresos:hover{border-left: 2px solid var(--color-red-700); }
+.card-color-estudiantes:hover{border-left: 2px solid var(--color-blue-600); }
+.card-color-general:hover{border-left: 2px solid var(--color-purple-700); }
 
 .report-card {
-    background-color: #ffffff;
+    background-color: var(--color-bg-primary);
     border-radius: 1.25rem;
     padding: 2rem;
     border: 1px solid #e2e8f0;
@@ -17,12 +17,12 @@
     display: flex;
     flex-direction: column;
     position: relative;
-    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+    box-shadow: var(--shadow-sm);
 }
 
 .report-card-enable:hover {
     transform: translateY(-5px);
-    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+    box-shadow: var(--shadow-lg);
 }
 
 .report-card--enable {

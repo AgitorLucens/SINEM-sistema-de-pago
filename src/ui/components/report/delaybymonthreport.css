@@ -7,17 +7,29 @@
     gap: 2rem;
 }
 
-.report-card {
+@media (max-width: 768px) {
+    .report-container {
+        padding: 1rem;
+        gap: 1rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .report-container {
+        padding: 0.75rem;
+    }
+}
+
+.delay-month-report {
     width: 100%;
-    /* max-width: 1000px; Remove max-width to allow full width like IncomeReport */
     background: white;
     border-radius: 8px;
-    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    box-shadow: var(--shadow-lg);
     overflow: hidden;
     border: 1px solid #e2e8f0;
 }
 
-.report-card .header-income-report-title {
+.delay-month-report .header-income-report-title {
     flex-direction: column;
     align-items: flex-start;
 }
@@ -55,7 +67,7 @@
 .header-income-report-title h1 {
     font-size: 2rem;
     font-weight: 800;
-    color: #1e293b;
+    color: var(--color-slate-800);
     margin: 0;
 }
 
@@ -64,7 +76,7 @@
     align-items: center;
     gap: 0.5rem;
     padding: 0.625rem 1.25rem;
-    background-color: #ffffff;
+    background-color: var(--color-bg-primary);
     border: 1px solid #e2e8f0;
     border-radius: 0.75rem;
     color: #475569;
@@ -72,14 +84,14 @@
     font-weight: 600;
     cursor: pointer;
     transition: all 0.2s ease;
-    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+    box-shadow: var(--shadow-sm);
 }
 
 .btn-back-report:hover {
     background-color: #f8fafc;
     border-color: #cbd5e1;
     transform: translateX(-2px);
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    box-shadow: var(--shadow-lg);
 }
 
 .btn-back-report:active {
@@ -175,7 +187,7 @@ td {
 }
 
 .text-paid {
-    color: #059669;
+    color: var(--color-emerald-600);
     font-weight: 600;
 }
 
@@ -191,13 +203,13 @@ td {
 }
 
 .badge-danger {
-    background-color: #fee2e2;
-    color: #b91c1c;
+    background-color: var(--color-red-100);
+    color: var(--color-red-800);
 }
 
 .badge-warning {
-    background-color: #ffedd5;
-    color: #c2410c;
+    background-color: var(--color-orange-100);
+    color: var(--color-orange-600);
 }
 
 .badge-optimal {
@@ -219,5 +231,5 @@ tr:hover {
 }
 
 .header-income-report h1 {
-    color: #4f46e5;
+    color: var(--color-indigo-600);
 }

@@ -6,11 +6,11 @@
 }
 
 .date-trigger svg {
-  color: #6b7280;
+  color: var(--color-gray-500);
 }
 
 .date-popover {
-  background: white;
+  background: var(--color-bg-primary);
   max-height: 450px;
   overflow-y: auto;
   border-radius: 0.75rem;

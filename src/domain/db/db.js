@@ -11,6 +11,40 @@ class AppDB {
         this.setUpDatabase();
     }
 
+    _run(sql, params = []) {
+        try {
+            const stmt = this.db.prepare(sql);
+            return stmt.run(...params);
+        } catch (error) {
+            console.error(`DB Error: ${error.message}`, { sql, params });
+            throw error;
+        }
+    }
+
+    _all(sql, params = []) {
+        try {
+            const stmt = this.db.prepare(sql);
+            return stmt.all(...params);
+        } catch (error) {
+            console.error(`DB Error: ${error.message}`, { sql, params });
+            throw error;
+        }
+    }
+
+    _get(sql, params = []) {
+        try {
+            const stmt = this.db.prepare(sql);
+            return stmt.get(...params);
+        } catch (error) {
+            console.error(`DB Error: ${error.message}`, { sql, params });
+            throw error;
+        }
+    }
+
+    _transaction(fn) {
+        return this.db.transaction(fn);
+    }
+
     setUpDatabase() {
 
         /*
@@ -428,10 +462,12 @@ class AppDB {
                                         divisions d ON p.division_id = d.id
                                      INNER JOIN
                                         students s ON p.student_id = s.id
+                                     WHERE
+                                        strftime('%Y', p.date) = ?
                                      ORDER BY
                                         p.id DESC;`
         );
-        const payments = sql.all();
+        const payments = sql.all(year);
         return payments;
     }
 
@@ -448,7 +484,8 @@ class AppDB {
                                     c.type AS concept_type,
                                     p.amount,
                                     p.year,
-                                    p.sequencp.month
+                                    p.sequence,
+                                    p.month
                                    FROM 
                                     payments p
                                    INNER JOIN

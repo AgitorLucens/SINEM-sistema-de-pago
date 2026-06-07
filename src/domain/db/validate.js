@@ -40,7 +40,7 @@ export function validatePaymentsUpdate(data){
         ALLOWED_PAYMENT_FIELDS.includes(k)
     );
     
-    if (!keys) return new Error("Intento de cambiar campo invalido");
+    if (keys.length === 0) return new Error("Intento de cambiar campo invalido");
 
     return keys;
 }
@@ -51,7 +51,7 @@ export function validateExpensesUpdate(data){
         ALLOWED_EXPENSE_FIELDS.includes(k)
     );
     
-    if (!keys) return new Error("Intento de cambiar campo invalido");
+    if (keys.length === 0) return new Error("Intento de cambiar campo invalido");
 
     return keys;
 }
@@ -62,7 +62,7 @@ export function validateStudentsUpdate(data){
         ALLOWED_STUDENT_FIELDS.includes(k)
     );
     
-    if (!keys) return new Error("Intento de cambiar campo invalido");
+    if (keys.length === 0) return new Error("Intento de cambiar campo invalido");
 
     return keys;
 }
@@ -73,7 +73,7 @@ export function validateTeachersUpdate(data){
         ALLOWED_TEACHER_FIELDS.includes(k)
     );
     
-    if (!keys) return new Error("Intento de cambiar campo invalido");
+    if (keys.length === 0) return new Error("Intento de cambiar campo invalido");
 
     return keys;
 }

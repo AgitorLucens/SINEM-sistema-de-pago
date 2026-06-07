@@ -1,0 +1,30 @@
+.chip {
+  padding: 6px 14px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 700;
+  background: var(--color-border-light);
+  color: #334155;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border: none;
+  line-height: 1.4;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.chip:hover {
+  background: #c7d2fe;
+}
+
+.chip-active {
+  background: var(--color-indigo-600) !important;
+  color: var(--color-bg-primary) !important;
+}
+
+.chip-group {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}

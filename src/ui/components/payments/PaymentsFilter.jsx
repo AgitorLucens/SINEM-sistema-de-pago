@@ -1,24 +1,21 @@
+import Chip from '../generic/chip/Chip.jsx';
 import './paymentfilter.css';
+
 const PaymentsFilters = ({ filterState, setFilterState, handleFilterChange, concepts, divisions, methods, clearFilters }) => {
-    
     return (
         <div className="filter-card">
-        <h2 className="filter-title">Clasificación y Filtrado</h2>
+        <h2 className="filter-title">Clasificaci&oacute;n y Filtrado</h2>
 
         <div className="filter-grid">
-          
-          {/* Campo Concepto */}
           <div className="filter-group">
             <label className="filter-label">Tipo de Pago</label>
-
-            <div className="chip-container">
+            <div className="chip-group">
               {concepts.map(c => {
                 const selected = filterState.concept.includes(c.name);
                 return (
-                  <button
+                  <Chip
                     key={c.id}
-                    type="button"
-                    className={`chip ${selected ? "chip-active" : ""}`}
+                    selected={selected}
                     onClick={() => {
                       setFilterState(prev => ({
                         ...prev,
@@ -29,24 +26,21 @@ const PaymentsFilters = ({ filterState, setFilterState, handleFilterChange, conc
                     }}
                   >
                     {c.name}
-                  </button>
+                  </Chip>
                 );
               })}
             </div>
           </div>
 
-          {/* Campo Curso/División */}
           <div className="filter-group">
             <label className="filter-label">Curso/Division</label>
-
-            <div className="chip-container">
+            <div className="chip-group">
               {divisions.map(d => {
                 const selected = filterState.division.includes(d.name);
                 return (
-                  <button
+                  <Chip
                     key={d.id}
-                    type="button"
-                    className={`chip ${selected ? "chip-active" : ""}`}
+                    selected={selected}
                     onClick={() => {
                       setFilterState(prev => ({
                         ...prev,
@@ -57,24 +51,21 @@ const PaymentsFilters = ({ filterState, setFilterState, handleFilterChange, conc
                     }}
                   >
                     {d.name}
-                  </button>
+                  </Chip>
                 );
               })}
             </div>
           </div>
 
-          {/* Campo Método de Pago */}
           <div className="filter-group">
             <label className="filter-label">Metodo de Pago</label>
-
-            <div className="chip-container">
+            <div className="chip-group">
               {methods.map(m => {
                 const selected = filterState.method.includes(m.value);
                 return (
-                  <button
+                  <Chip
                     key={m.value}
-                    type="button"
-                    className={`chip ${selected ? "chip-active" : ""}`}
+                    selected={selected}
                     onClick={() => {
                       setFilterState(prev => ({
                         ...prev,
@@ -85,15 +76,14 @@ const PaymentsFilters = ({ filterState, setFilterState, handleFilterChange, conc
                     }}
                   >
                     {m.label}
-                  </button>
+                  </Chip>
                 );
               })}
             </div>
           </div>
-          
         </div>
+
         <div className="filter-grid">
-          {/* Campo Fecha Inicial */}
           <div className="filter-group">
             <label htmlFor="startDate" className="filter-label">Fecha Inicial</label>
             <input
@@ -107,7 +97,6 @@ const PaymentsFilters = ({ filterState, setFilterState, handleFilterChange, conc
             />
           </div>
 
-          {/* Campo Fecha Final */}
           <div className="filter-group">
             <label htmlFor="endDate" className="filter-label">Fecha Final</label>
             <input
@@ -121,7 +110,7 @@ const PaymentsFilters = ({ filterState, setFilterState, handleFilterChange, conc
             />
           </div>
         </div>
-        {/* Botón de Limpiar Filtros */}
+
         <div className="filter-actions">
           <button
             onClick={clearFilters}
@@ -131,7 +120,6 @@ const PaymentsFilters = ({ filterState, setFilterState, handleFilterChange, conc
           </button>
         </div>
       </div>
-
     );
 }
 

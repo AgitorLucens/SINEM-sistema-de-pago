@@ -1,30 +1,21 @@
 .btn-primary-invoice {
     width: 100%;
-    background: #111827;
-    color: white;
-    font-weight: 700;
-    padding: 0.875rem;
-    border: none;
+    background: var(--color-gray-900);
     border-radius: 0.75rem;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 0.5rem;
-    transition: background 0.2s;
+    padding: 1.5rem;
+    color: #94a3b8;
 }
 
-.detail-header {
-    padding: 32px;
-    background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
-    color: #fff;
+.s-detail-header-gradient {
+    background: linear-gradient(135deg, var(--color-slate-800) 0%, #334155 100%);
+    color: var(--color-bg-primary);
     position: relative;
     border-radius: 0.75rem;
 }
 
 .detail-body {
     padding: 32px;
-    background-color: #fff;
+    background-color: var(--color-bg-primary);
 }
 
 .detail-label {
@@ -37,7 +28,7 @@
 .detail-value {
     font-size: 15px;
     font-weight: 500;
-    color: #1e293b;
+    color: var(--color-slate-800);
     display: flex;
     align-items: center;
     gap: 8px;

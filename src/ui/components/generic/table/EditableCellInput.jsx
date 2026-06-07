@@ -1,7 +1,7 @@
-import {useEffect,useState,useRef} from "react";
+import {useEffect,useState,useRef,memo} from "react";
 
 import './editablecellinput.css';
-const EditableCellInput = ({
+const EditableCellInput = memo(({
                     value,
                     onSave,
                     type = "text",       // text | number
@@ -63,12 +63,21 @@ const EditableCellInput = ({
     return (
         <div
             onDoubleClick={startEditing}
+            onKeyDown={(e) => {
+                if (e.key === "Enter" || e.key === " ") {
+                    e.preventDefault();
+                    startEditing();
+                }
+            }}
+            tabIndex={0}
+            role="button"
+            aria-label={value ? `Editar: ${value}` : "Editar celda vacía"}
             style={{ cursor: "pointer", width }}
-            title="Doble click para editar"
+            title="Doble click o Enter para editar"
         >
             {formatDisplay ? formatDisplay(value) : value || placeholder}
         </div>
     );
-}
+});
 
 export default EditableCellInput;

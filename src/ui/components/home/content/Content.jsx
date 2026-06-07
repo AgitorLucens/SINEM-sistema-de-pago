@@ -52,22 +52,10 @@ const Content = ({ page }) => {
             <Payments />
           </div>
         );
-    case Page.EXPENSES_REGISTRY:
-        return (
-          <div className="content-area expense-page-container">
-            <Expenses />
-          </div>
-        );
     case Page.STUDENTS_REGISTRY:
         return (
           <div className="content-area student-page-container">
             <Students />
-          </div>
-        );
-    case Page.EXPENSES_REGISTRY:
-        return (
-          <div className="content-area expense-page-container">
-            <Expenses />
           </div>
         );
     case Page.TEACHERS_REGISTRY:
@@ -76,6 +64,12 @@ const Content = ({ page }) => {
             <Teachers />
           </div>
         );
+    case Page.EXPENSES_REGISTRY:
+      return (
+        <div className="content-area expense-page-container">
+          <Expenses />
+        </div>
+      );
     case Page.PRICING_REGISTRY:
         return (
           <div className="content-area pricing-page-container">
@@ -110,7 +104,7 @@ const Content = ({ page }) => {
       <h1 className="main-header">{title}</h1>
       <img src={logo} width={500} height={500} alt='sinem-logo' className="img" id="" />
       <div className="info-card">
-        <h2 className="card-title">Pagina Inicial</h2>
+        <h2 className="card-title">{title}</h2>
         <p className="card-text">{description}</p>
       </div>
 

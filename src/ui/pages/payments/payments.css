@@ -2,6 +2,24 @@
     padding: 3rem 2rem;
 }
 
+@media (max-width: 1100px) {
+    .container-payment {
+        padding: 2rem 1.5rem;
+    }
+}
+
+@media (max-width: 768px) {
+    .container-payment {
+        padding: 1.5rem 1rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .container-payment {
+        padding: 1rem 0.75rem;
+    }
+}
+
 .header-container {
     display: flex;
     flex-direction: column; /* Columna en móvil */
@@ -11,7 +29,7 @@
 
 /* Título de la Sección */
 .section-title {
-    color: #4f46e5;
+    color: var(--color-indigo-600);
     font-size: 1.5rem;
     font-weight: 600;
     margin: 0;
@@ -20,7 +38,7 @@
 
 /* Subtítulo / Descripción */
 .section-description {
-    color: var(--secondary-text);
+    color: var(--color-text-secondary);
     font-size: 0.875rem;
     margin-top: 0.25rem;
     margin-bottom: 0;
@@ -57,8 +75,8 @@
 
 .btn-delete-confirm{
     width: 100%;
-    background: #dc2626;
-    color: white;
+    background: var(--color-red-700);
+    color: var(--color-bg-primary);
     font-weight: 500;
     padding: 0.5rem;
     border: none;
@@ -69,7 +87,7 @@
 
 .btn-delete-confirm:hover{
     background: rgb(255, 216, 216);
-    color: #dc2626;
+    color: var(--color-red-700);
 }
 
 @media (min-width: 768px) {
