@@ -602,3 +602,14 @@ export async function deleteImageById(id) {
     }
 }
 
+export async function quitApp() {
+    try {
+        return await window.api.quitApp();
+    } catch (error) {
+        console.error('Error al cerrar aplicación:', error.message);
+        return {
+            error: "Error al cerrar la aplicación.",
+        };
+    }
+}
+

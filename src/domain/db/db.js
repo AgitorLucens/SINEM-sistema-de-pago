@@ -750,10 +750,10 @@ class AppDB {
                                     e.description,
                                     e.reference,
                                     e.total_amount AS amount
-                                   FROM 
-                                    expenses
-                                   ORDER BY 
-                                    date ASC;`
+                                    FROM 
+                                     expenses e
+                                    ORDER BY 
+                                     date ASC;`
             );
             expenses = sql.all();
         }

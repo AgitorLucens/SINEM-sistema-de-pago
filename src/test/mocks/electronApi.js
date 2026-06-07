@@ -56,6 +56,7 @@ export const mockElectronApi = {
   setImage: vi.fn(),
   getCurrentImage: vi.fn(),
   deleteImageById: vi.fn(),
+  quitApp: vi.fn(),
 };
 
 beforeEach(() => {

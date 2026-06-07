@@ -168,6 +168,62 @@ npm start
 
 ---
 
+## Tests
+
+The project uses **Vitest** as the test runner, with **@testing-library/react** for UI component tests.
+
+### Run all tests
+
+```bash
+npx vitest run
+```
+
+### Run in watch mode
+
+```bash
+npx vitest
+```
+
+### Run a specific test file
+
+```bash
+npx vitest run src/domain/db/AppDB.test.js
+```
+
+### Run tests matching a name
+
+```bash
+npx vitest run -t "getAllPayments"
+```
+
+### Run with coverage report
+
+```bash
+npx vitest run --coverage
+```
+
+### Test Structure
+
+Tests are split into two environments:
+
+| Environment | Location | Tests |
+|---|---|---|
+| **Node.js** | `src/domain/**/*.test.js` | Backend logic: database CRUD, Excel generation, IPC handlers, validation |
+| **jsdom** | `src/ui/**/*.test.{js,jsx}` | React components, hooks, pages |
+
+Each frontend test file requires a `// @vitest-environment jsdom` comment at the top.
+
+### Current Coverage
+
+- **Statements**: 51%
+- **Lines**: 52%
+- **Test files**: 55
+- **Total tests**: 751+
+
+Key areas covered: database CRUD (AppDB class), IPC handler registration, Excel export/report generation, validation logic, React hooks, generic UI components, and page-level rendering.
+
+---
+
 ## Development Workflow
 
 - Run the application in development mode
