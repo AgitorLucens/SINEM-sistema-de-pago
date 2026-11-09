@@ -41,7 +41,7 @@ vi.mock('../../icons/Icons.jsx', () => ({
 }));
 
 beforeEach(() => {
-  window.api = { quitApp: vi.fn() };
+  window.api = { app: { quitApp: vi.fn() } };
   window.matchMedia = vi.fn().mockImplementation((query) => ({
     matches: false,
     media: query,
@@ -91,10 +91,10 @@ describe('Sidebar', () => {
     expect(setCurrentPage).toHaveBeenCalledWith(Page.PAYMENT_REGISTRY);
   });
 
-  it('calls window.api.quitApp when Salir is clicked', () => {
+  it('calls window.api.app.quitApp when Salir is clicked', () => {
     render(<Sidebar currentPage={Page.DASHBOARD} setCurrentPage={vi.fn()} />);
     fireEvent.click(screen.getByTestId('navlink-settings'));
-    expect(window.api.quitApp).toHaveBeenCalled();
+    expect(window.api.app.quitApp).toHaveBeenCalled();
   });
 
   it('toggles sidebar width when toggle button is clicked', () => {

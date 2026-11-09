@@ -34,46 +34,27 @@ const ALLOWED_TEACHER_FIELDS = [
 ];
 
 
-export function validatePaymentsUpdate(data){
-    const { fields } = data;
-    const keys = Object.keys(fields).filter(k =>
-        ALLOWED_PAYMENT_FIELDS.includes(k)
-    );
-    
-    if (keys.length === 0) return new Error("Intento de cambiar campo invalido");
+function filterAllowedFields(data, allowedFields) {
+    if (!data || typeof data.fields !== "object" || data.fields === null) return null;
+
+    const keys = Object.keys(data.fields).filter(k => allowedFields.includes(k));
+    if (keys.length === 0) return null;
 
     return keys;
+}
+
+export function validatePaymentsUpdate(data){
+    return filterAllowedFields(data, ALLOWED_PAYMENT_FIELDS);
 }
 
 export function validateExpensesUpdate(data){
-    const { fields } = data;
-    const keys = Object.keys(fields).filter(k =>
-        ALLOWED_EXPENSE_FIELDS.includes(k)
-    );
-    
-    if (keys.length === 0) return new Error("Intento de cambiar campo invalido");
-
-    return keys;
+    return filterAllowedFields(data, ALLOWED_EXPENSE_FIELDS);
 }
 
 export function validateStudentsUpdate(data){
-    const { fields } = data;
-    const keys = Object.keys(fields).filter(k =>
-        ALLOWED_STUDENT_FIELDS.includes(k)
-    );
-    
-    if (keys.length === 0) return new Error("Intento de cambiar campo invalido");
-
-    return keys;
+    return filterAllowedFields(data, ALLOWED_STUDENT_FIELDS);
 }
 
 export function validateTeachersUpdate(data){
-    const { fields } = data;
-    const keys = Object.keys(fields).filter(k =>
-        ALLOWED_TEACHER_FIELDS.includes(k)
-    );
-    
-    if (keys.length === 0) return new Error("Intento de cambiar campo invalido");
-
-    return keys;
+    return filterAllowedFields(data, ALLOWED_TEACHER_FIELDS);
 }

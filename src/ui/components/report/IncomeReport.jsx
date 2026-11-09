@@ -1,14 +1,14 @@
 import ReportFilters from "./ReportFilters.jsx";
 import ReportTable from "./ReportTable.jsx";
-import { useState, useEffect, useCallback, useMemo } from 'react';
-import { getPaymentConcepts, getPaymentDivisions, getAllPayments,
+import { useState, useEffect, useMemo } from 'react';
+import { getPaymentDivisions, getAllPayments,
         getDateOfPayments, exportReportToExcel
         } from "../../constant/DBFunctions.jsx";
 import { DownloadIcon, InfoCircledIcon, ChevronLeftIcon } from "@radix-ui/react-icons";
 
 import './incomereport.css';
 const IncomeReport = ({ onBack }) => {
-    const [error, setError] = useState("");
+    const [, setError] = useState("");
     const [payments, setPayments] = useState([]);
     // Listados para filtros
     const [dates, setDates] = useState([]);
@@ -98,14 +98,6 @@ const IncomeReport = ({ onBack }) => {
         );
     };
 
-    const toggleItem = (item, list, setList) => {
-        if (list.includes(item)) {
-            setList(list.filter(i => i !== item));
-        } else {
-            setList([...list, item]);
-        }
-    };
-
     const toggleMethod = (method) => {
         setSelectedMethods(prev =>
             prev.some(m => m.value === method.value)
@@ -130,7 +122,6 @@ const IncomeReport = ({ onBack }) => {
                 } catch (err) {
                     console.error("Error al cargar metadata:", err);
                     setError("No se pudieron cargar los conceptos/cursos de pago.");
-                } finally {
                 }
             };
     

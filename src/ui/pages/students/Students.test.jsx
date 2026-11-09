@@ -84,16 +84,26 @@ vi.mock('@radix-ui/react-icons', () => ({
 
 beforeEach(() => {
   window.api = {
-    getAllPayments: vi.fn().mockResolvedValue([]),
-    getAllExpenses: vi.fn().mockResolvedValue([]),
-    getAllStudents: vi.fn().mockResolvedValue([]),
-    getAllTeachers: vi.fn().mockResolvedValue([]),
-    getPaymentConcepts: vi.fn().mockResolvedValue([]),
-    getPaymentDivisions: vi.fn().mockResolvedValue([]),
-    getYearsOfPayments: vi.fn().mockResolvedValue([]),
-    addStudent: vi.fn().mockResolvedValue({ success: true }),
-    deleteStudentById: vi.fn().mockResolvedValue({ success: true }),
-    getPaymentByStudentId: vi.fn().mockResolvedValue([]),
+    payments: {
+      getAllPayments: vi.fn().mockResolvedValue([]),
+      getYearsOfPayments: vi.fn().mockResolvedValue([]),
+      getPaymentByStudentId: vi.fn().mockResolvedValue([]),
+    },
+    expenses: {
+      getAllExpenses: vi.fn().mockResolvedValue([]),
+    },
+    students: {
+      getAllStudents: vi.fn().mockResolvedValue([]),
+      addStudent: vi.fn().mockResolvedValue({ success: true }),
+      deleteStudentById: vi.fn().mockResolvedValue({ success: true }),
+    },
+    teachers: {
+      getAllTeachers: vi.fn().mockResolvedValue([]),
+    },
+    pricing: {
+      getPaymentConcepts: vi.fn().mockResolvedValue([]),
+      getPaymentDivisions: vi.fn().mockResolvedValue([]),
+    },
   };
 });
 

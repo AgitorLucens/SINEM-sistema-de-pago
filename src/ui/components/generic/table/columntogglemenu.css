@@ -39,9 +39,8 @@
 .column-menu-item {
     display: flex;
     align-items: center;
-    justify-content: space-between;
     width: 100%;
-    padding: 12px 16px;
+    padding: 0;
     border: none;
     background: none;
     cursor: pointer;
@@ -51,7 +50,7 @@
 }
 
 .column-menu-item:hover {
-    background-color: #f1f5f9;
+    background-color: var(--color-gray-100);
 }
 
 .column-menu-label {
@@ -59,6 +58,8 @@
     align-items: center;
     gap: 0.5rem;
     cursor: pointer;
+    flex: 1;
+    padding: 12px 16px;
 }
 
 .column-menu-checkbox {

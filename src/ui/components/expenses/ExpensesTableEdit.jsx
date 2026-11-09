@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { ArchiveIcon } from "@radix-ui/react-icons";
 
 // We can reuse the css from teachers or create a new one. 

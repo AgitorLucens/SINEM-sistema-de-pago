@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { ChevronLeftIcon, ArrowDownIcon, DownloadIcon } from "@radix-ui/react-icons";
+import { ChevronLeftIcon, ArrowDownIcon } from "@radix-ui/react-icons";
 import MultiSelectRadix from "../generic/multiselect/MultiSelectRadix";
 import { formatCRC, formatMonth } from "../generic/function/Function";
 import {
@@ -146,7 +146,7 @@ const DelayByMonthReport = ({ onBack }) => {
             />
           </span>
         </div>
-        <div className="header-item text-right">
+        <div className="header-item cell-num">
           <span className="header-label">Morosidad Global</span>
           <span className="header-value">85.8%</span>
         </div>
@@ -157,22 +157,22 @@ const DelayByMonthReport = ({ onBack }) => {
           <thead>
             <tr>
               <th>Mes</th>
-              <th className="text-right">Monto Total</th>
-              <th className="text-right">Pagado</th>
-              <th className="text-right">% Pago</th>
-              <th className="text-right">% Morosidad</th>
+              <th className="cell-num">Monto Total</th>
+              <th className="cell-num">Pagado</th>
+              <th className="cell-num">% Pago</th>
+              <th className="cell-num">% Morosidad</th>
             </tr>
           </thead>
           <tbody>
             {reportData?.map((item, index) => (
               <tr key={index}>
                 <td className="row-concept">{item.concept}</td>
-                <td className="text-right font-mono">{formatCRC(item.total)}</td>
-                <td className={`text-right font-mono ${item.paid === '-' ? 'text-empty' : 'text-paid'}`}>
+                <td className="cell-num">{formatCRC(item.total)}</td>
+                <td className={`cell-num ${item.paid === '-' ? 'text-empty' : 'text-paid'}`}>
                   {item.paid !== "-" ? formatCRC(item.paid) : formatCRC(0)}
                 </td>
-                <td className="text-right">{item.pPaid}</td>
-                <td className="text-right">
+                <td className="cell-num">{item.pPaid}</td>
+                <td className="cell-num">
                   <span className={`badge ${getPorcentage(parseFloat(item.pDelin))}`}>
                     {item.pDelin}
                   </span>

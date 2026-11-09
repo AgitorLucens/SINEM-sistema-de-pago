@@ -1,49 +1,51 @@
-import { useState, useEffect, useRef, useMemo } from 'react';
 import { updatePayment } from "../../constant/DBFunctions.jsx"
 import EditableCellDropdown from '../generic/table/EditableCellDropdown';
 import EditableCellInput from '../generic/table/EditableCellInput.jsx';
 import EditableCellDate from '../generic/table/EditableCellDate.jsx';
 import EditableCellSearchDropdown from "../generic/table/EditableCellSearchDropdown.jsx";
 import ColumnToggleMenu from '../generic/table/ColumnToggleMenu';
-import PaymentsPagination from './PaymentsPagination';
-import PaymentsPaginationInput from './PaymentsPaginationInput';
+import Pagination from '../generic/pagination/Pagination';
+import PaginationInput from '../generic/pagination/PaginationInput';
+import useTableControls from '../../hooks/useTableControls';
+import useResizableTable from '../../hooks/useResizableTable';
+import DeleteButton from '../generic/table/DeleteButton';
+import { paymentMethods } from '../../constant/paymentMethods.js';
 
 import './paymentstable.css';
 
+const COLUMN_KEYS = [
+    'invoice_number',
+    'date',
+    'student_name',
+    'payment_method',
+    'division_name',
+    'teacher_name',
+    'concept_type',
+    'amount',
+    'receipt',
+];
+
+const getPaymentSortValue = (payment, key) => {
+    if (key === 'invoice_number') {
+        return `${payment.year}-${String(payment.sequence).padStart(5, '0')}`;
+    }
+    return payment[key];
+};
+
 // Componente para visualizar el historial de pagos con redimensionamiento manual
 const PaymentsTable = ({ concepts, divisions, payments, students, minTableWidth = '800px', onDeletePayment, onRowClick, confirmingId, handleTableUpdate }) => {
-    // Convertir el prop de cadena a número para cálculos
-    const minWidthValue = parseInt(minTableWidth, 10) || 600;
-    const [tableWidth, setTableWidth] = useState(() => {
-        const saved = localStorage.getItem("paymentsTableWidth");
-        return saved ? Number(saved) : minWidthValue;
-    });
+    const { tableWidth, handleMouseDown } = useResizableTable("paymentsTableWidth", parseInt(minTableWidth, 10) || 600);
 
-    const [visibleColumns, setVisibleColumns] = useState({
-        invoice_number: true,
-        date: true,
-        student_name: true,
-        payment_method: true,
-        division_name: true,
-        teacher_name: true,
-        concept_type: true,
-        amount: true,
-        receipt: true,
-    });
-
-    // Pagination State
-    const [currentPage, setCurrentPage] = useState(1);
-    const [itemsPerPage] = useState(5);
-
-    // Sorting State
-    const [sortConfig, setSortConfig] = useState({ key: null, direction: 'default' });
-
-    const toggleColumn = (column) => {
-        setVisibleColumns(prev => ({
-            ...prev,
-            [column]: !prev[column]
-        }));
-    };
+    const {
+        visibleColumns,
+        toggleColumn,
+        requestSort,
+        getSortIndicator,
+        currentPage,
+        totalPages,
+        currentItems,
+        paginate,
+    } = useTableControls(payments, COLUMN_KEYS, { getSortValue: getPaymentSortValue });
 
     const paymentColumns = [
         { key: 'invoice_number', label: '# Factura' },
@@ -56,133 +58,6 @@ const PaymentsTable = ({ concepts, divisions, payments, students, minTableWidth 
         { key: 'amount', label: 'Monto' },
         { key: 'receipt', label: '# Comprobante' },
     ];
-
-    // Sorting Logic
-    const sortedPayments = useMemo(() => {
-        let sortableItems = [...(payments || [])];
-        if (sortConfig.direction !== 'default' && sortConfig.key) {
-            sortableItems.sort((a, b) => {
-                let aValue = a[sortConfig.key];
-                let bValue = b[sortConfig.key];
-
-                // Handle special case for invoice_number (composite)
-                if (sortConfig.key === 'invoice_number') {
-                    aValue = `${a.year}-${String(a.sequence).padStart(5, '0')}`;
-                    bValue = `${b.year}-${String(b.sequence).padStart(5, '0')}`;
-                }
-
-                if (aValue === null || aValue === undefined) aValue = '';
-                if (bValue === null || bValue === undefined) bValue = '';
-
-                if (aValue < bValue) {
-                    return sortConfig.direction === 'ascending' ? -1 : 1;
-                }
-                if (aValue > bValue) {
-                    return sortConfig.direction === 'ascending' ? 1 : -1;
-                }
-                return 0;
-            });
-        }
-        return sortableItems;
-    }, [payments, sortConfig]);
-
-    const requestSort = (key) => {
-        let direction = 'ascending';
-        if (sortConfig.key === key && sortConfig.direction === 'ascending') {
-            direction = 'descending';
-        } else if (sortConfig.key === key && sortConfig.direction === 'descending') {
-            direction = 'default';
-        }
-        setSortConfig({ key, direction });
-    };
-
-    const getSortIndicator = (name) => {
-        if (sortConfig.key !== name) {
-            return null;
-        }
-        if (sortConfig.direction === 'ascending') {
-            return <span>&uarr;</span>;
-        }
-        if (sortConfig.direction === 'descending') {
-            return <span>&darr;</span>;
-        }
-        return null;
-    };
-
-    // Pagination Logic
-    const indexOfLastItem = currentPage * itemsPerPage;
-    const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-    const currentItems = sortedPayments.slice(indexOfFirstItem, indexOfLastItem);
-    const totalPages = sortedPayments.length ? Math.ceil(sortedPayments.length / itemsPerPage) : 0;
-
-    const paginate = (pageNumber) => setCurrentPage(pageNumber);
-
-    // Ref para almacenar temporalmente el estado del arrastre (posición inicial, ancho inicial)
-    const dragState = useRef(null);
-
-    // ====================================================================
-    // Lógica de Redimensionamiento
-    // ====================================================================
-
-    // Inicia el proceso de redimensionamiento
-    const handleMouseDown = (e) => {
-        e.preventDefault();
-
-        // Almacenar el estado inicial para el cálculo de movimiento
-        dragState.current = {
-            startX: e.clientX,
-            startWidth: tableWidth,
-        };
-
-        // Adjuntar listeners globales al objeto window para capturar el movimiento
-        // incluso si el cursor se sale del resizer.
-        window.addEventListener('mousemove', handleMouseMove);
-        window.addEventListener('mouseup', handleMouseUp);
-
-        // Evitar la selección de texto durante el arrastre
-        document.body.style.userSelect = 'none';
-        document.body.style.cursor = 'col-resize';
-    };
-
-    // Actualiza el ancho de la tabla mientras se arrastra
-    const handleMouseMove = (e) => {
-        if (!dragState.current) return;
-
-        const deltaX = e.clientX - dragState.current.startX;
-        let newWidth = dragState.current.startWidth + deltaX;
-
-        // Aplicar la restricción de ancho mínimo
-        if (newWidth < minWidthValue) {
-            newWidth = minWidthValue;
-        }
-
-        // Aplicar la restricción de ancho máximo (no exceder el ancho del viewport)
-        const maxAllowedWidth = window.innerWidth * 0.95; // 95% del ancho de la ventana
-        if (newWidth > maxAllowedWidth) {
-            newWidth = maxAllowedWidth;
-        }
-
-        setTableWidth(newWidth);
-        localStorage.setItem("paymentsTableWidth", newWidth);
-    };
-
-    // Finaliza el proceso de redimensionamiento
-    const handleMouseUp = () => {
-        window.removeEventListener('mousemove', handleMouseMove);
-        window.removeEventListener('mouseup', handleMouseUp);
-        dragState.current = null;
-        document.body.style.userSelect = '';
-        document.body.style.cursor = '';
-    };
-
-    // Limpieza de listeners al desmontar el componente (CRUCIAL)
-    useEffect(() => {
-        return () => {
-            window.removeEventListener('mousemove', handleMouseMove);
-            window.removeEventListener('mouseup', handleMouseUp);
-        };
-    }, []);
-
 
     // Renderizado
     return (
@@ -201,7 +76,7 @@ const PaymentsTable = ({ concepts, divisions, payments, students, minTableWidth 
                 />
 
                 {payments && payments.length > 0 && (
-                    <PaymentsPaginationInput
+                    <PaginationInput
                         currentPage={currentPage}
                         totalPages={totalPages}
                         onPageChange={paginate}
@@ -346,10 +221,7 @@ const PaymentsTable = ({ concepts, divisions, payments, students, minTableWidth 
                                             <td className="payments-td">
                                                 <span className={`badge-method ${p.payment_method?.toLowerCase().includes('trans') ? 'method-transfer' : 'method-other'}`}>
                                                     <EditableCellDropdown
-                                                        options={[
-                                                            { value: "Transferencia", label: "Transferencia" },
-                                                            { value: "Efectivo", label: "Efectivo" },
-                                                        ]}
+                                                        options={paymentMethods}
                                                         value={p.payment_method}
                                                         onSave={(val) => handleTableUpdate({ id: p.id, fields: { payment_method: val } }, updatePayment)}
                                                     />
@@ -425,28 +297,17 @@ const PaymentsTable = ({ concepts, divisions, payments, students, minTableWidth 
 
                                         {/* Boton Borrado  */}
                                         <td className="payments-td" style={{ textAlign: 'center' }}>
-                                            <button
-                                                onClick={(e) => onDeletePayment(e, p.id)}
-                                                className={`delete-btn ${confirmingId === p.id ? 'confirming' : ''}`}
-                                            >
-                                                {confirmingId === p.id ? (
-                                                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
-                                                        <polyline points="20 6 9 17 4 12"></polyline>
-                                                    </svg>
-                                                ) : (
-                                                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                                                        <path d="M3 6h18"></path>
-                                                        <path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"></path>
-                                                        <path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"></path>
-                                                    </svg>
-                                                )}
-                                            </button>
+                                            <DeleteButton
+                                                id={p.id}
+                                                confirmingId={confirmingId}
+                                                onDelete={onDeletePayment}
+                                            />
                                         </td>
                                     </tr>
                                 ))}
                                 {payments.length === 0 && (
                                     <tr>
-                                        <td colSpan="6" style={{ padding: '1rem', textAlign: 'center', color: '#9ca3af' }}>No hay pagos registrados.</td>
+<td colSpan={Object.values(visibleColumns).filter(Boolean).length + 1} style={{ padding: '1rem', textAlign: 'center', color: '#9ca3af' }}>No hay pagos registrados.</td>
                                     </tr>
                                 )}
                             </tbody>
@@ -474,7 +335,7 @@ const PaymentsTable = ({ concepts, divisions, payments, students, minTableWidth 
 
             {/* Pagination Controls */}
             {payments && payments.length > 0 && (
-                <PaymentsPagination
+                <Pagination
                     currentPage={currentPage}
                     totalPages={totalPages}
                     onPageChange={paginate}

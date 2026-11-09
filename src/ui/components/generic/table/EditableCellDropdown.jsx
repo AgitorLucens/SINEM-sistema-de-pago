@@ -1,7 +1,6 @@
 import { useState, memo } from "react";
 import SelectRadix from "../select/SelectRadix.jsx";
 
-import './editabletable.css';
 const EditableCellDropdown = memo(({
   value,
   options,

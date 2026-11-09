@@ -1,5 +1,4 @@
 import { useState } from "react";
-import { ColonIcon } from "../icons/Icons";
 import { formatCRC } from "../generic/function/Function.jsx";
 
 import './pricingform.css';

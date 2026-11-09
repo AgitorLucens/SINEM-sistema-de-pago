@@ -1,12 +1,18 @@
-import { useState, useEffect, useRef, useMemo } from 'react';
 import ColumnToggleMenu from '../generic/table/ColumnToggleMenu';
-import TeachersPagination from './TeachersPagination';
-import TeachersPaginationInput from './TeachersPaginationInput';
+import Pagination from '../generic/pagination/Pagination';
+import PaginationInput from '../generic/pagination/PaginationInput';
 import EditableCellInput from '../generic/table/EditableCellInput';
 import EditableCellDropdown from '../generic/table/EditableCellDropdown';
 import { updateTeacher } from '../../constant/DBFunctions';
+import useTableControls from '../../hooks/useTableControls';
+import useResizableTable from '../../hooks/useResizableTable';
+import DeleteButton from '../generic/table/DeleteButton';
 
 import './teacherstable.css';
+
+const COLUMN_KEYS = ['name', 'courseDivision', 'amount'];
+const getTeacherSortValue = (teacher, key) =>
+    key === 'courseDivision' ? teacher.division_name : teacher[key];
 
 const TeachersTable = ({
     teachers,
@@ -16,151 +22,24 @@ const TeachersTable = ({
     onDeleteTeacher,
     confirmingId
 }) => {
-    const minWidthValue = parseInt(minTableWidth, 10) || 600;
+    const { tableWidth, handleMouseDown } = useResizableTable('teachersTableWidth', parseInt(minTableWidth, 10) || 600);
 
-    const [tableWidth, setTableWidth] = useState(() => {
-        const saved = localStorage.getItem('teachersTableWidth');
-        return saved ? Number(saved) : minWidthValue;
-    });
-
-    // State for column visibility
-    const [visibleColumns, setVisibleColumns] = useState({
-        name: true,
-        courseDivision: true,
-        amount: true
-    });
-
-    // Pagination State
-    const [currentPage, setCurrentPage] = useState(1);
-    const [itemsPerPage] = useState(5);
-
-    // Sorting State
-    const [sortConfig, setSortConfig] = useState({ key: null, direction: 'default' });
-
-    const toggleColumn = (column) => {
-        setVisibleColumns(prev => ({
-            ...prev,
-            [column]: !prev[column]
-        }));
-    };
+    const {
+        visibleColumns,
+        toggleColumn,
+        requestSort,
+        getSortIndicator,
+        currentPage,
+        totalPages,
+        currentItems,
+        paginate,
+    } = useTableControls(teachers, COLUMN_KEYS, { getSortValue: getTeacherSortValue });
 
     const teacherColumns = [
         { key: 'name', label: 'Nombre' },
         { key: 'courseDivision', label: 'Curso/Division' },
         { key: 'amount', label: 'Monto' },
     ];
-
-    // Sorting Logic
-    const sortedTeachers = useMemo(() => {
-        const sortableItems = [...(teachers || [])];
-        if (sortConfig.direction !== 'default' && sortConfig.key) {
-            sortableItems.sort((a, b) => {
-                let aValue;
-                let bValue;
-
-                if (sortConfig.key === 'name') {
-                    aValue = a.name;
-                    bValue = b.name;
-                } else if (sortConfig.key === 'courseDivision') {
-                    aValue = a.division_name || '';
-                    bValue = b.division_name || '';
-                } else if (sortConfig.key === 'amount') {
-                    aValue = a.amount;
-                    bValue = b.amount;
-                }
-
-                if (aValue < bValue) {
-                    return sortConfig.direction === 'ascending' ? -1 : 1;
-                }
-                if (aValue > bValue) {
-                    return sortConfig.direction === 'ascending' ? 1 : -1;
-                }
-                return 0;
-            });
-        }
-        return sortableItems;
-    }, [teachers, sortConfig]);
-
-    const requestSort = (key) => {
-        let direction = 'ascending';
-        if (sortConfig.key === key && sortConfig.direction === 'ascending') {
-            direction = 'descending';
-        } else if (sortConfig.key === key && sortConfig.direction === 'descending') {
-            direction = 'default';
-        }
-        setSortConfig({ key, direction });
-    };
-
-    const getSortIndicator = (name) => {
-        if (sortConfig.key !== name) {
-            return null;
-        }
-        if (sortConfig.direction === 'ascending') {
-            return <span>&uarr;</span>;
-        }
-        if (sortConfig.direction === 'descending') {
-            return <span>&darr;</span>;
-        }
-        return null;
-    };
-
-    // Pagination Logic
-    const indexOfLastItem = currentPage * itemsPerPage;
-    const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-    const currentItems = sortedTeachers.slice(indexOfFirstItem, indexOfLastItem);
-    const totalPages = sortedTeachers.length ? Math.ceil(sortedTeachers.length / itemsPerPage) : 0;
-
-    const paginate = (pageNumber) => setCurrentPage(pageNumber);
-
-    const dragState = useRef(null);
-    const handleMouseDown = (e) => {
-        e.preventDefault();
-
-        dragState.current = {
-            startX: e.clientX,
-            startWidth: tableWidth,
-        };
-
-        window.addEventListener('mousemove', handleMouseMove);
-        window.addEventListener('mouseup', handleMouseUp);
-
-        document.body.style.userSelect = 'none';
-        document.body.style.cursor = 'col-resize';
-    };
-
-    const handleMouseMove = (e) => {
-        if (!dragState.current) return;
-
-        const deltaX = e.clientX - dragState.current.startX;
-        let newWidth = dragState.current.startWidth + deltaX;
-
-        if (newWidth < minWidthValue) {
-            newWidth = minWidthValue;
-        }
-
-        const maxAllowedWidth = window.innerWidth * 0.95;
-        if (newWidth > maxAllowedWidth) {
-            newWidth = maxAllowedWidth;
-        }
-
-        setTableWidth(newWidth);
-        localStorage.setItem('teachersTableWidth', newWidth);
-    };
-
-    const handleMouseUp = () => {
-        window.removeEventListener('mousemove', handleMouseMove);
-        window.removeEventListener('mouseup', handleMouseUp);
-        dragState.current = null;
-        document.body.style.userSelect = '';
-        document.body.style.cursor = '';
-    };
-
-    useEffect(() => {
-        return () => {
-            window.removeEventListener('mousemove', handleMouseMove);
-            window.removeEventListener('mouseup', handleMouseUp);
-        };
-    }, []);
 
     return (
         <div
@@ -177,7 +56,7 @@ const TeachersTable = ({
                 />
 
                 {teachers && teachers.length > 0 && (
-                    <TeachersPaginationInput
+                    <PaginationInput
                         currentPage={currentPage}
                         totalPages={totalPages}
                         onPageChange={paginate}
@@ -265,8 +144,8 @@ const TeachersTable = ({
                                                     }
                                                     onSave={(val) =>
                                                         handleTableUpdate(
-                                                            { id: ex.id, fields: { total_amount: parseFloat(val) } },
-                                                            updateExpense
+                                                            { id: teacher.id, fields: { amount: parseFloat(val) } },
+                                                            updateTeacher
                                                         )
                                                     }
                                                 />
@@ -274,28 +153,17 @@ const TeachersTable = ({
                                         )}
                                         {/* Boton Borrado  */}
                                         <td className="payments-td" style={{ textAlign: 'center' }}>
-                                            <button
-                                                onClick={(e) => onDeleteTeacher(e, teacher.id)}
-                                                className={`delete-btn ${confirmingId === teacher.id ? 'confirming' : ''}`}
-                                            >
-                                                {confirmingId === teacher.id ? (
-                                                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
-                                                        <polyline points="20 6 9 17 4 12"></polyline>
-                                                    </svg>
-                                                ) : (
-                                                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                                                        <path d="M3 6h18"></path>
-                                                        <path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"></path>
-                                                        <path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"></path>
-                                                    </svg>
-                                                )}
-                                            </button>
+                                            <DeleteButton
+                                                id={teacher.id}
+                                                confirmingId={confirmingId}
+                                                onDelete={onDeleteTeacher}
+                                            />
                                         </td>
                                     </tr>
                                 ))
                             ) : (
                                 <tr>
-                                    <td colSpan="3" className="teachers-table-empty">
+<td colSpan={Object.values(visibleColumns).filter(Boolean).length + 1} className="teachers-table-empty">
                                         No hay profesores registrados.
                                     </td>
                                 </tr>
@@ -324,7 +192,7 @@ const TeachersTable = ({
 
             {/* Pagination Controls */}
             {teachers && teachers.length > 0 && (
-                <TeachersPagination
+                <Pagination
                     currentPage={currentPage}
                     totalPages={totalPages}
                     onPageChange={paginate}

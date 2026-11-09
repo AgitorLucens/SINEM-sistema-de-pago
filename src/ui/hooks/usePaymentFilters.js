@@ -1,9 +1,5 @@
 import { useState, useEffect, useMemo, useCallback } from 'react';
-
-const paymentMethods = [
-    { label: "Efectivo", value: "Efectivo" },
-    { label: "Transferencia", value: "Transferencia" },
-];
+import { paymentMethods } from '../constant/paymentMethods.js';
 
 const initialFilterState = {
     concept: [],

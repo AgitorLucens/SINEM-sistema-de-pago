@@ -1,12 +1,26 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 
-const mockHandle = vi.hoisted(() => vi.fn());
+const mockHandle = vi.hoisted(() => {
+  // Mirrors real Electron: registering a second handler for the same
+  // channel throws. setUpHandlers runs in every beforeEach, so any
+  // duplicated channel registration fails the whole suite.
+  const registered = new Set();
+  const fn = vi.fn((channel) => {
+    if (registered.has(channel)) {
+      throw new Error(`Attempted to register a second handler for '${channel}'`);
+    }
+    registered.add(channel);
+  });
+  fn.registered = registered;
+  return fn;
+});
 vi.mock('electron', () => ({
   ipcMain: { handle: mockHandle },
   app: { quit: vi.fn() },
 }));
 
 import setUpHandlers from './ipcHandlers';
+import { CHANNELS } from '../../ipc/channels.js';
 
 function callHandler(channel, ...args) {
   const entry = mockHandle.mock.calls.find(c => c[0] === channel);
@@ -16,52 +30,66 @@ function callHandler(channel, ...args) {
 
 function makeMocks() {
   const db = {
-    addPayment: vi.fn(),
-    updatePayment: vi.fn(),
-    addPaymentWithConsecutive: vi.fn(),
-    getNextConsecutiveByYear: vi.fn(),
-    getAllPayments: vi.fn(),
-    getPaymentsByYear: vi.fn(),
-    getYearsOfPayments: vi.fn(),
-    getDateOfPayments: vi.fn(),
-    getPaymentByStudentId: vi.fn(),
-    deletePaymentById: vi.fn(),
-    getPaymentsConcepts: vi.fn(),
-    getPaymentsDivisions: vi.fn(),
-    getDelayPayments: vi.fn(),
-    getExpectedIncome: vi.fn(),
-    getPaymentAmount: vi.fn(),
-    getAllExpenses: vi.fn(),
-    getExpensesByYear: vi.fn(),
-    getYearsOfExpenses: vi.fn(),
-    addExpense: vi.fn(),
-    updateExpense: vi.fn(),
-    deleteExpenseById: vi.fn(),
-    getAllStudents: vi.fn(),
-    getStudentsByActive: vi.fn(),
-    getStudentsActive: vi.fn(),
-    getStudentCount: vi.fn(),
-    addStudent: vi.fn(),
-    updateStudent: vi.fn(),
-    deleteStudentById: vi.fn(),
-    getAllTeachers: vi.fn(),
-    addTeacher: vi.fn(),
-    deleteTeacherById: vi.fn(),
-    updateTeacher: vi.fn(),
-    getCashRegister: vi.fn(),
-    addDivision: vi.fn(),
-    deleteDivision: vi.fn(),
-    updateDivision: vi.fn(),
-    updatePriceConcept: vi.fn(),
-    updatePriceDivision: vi.fn(),
-    getAllDivisionPaymentConcepts: vi.fn(),
-    updateDivisionPaymentConcept: vi.fn(),
-    addImage: vi.fn(),
-    getImages: vi.fn(),
-    setImage: vi.fn(),
-    getCurrentImage: vi.fn(),
-    deleteImageById: vi.fn(),
-    importStudents: vi.fn(),
+    payments: {
+      addPayment: vi.fn(),
+      updatePayment: vi.fn(),
+      addPaymentWithConsecutive: vi.fn(),
+      getNextConsecutiveByYear: vi.fn(),
+      getAllPayments: vi.fn(),
+      getPaymentsByYear: vi.fn(),
+      getYearsOfPayments: vi.fn(),
+      getDateOfPayments: vi.fn(),
+      getPaymentByStudentId: vi.fn(),
+      deletePaymentById: vi.fn(),
+    },
+    pricing: {
+      getPaymentsConcepts: vi.fn(),
+      getPaymentsDivisions: vi.fn(),
+      getPaymentAmount: vi.fn(),
+      addDivision: vi.fn(),
+      deleteDivision: vi.fn(),
+      updateDivision: vi.fn(),
+      updatePriceConcept: vi.fn(),
+      updatePriceDivision: vi.fn(),
+      getAllDivisionPaymentConcepts: vi.fn(),
+      updateDivisionPaymentConcept: vi.fn(),
+    },
+    reports: {
+      getDelayPayments: vi.fn(),
+      getExpectedIncome: vi.fn(),
+      getCashRegister: vi.fn(),
+    },
+    expenses: {
+      getAllExpenses: vi.fn(),
+      getExpensesByYear: vi.fn(),
+      getYearsOfExpenses: vi.fn(),
+      addExpense: vi.fn(),
+      updateExpense: vi.fn(),
+      deleteExpenseById: vi.fn(),
+    },
+    students: {
+      getAllStudents: vi.fn(),
+      getStudentsByActive: vi.fn(),
+      getStudentsActive: vi.fn(),
+      getStudentCount: vi.fn(),
+      addStudent: vi.fn(),
+      updateStudent: vi.fn(),
+      deleteStudentById: vi.fn(),
+      importStudents: vi.fn(),
+    },
+    teachers: {
+      getAllTeachers: vi.fn(),
+      addTeacher: vi.fn(),
+      deleteTeacherById: vi.fn(),
+      updateTeacher: vi.fn(),
+    },
+    images: {
+      addImage: vi.fn(),
+      getImages: vi.fn(),
+      setImage: vi.fn(),
+      getCurrentImage: vi.fn(),
+      deleteImageById: vi.fn(),
+    },
   };
   const excel = {
     exportReceiptToExcel: vi.fn(),
@@ -83,6 +111,7 @@ let db, excel;
 
 beforeEach(() => {
   mockHandle.mockClear();
+  mockHandle.registered.clear();
   const mocks = makeMocks();
   db = mocks.db;
   excel = mocks.excel;
@@ -99,122 +128,115 @@ describe('setUpHandlers', () => {
 // Pagina Pagos
 // ---------------------------------------------------------------------------
 describe('Pagos handlers', () => {
-  it('add-payment delegates to db.addPayment', async () => {
+  it('add-payment delegates to db.payments.addPayment', async () => {
     const data = { amount: 10000, student_id: 1 };
-    db.addPayment.mockResolvedValue({ success: true });
-    const result = await callHandler('add-payment', data);
-    expect(db.addPayment).toHaveBeenCalledWith(data);
+    db.payments.addPayment.mockResolvedValue({ success: true });
+    const result = await callHandler(CHANNELS.payments.addPayment, data);
+    expect(db.payments.addPayment).toHaveBeenCalledWith(data);
     expect(result).toEqual({ success: true });
   });
 
   it('add-payment propagates errors', async () => {
-    db.addPayment.mockRejectedValue(new Error('fail'));
-    await expect(callHandler('add-payment', {})).rejects.toThrow('fail');
+    db.payments.addPayment.mockRejectedValue(new Error('fail'));
+    await expect(callHandler(CHANNELS.payments.addPayment, {})).rejects.toThrow('fail');
   });
 
-  it('update-payment delegates to db.updatePayment', async () => {
+  it('update-payment delegates to db.payments.updatePayment', async () => {
     const data = { id: 1, fields: { amount: 5000 } };
-    db.updatePayment.mockResolvedValue({ success: true });
-    const result = await callHandler('update-payment', data);
-    expect(db.updatePayment).toHaveBeenCalledWith(data);
+    db.payments.updatePayment.mockResolvedValue({ success: true });
+    const result = await callHandler(CHANNELS.payments.updatePayment, data);
+    expect(db.payments.updatePayment).toHaveBeenCalledWith(data);
     expect(result).toEqual({ success: true });
   });
 
-  it('add-payment-without-consecutive delegates to db.addPaymentWithConsecutive', async () => {
+  it('add-payment-without-consecutive delegates to db.payments.addPaymentWithConsecutive', async () => {
     const data = { receipt: 'R01', amount: 5000 };
-    db.addPaymentWithConsecutive.mockResolvedValue({ success: true });
-    const result = await callHandler('add-payment-without-consecutive', data);
-    expect(db.addPaymentWithConsecutive).toHaveBeenCalledWith(data);
+    db.payments.addPaymentWithConsecutive.mockResolvedValue({ success: true });
+    const result = await callHandler(CHANNELS.payments.addPaymentWithConsecutive, data);
+    expect(db.payments.addPaymentWithConsecutive).toHaveBeenCalledWith(data);
     expect(result).toEqual({ success: true });
   });
 
-  it('get-consecutive delegates to db.getNextConsecutiveByYear', async () => {
-    db.getNextConsecutiveByYear.mockResolvedValue(3);
-    const result = await callHandler('get-consecutive', 2025);
-    expect(db.getNextConsecutiveByYear).toHaveBeenCalledWith(2025);
+  it('get-consecutive delegates to db.payments.getNextConsecutiveByYear', async () => {
+    db.payments.getNextConsecutiveByYear.mockResolvedValue(3);
+    const result = await callHandler(CHANNELS.payments.getNextConsecutiveByYear, 2025);
+    expect(db.payments.getNextConsecutiveByYear).toHaveBeenCalledWith(2025);
     expect(result).toBe(3);
   });
 
-  it('get-all-payments delegates to db.getAllPayments', async () => {
-    db.getAllPayments.mockResolvedValue([{ id: 1 }]);
-    const result = await callHandler('get-all-payments');
-    expect(db.getAllPayments).toHaveBeenCalledOnce();
+  it('get-all-payments delegates to db.payments.getAllPayments', async () => {
+    db.payments.getAllPayments.mockResolvedValue([{ id: 1 }]);
+    const result = await callHandler(CHANNELS.payments.getAllPayments);
+    expect(db.payments.getAllPayments).toHaveBeenCalledOnce();
     expect(result).toEqual([{ id: 1 }]);
   });
 
-  it('get-payments-by-year delegates to db.getPaymentsByYear', async () => {
-    db.getPaymentsByYear.mockResolvedValue([{ id: 1 }]);
-    const result = await callHandler('get-payments-by-year', '2025');
-    expect(db.getPaymentsByYear).toHaveBeenCalledWith('2025');
+  it('get-payments-by-year delegates to db.payments.getPaymentsByYear', async () => {
+    db.payments.getPaymentsByYear.mockResolvedValue([{ id: 1 }]);
+    const result = await callHandler(CHANNELS.payments.getPaymentsByYear, '2025');
+    expect(db.payments.getPaymentsByYear).toHaveBeenCalledWith('2025');
     expect(result).toEqual([{ id: 1 }]);
   });
 
-  it('get-year-payments delegates to db.getYearsOfPayments', async () => {
-    db.getYearsOfPayments.mockResolvedValue([{ year: '2025' }]);
-    const result = await callHandler('get-year-payments');
-    expect(db.getYearsOfPayments).toHaveBeenCalledOnce();
+  it('get-year-payments delegates to db.payments.getYearsOfPayments', async () => {
+    db.payments.getYearsOfPayments.mockResolvedValue([{ year: '2025' }]);
+    const result = await callHandler(CHANNELS.payments.getYearsOfPayments);
+    expect(db.payments.getYearsOfPayments).toHaveBeenCalledOnce();
     expect(result).toEqual([{ year: '2025' }]);
   });
 
-  it('get-consecutive-payments delegates to db.getYearsOfPayments', async () => {
-    db.getYearsOfPayments.mockResolvedValue([{ year: '2024' }]);
-    const result = await callHandler('get-consecutive-payments');
-    expect(db.getYearsOfPayments).toHaveBeenCalledOnce();
-    expect(result).toEqual([{ year: '2024' }]);
-  });
-
-  it('get-date-payments delegates to db.getDateOfPayments', async () => {
-    db.getDateOfPayments.mockResolvedValue([{ date: '2025-01-15' }]);
-    const result = await callHandler('get-date-payments');
-    expect(db.getDateOfPayments).toHaveBeenCalledOnce();
+  it('get-date-payments delegates to db.payments.getDateOfPayments', async () => {
+    db.payments.getDateOfPayments.mockResolvedValue([{ date: '2025-01-15' }]);
+    const result = await callHandler(CHANNELS.payments.getDateOfPayments);
+    expect(db.payments.getDateOfPayments).toHaveBeenCalledOnce();
     expect(result).toEqual([{ date: '2025-01-15' }]);
   });
 
-  it('get-payment-by-student-id delegates to db.getPaymentByStudentId', async () => {
-    db.getPaymentByStudentId.mockResolvedValue([{ id: 10 }]);
-    const result = await callHandler('get-payment-by-student-id', 5);
-    expect(db.getPaymentByStudentId).toHaveBeenCalledWith(5);
+  it('get-payment-by-student-id delegates to db.payments.getPaymentByStudentId', async () => {
+    db.payments.getPaymentByStudentId.mockResolvedValue([{ id: 10 }]);
+    const result = await callHandler(CHANNELS.payments.getPaymentByStudentId, 5);
+    expect(db.payments.getPaymentByStudentId).toHaveBeenCalledWith(5);
     expect(result).toEqual([{ id: 10 }]);
   });
 
-  it('delete-payment-by-id delegates to db.deletePaymentById', async () => {
-    db.deletePaymentById.mockResolvedValue(undefined);
-    await callHandler('delete-payment-by-id', 99);
-    expect(db.deletePaymentById).toHaveBeenCalledWith(99);
+  it('delete-payment-by-id delegates to db.payments.deletePaymentById', async () => {
+    db.payments.deletePaymentById.mockResolvedValue(undefined);
+    await callHandler(CHANNELS.payments.deletePaymentById, 99);
+    expect(db.payments.deletePaymentById).toHaveBeenCalledWith(99);
   });
 
-  it('get-payment-concepts delegates to db.getPaymentsConcepts', async () => {
-    db.getPaymentsConcepts.mockResolvedValue([{ name: 'Matricula' }]);
-    const result = await callHandler('get-payment-concepts');
-    expect(db.getPaymentsConcepts).toHaveBeenCalledOnce();
+  it('get-payment-concepts delegates to db.pricing.getPaymentsConcepts', async () => {
+    db.pricing.getPaymentsConcepts.mockResolvedValue([{ name: 'Matricula' }]);
+    const result = await callHandler(CHANNELS.pricing.getPaymentConcepts);
+    expect(db.pricing.getPaymentsConcepts).toHaveBeenCalledOnce();
     expect(result).toEqual([{ name: 'Matricula' }]);
   });
 
-  it('get-payment-divisions delegates to db.getPaymentsDivisions', async () => {
-    db.getPaymentsDivisions.mockResolvedValue([{ name: 'SINEM' }]);
-    const result = await callHandler('get-payment-divisions');
-    expect(db.getPaymentsDivisions).toHaveBeenCalledOnce();
+  it('get-payment-divisions delegates to db.pricing.getPaymentsDivisions', async () => {
+    db.pricing.getPaymentsDivisions.mockResolvedValue([{ name: 'SINEM' }]);
+    const result = await callHandler(CHANNELS.pricing.getPaymentDivisions);
+    expect(db.pricing.getPaymentsDivisions).toHaveBeenCalledOnce();
     expect(result).toEqual([{ name: 'SINEM' }]);
   });
 
-  it('get-delay-payment delegates to db.getDelayPayments', async () => {
-    db.getDelayPayments.mockResolvedValue({ months: {} });
-    const result = await callHandler('get-delay-payment', 2025);
-    expect(db.getDelayPayments).toHaveBeenCalledWith(2025);
+  it('get-delay-payment delegates to db.reports.getDelayPayments', async () => {
+    db.reports.getDelayPayments.mockResolvedValue({ months: {} });
+    const result = await callHandler(CHANNELS.reports.getDelayPayments, 2025);
+    expect(db.reports.getDelayPayments).toHaveBeenCalledWith(2025);
     expect(result).toEqual({ months: {} });
   });
 
-  it('get-expected-income delegates to db.getExpectedIncome', async () => {
-    db.getExpectedIncome.mockResolvedValue({ matricula1: 50000 });
-    const result = await callHandler('get-expected-income', [2025]);
-    expect(db.getExpectedIncome).toHaveBeenCalledWith([2025]);
+  it('get-expected-income delegates to db.reports.getExpectedIncome', async () => {
+    db.reports.getExpectedIncome.mockResolvedValue({ matricula1: 50000 });
+    const result = await callHandler(CHANNELS.reports.getExpectedIncome, [2025]);
+    expect(db.reports.getExpectedIncome).toHaveBeenCalledWith([2025]);
     expect(result).toEqual({ matricula1: 50000 });
   });
 
-  it('get-payment-amount delegates to db.getPaymentAmount with destructured args', async () => {
-    db.getPaymentAmount.mockResolvedValue(25000);
-    const result = await callHandler('get-payment-amount', { divisionId: 3, conceptId: 7 });
-    expect(db.getPaymentAmount).toHaveBeenCalledWith(3, 7);
+  it('get-payment-amount delegates to db.pricing.getPaymentAmount with destructured args', async () => {
+    db.pricing.getPaymentAmount.mockResolvedValue(25000);
+    const result = await callHandler(CHANNELS.pricing.getPaymentAmount, { divisionId: 3, conceptId: 7 });
+    expect(db.pricing.getPaymentAmount).toHaveBeenCalledWith(3, 7);
     expect(result).toBe(25000);
   });
 });
@@ -223,52 +245,52 @@ describe('Pagos handlers', () => {
 // Pagina Egresos
 // ---------------------------------------------------------------------------
 describe('Expenses handlers', () => {
-  it('get-all-expenses delegates to db.getAllExpenses', async () => {
-    db.getAllExpenses.mockResolvedValue([{ description: 'Rent' }]);
-    const result = await callHandler('get-all-expenses');
-    expect(db.getAllExpenses).toHaveBeenCalledOnce();
+  it('get-all-expenses delegates to db.expenses.getAllExpenses', async () => {
+    db.expenses.getAllExpenses.mockResolvedValue([{ description: 'Rent' }]);
+    const result = await callHandler(CHANNELS.expenses.getAllExpenses);
+    expect(db.expenses.getAllExpenses).toHaveBeenCalledOnce();
     expect(result).toEqual([{ description: 'Rent' }]);
   });
 
-  it('get-expenses-by-year delegates to db.getExpensesByYear', async () => {
-    db.getExpensesByYear.mockResolvedValue([{ id: 1 }]);
-    const result = await callHandler('get-expenses-by-year', '2025');
-    expect(db.getExpensesByYear).toHaveBeenCalledWith('2025');
+  it('get-expenses-by-year delegates to db.expenses.getExpensesByYear', async () => {
+    db.expenses.getExpensesByYear.mockResolvedValue([{ id: 1 }]);
+    const result = await callHandler(CHANNELS.expenses.getExpensesByYear, '2025');
+    expect(db.expenses.getExpensesByYear).toHaveBeenCalledWith('2025');
     expect(result).toEqual([{ id: 1 }]);
   });
 
-  it('get-year-expenses delegates to db.getYearsOfExpenses', async () => {
-    db.getYearsOfExpenses.mockResolvedValue([{ year: '2025' }]);
-    const result = await callHandler('get-year-expenses');
-    expect(db.getYearsOfExpenses).toHaveBeenCalledOnce();
+  it('get-year-expenses delegates to db.expenses.getYearsOfExpenses', async () => {
+    db.expenses.getYearsOfExpenses.mockResolvedValue([{ year: '2025' }]);
+    const result = await callHandler(CHANNELS.expenses.getYearsOfExpenses);
+    expect(db.expenses.getYearsOfExpenses).toHaveBeenCalledOnce();
     expect(result).toEqual([{ year: '2025' }]);
   });
 
-  it('add-expense delegates to db.addExpense', async () => {
+  it('add-expense delegates to db.expenses.addExpense', async () => {
     const data = { description: 'Rent', amount: 500000 };
-    db.addExpense.mockResolvedValue(1);
-    const result = await callHandler('add-expense', data);
-    expect(db.addExpense).toHaveBeenCalledWith(data);
+    db.expenses.addExpense.mockResolvedValue(1);
+    const result = await callHandler(CHANNELS.expenses.addExpense, data);
+    expect(db.expenses.addExpense).toHaveBeenCalledWith(data);
     expect(result).toBe(1);
   });
 
-  it('update-expense delegates to db.updateExpense', async () => {
+  it('update-expense delegates to db.expenses.updateExpense', async () => {
     const data = { id: 1, fields: { amount: 600000 } };
-    db.updateExpense.mockResolvedValue({ success: true });
-    const result = await callHandler('update-expense', data);
-    expect(db.updateExpense).toHaveBeenCalledWith(data);
+    db.expenses.updateExpense.mockResolvedValue({ success: true });
+    const result = await callHandler(CHANNELS.expenses.updateExpense, data);
+    expect(db.expenses.updateExpense).toHaveBeenCalledWith(data);
     expect(result).toEqual({ success: true });
   });
 
-  it('delete-expense-by-id delegates to db.deleteExpenseById', async () => {
-    db.deleteExpenseById.mockResolvedValue(undefined);
-    await callHandler('delete-expense-by-id', 5);
-    expect(db.deleteExpenseById).toHaveBeenCalledWith(5);
+  it('delete-expense-by-id delegates to db.expenses.deleteExpenseById', async () => {
+    db.expenses.deleteExpenseById.mockResolvedValue(undefined);
+    await callHandler(CHANNELS.expenses.deleteExpenseById, 5);
+    expect(db.expenses.deleteExpenseById).toHaveBeenCalledWith(5);
   });
 
   it('propagates errors from expense handlers', async () => {
-    db.getAllExpenses.mockRejectedValue(new Error('no db'));
-    await expect(callHandler('get-all-expenses')).rejects.toThrow('no db');
+    db.expenses.getAllExpenses.mockRejectedValue(new Error('no db'));
+    await expect(callHandler(CHANNELS.expenses.getAllExpenses)).rejects.toThrow('no db');
   });
 });
 
@@ -276,61 +298,61 @@ describe('Expenses handlers', () => {
 // Pagina Estudiantes
 // ---------------------------------------------------------------------------
 describe('Students handlers', () => {
-  it('get-all-students delegates to db.getAllStudents', async () => {
-    db.getAllStudents.mockResolvedValue([{ name: 'Juan' }]);
-    const result = await callHandler('get-all-students');
-    expect(db.getAllStudents).toHaveBeenCalledOnce();
+  it('get-all-students delegates to db.students.getAllStudents', async () => {
+    db.students.getAllStudents.mockResolvedValue([{ name: 'Juan' }]);
+    const result = await callHandler(CHANNELS.students.getAllStudents);
+    expect(db.students.getAllStudents).toHaveBeenCalledOnce();
     expect(result).toEqual([{ name: 'Juan' }]);
   });
 
-  it('get-students-by-active delegates to db.getStudentsByActive', async () => {
-    db.getStudentsByActive.mockResolvedValue([{ name: 'Active' }]);
-    const result = await callHandler('get-students-by-active', 1);
-    expect(db.getStudentsByActive).toHaveBeenCalledWith(1);
+  it('get-students-by-active delegates to db.students.getStudentsByActive', async () => {
+    db.students.getStudentsByActive.mockResolvedValue([{ name: 'Active' }]);
+    const result = await callHandler(CHANNELS.students.getStudentsByActive, 1);
+    expect(db.students.getStudentsByActive).toHaveBeenCalledWith(1);
     expect(result).toEqual([{ name: 'Active' }]);
   });
 
-  it('get-students-active delegates to db.getStudentsActive', async () => {
-    db.getStudentsActive.mockResolvedValue([1, 0]);
-    const result = await callHandler('get-students-active');
-    expect(db.getStudentsActive).toHaveBeenCalledOnce();
+  it('get-students-active delegates to db.students.getStudentsActive', async () => {
+    db.students.getStudentsActive.mockResolvedValue([1, 0]);
+    const result = await callHandler(CHANNELS.students.getStudentsActive);
+    expect(db.students.getStudentsActive).toHaveBeenCalledOnce();
     expect(result).toEqual([1, 0]);
   });
 
-  it('get-students-count delegates to db.getStudentCount', async () => {
-    db.getStudentCount.mockResolvedValue([{ 'COUNT(*)': 5 }]);
-    const result = await callHandler('get-students-count');
-    expect(db.getStudentCount).toHaveBeenCalledOnce();
+  it('get-students-count delegates to db.students.getStudentCount', async () => {
+    db.students.getStudentCount.mockResolvedValue([{ 'COUNT(*)': 5 }]);
+    const result = await callHandler(CHANNELS.students.getStudentCount);
+    expect(db.students.getStudentCount).toHaveBeenCalledOnce();
     expect(result).toEqual([{ 'COUNT(*)': 5 }]);
   });
 
-  it('add-student delegates to db.addStudent', async () => {
+  it('add-student delegates to db.students.addStudent', async () => {
     const data = { name: 'Maria' };
-    db.addStudent.mockResolvedValue(42);
-    const result = await callHandler('add-student', data);
-    expect(db.addStudent).toHaveBeenCalledWith(data);
+    db.students.addStudent.mockResolvedValue(42);
+    const result = await callHandler(CHANNELS.students.addStudent, data);
+    expect(db.students.addStudent).toHaveBeenCalledWith(data);
     expect(result).toBe(42);
   });
 
-  it('update-student delegates to db.updateStudent', async () => {
+  it('update-student delegates to db.students.updateStudent', async () => {
     const data = { id: 1, fields: { name: 'New' } };
-    db.updateStudent.mockResolvedValue({ success: true });
-    const result = await callHandler('update-student', data);
-    expect(db.updateStudent).toHaveBeenCalledWith(data);
+    db.students.updateStudent.mockResolvedValue({ success: true });
+    const result = await callHandler(CHANNELS.students.updateStudent, data);
+    expect(db.students.updateStudent).toHaveBeenCalledWith(data);
     expect(result).toEqual({ success: true });
   });
 
-  it('delete-student-by-id delegates to db.deleteStudentById', async () => {
-    db.deleteStudentById.mockResolvedValue(undefined);
-    await callHandler('delete-student-by-id', 7);
-    expect(db.deleteStudentById).toHaveBeenCalledWith(7);
+  it('delete-student-by-id delegates to db.students.deleteStudentById', async () => {
+    db.students.deleteStudentById.mockResolvedValue(undefined);
+    await callHandler(CHANNELS.students.deleteStudentById, 7);
+    expect(db.students.deleteStudentById).toHaveBeenCalledWith(7);
   });
 
-  it('import-student delegates to db.importStudents', async () => {
+  it('students:import delegates to db.students.importStudents', async () => {
     const data = [{ name: 'Juan', activo: 'Si' }];
-    db.importStudents.mockResolvedValue({ success: true });
-    const result = await callHandler('import-student', data);
-    expect(db.importStudents).toHaveBeenCalledWith(data);
+    db.students.importStudents.mockResolvedValue({ success: true });
+    const result = await callHandler(CHANNELS.students.importStudents, data);
+    expect(db.students.importStudents).toHaveBeenCalledWith(data);
     expect(result).toEqual({ success: true });
   });
 });
@@ -339,32 +361,32 @@ describe('Students handlers', () => {
 // Pagina Profesores
 // ---------------------------------------------------------------------------
 describe('Teachers handlers', () => {
-  it('get-all-teachers delegates to db.getAllTeachers', async () => {
-    db.getAllTeachers.mockResolvedValue([{ name: 'Prof A' }]);
-    const result = await callHandler('get-all-teachers');
-    expect(db.getAllTeachers).toHaveBeenCalledOnce();
+  it('get-all-teachers delegates to db.teachers.getAllTeachers', async () => {
+    db.teachers.getAllTeachers.mockResolvedValue([{ name: 'Prof A' }]);
+    const result = await callHandler(CHANNELS.teachers.getAllTeachers);
+    expect(db.teachers.getAllTeachers).toHaveBeenCalledOnce();
     expect(result).toEqual([{ name: 'Prof A' }]);
   });
 
-  it('add-teacher delegates to db.addTeacher', async () => {
+  it('add-teacher delegates to db.teachers.addTeacher', async () => {
     const data = { name: 'Prof B' };
-    db.addTeacher.mockResolvedValue({ lastInsertRowid: 1 });
-    const result = await callHandler('add-teacher', data);
-    expect(db.addTeacher).toHaveBeenCalledWith(data);
+    db.teachers.addTeacher.mockResolvedValue({ lastInsertRowid: 1 });
+    const result = await callHandler(CHANNELS.teachers.addTeacher, data);
+    expect(db.teachers.addTeacher).toHaveBeenCalledWith(data);
     expect(result).toEqual({ lastInsertRowid: 1 });
   });
 
-  it('delete-teacher-by-id delegates to db.deleteTeacherById', async () => {
-    db.deleteTeacherById.mockResolvedValue(undefined);
-    await callHandler('delete-teacher-by-id', 10);
-    expect(db.deleteTeacherById).toHaveBeenCalledWith(10);
+  it('delete-teacher-by-id delegates to db.teachers.deleteTeacherById', async () => {
+    db.teachers.deleteTeacherById.mockResolvedValue(undefined);
+    await callHandler(CHANNELS.teachers.deleteTeacherById, 10);
+    expect(db.teachers.deleteTeacherById).toHaveBeenCalledWith(10);
   });
 
-  it('update-teacher delegates to db.updateTeacher', async () => {
+  it('update-teacher delegates to db.teachers.updateTeacher', async () => {
     const data = { id: 1, fields: { name: 'Updated' } };
-    db.updateTeacher.mockResolvedValue({ success: true });
-    const result = await callHandler('update-teacher', data);
-    expect(db.updateTeacher).toHaveBeenCalledWith(data);
+    db.teachers.updateTeacher.mockResolvedValue({ success: true });
+    const result = await callHandler(CHANNELS.teachers.updateTeacher, data);
+    expect(db.teachers.updateTeacher).toHaveBeenCalledWith(data);
     expect(result).toEqual({ success: true });
   });
 });
@@ -373,10 +395,10 @@ describe('Teachers handlers', () => {
 // Pagina Report
 // ---------------------------------------------------------------------------
 describe('Report handlers', () => {
-  it('get-cash-register delegates to db.getCashRegister', async () => {
-    db.getCashRegister.mockResolvedValue([{ type: 'payment' }]);
-    const result = await callHandler('get-cash-register');
-    expect(db.getCashRegister).toHaveBeenCalledOnce();
+  it('get-cash-register delegates to db.reports.getCashRegister', async () => {
+    db.reports.getCashRegister.mockResolvedValue([{ type: 'payment' }]);
+    const result = await callHandler(CHANNELS.reports.getCashRegister);
+    expect(db.reports.getCashRegister).toHaveBeenCalledOnce();
     expect(result).toEqual([{ type: 'payment' }]);
   });
 });
@@ -385,52 +407,52 @@ describe('Report handlers', () => {
 // Pagina Precios
 // ---------------------------------------------------------------------------
 describe('Pricing handlers', () => {
-  it('add-division delegates to db.addDivision', async () => {
+  it('add-division delegates to db.pricing.addDivision', async () => {
     const division = { name: 'NewDiv' };
-    db.addDivision.mockResolvedValue({ lastInsertRowid: 5 });
-    const result = await callHandler('add-division', division);
-    expect(db.addDivision).toHaveBeenCalledWith(division);
+    db.pricing.addDivision.mockResolvedValue({ lastInsertRowid: 5 });
+    const result = await callHandler(CHANNELS.pricing.addDivision, division);
+    expect(db.pricing.addDivision).toHaveBeenCalledWith(division);
     expect(result).toEqual({ lastInsertRowid: 5 });
   });
 
-  it('delete-division delegates to db.deleteDivision', async () => {
-    db.deleteDivision.mockResolvedValue(undefined);
-    await callHandler('delete-division', 3);
-    expect(db.deleteDivision).toHaveBeenCalledWith(3);
+  it('delete-division delegates to db.pricing.deleteDivision', async () => {
+    db.pricing.deleteDivision.mockResolvedValue(undefined);
+    await callHandler(CHANNELS.pricing.deleteDivision, 3);
+    expect(db.pricing.deleteDivision).toHaveBeenCalledWith(3);
   });
 
-  it('update-division delegates to db.updateDivision with id and name', async () => {
-    db.updateDivision.mockResolvedValue({ success: true });
-    const result = await callHandler('update-division', { id: 2, name: 'Renamed' });
-    expect(db.updateDivision).toHaveBeenCalledWith(2, 'Renamed');
+  it('update-division delegates to db.pricing.updateDivision with id and name', async () => {
+    db.pricing.updateDivision.mockResolvedValue({ success: true });
+    const result = await callHandler(CHANNELS.pricing.updateDivision, { id: 2, name: 'Renamed' });
+    expect(db.pricing.updateDivision).toHaveBeenCalledWith(2, 'Renamed');
     expect(result).toEqual({ success: true });
   });
 
-  it('update-price-concept delegates to db.updatePriceConcept', async () => {
+  it('update-price-concept delegates to db.pricing.updatePriceConcept', async () => {
     const concept = { id: 1, amount: 50000 };
-    db.updatePriceConcept.mockResolvedValue(undefined);
-    await callHandler('update-price-concept', concept);
-    expect(db.updatePriceConcept).toHaveBeenCalledWith(concept);
+    db.pricing.updatePriceConcept.mockResolvedValue(undefined);
+    await callHandler(CHANNELS.pricing.updatePriceConcept, concept);
+    expect(db.pricing.updatePriceConcept).toHaveBeenCalledWith(concept);
   });
 
-  it('update-price-division delegates to db.updatePriceDivision', async () => {
+  it('update-price-division delegates to db.pricing.updatePriceDivision', async () => {
     const division = { id: 1, amount: 75000 };
-    db.updatePriceDivision.mockResolvedValue(undefined);
-    await callHandler('update-price-division', division);
-    expect(db.updatePriceDivision).toHaveBeenCalledWith(division);
+    db.pricing.updatePriceDivision.mockResolvedValue(undefined);
+    await callHandler(CHANNELS.pricing.updatePriceDivision, division);
+    expect(db.pricing.updatePriceDivision).toHaveBeenCalledWith(division);
   });
 
-  it('get-all-division-payment-concepts delegates to db.getAllDivisionPaymentConcepts', async () => {
-    db.getAllDivisionPaymentConcepts.mockResolvedValue([{ id: 1 }]);
-    const result = await callHandler('get-all-division-payment-concepts');
-    expect(db.getAllDivisionPaymentConcepts).toHaveBeenCalledOnce();
+  it('get-all-division-payment-concepts delegates to db.pricing.getAllDivisionPaymentConcepts', async () => {
+    db.pricing.getAllDivisionPaymentConcepts.mockResolvedValue([{ id: 1 }]);
+    const result = await callHandler(CHANNELS.pricing.getAllDivisionPaymentConcepts);
+    expect(db.pricing.getAllDivisionPaymentConcepts).toHaveBeenCalledOnce();
     expect(result).toEqual([{ id: 1 }]);
   });
 
   it('update-division-payment-concept delegates with id and amount', async () => {
-    db.updateDivisionPaymentConcept.mockResolvedValue(1);
-    const result = await callHandler('update-division-payment-concept', { id: 10, amount: 999 });
-    expect(db.updateDivisionPaymentConcept).toHaveBeenCalledWith(10, 999);
+    db.pricing.updateDivisionPaymentConcept.mockResolvedValue(1);
+    const result = await callHandler(CHANNELS.pricing.updateDivisionPaymentConcept, { id: 10, amount: 999 });
+    expect(db.pricing.updateDivisionPaymentConcept).toHaveBeenCalledWith(10, 999);
     expect(result).toBe(1);
   });
 });
@@ -442,7 +464,7 @@ describe('Excel handlers', () => {
   it('export-receipt-excel delegates to excel.exportReceiptToExcel', async () => {
     const payment = { id: 1 };
     excel.exportReceiptToExcel.mockResolvedValue(true);
-    const result = await callHandler('export-receipt-excel', payment);
+    const result = await callHandler(CHANNELS.excel.exportReceiptToExcel, payment);
     expect(excel.exportReceiptToExcel).toHaveBeenCalledWith(payment);
     expect(result).toBe(true);
   });
@@ -450,7 +472,7 @@ describe('Excel handlers', () => {
   it('export-report-excel delegates to excel.exportReportToExcel with payments', async () => {
     const data = { payments: [{ id: 1 }, { id: 2 }] };
     excel.exportReportToExcel.mockResolvedValue(true);
-    const result = await callHandler('export-report-excel', data);
+    const result = await callHandler(CHANNELS.excel.exportReportToExcel, data);
     expect(excel.exportReportToExcel).toHaveBeenCalledWith(data.payments);
     expect(result).toBe(true);
   });
@@ -458,7 +480,7 @@ describe('Excel handlers', () => {
   it('export-cash-register-report delegates to excel.exportCashRegisterReportToExcel', async () => {
     const data = { entries: [] };
     excel.exportCashRegisterReportToExcel.mockResolvedValue(true);
-    const result = await callHandler('export-cash-register-report', data);
+    const result = await callHandler(CHANNELS.excel.exportCashRegisterReportToExcel, data);
     expect(excel.exportCashRegisterReportToExcel).toHaveBeenCalledWith(data);
     expect(result).toBe(true);
   });
@@ -466,7 +488,7 @@ describe('Excel handlers', () => {
   it('export-payments-by-year delegates to excel.exportPaymentsByYearToExcel', async () => {
     const data = [{ id: 1 }];
     excel.exportPaymentsByYearToExcel.mockResolvedValue(true);
-    const result = await callHandler('export-payments-by-year', data);
+    const result = await callHandler(CHANNELS.excel.exportPaymentsByYearToExcel, data);
     expect(excel.exportPaymentsByYearToExcel).toHaveBeenCalledWith(data);
     expect(result).toBe(true);
   });
@@ -474,7 +496,7 @@ describe('Excel handlers', () => {
   it('export-expenses-by-year delegates to excel.exportExpensesByYearToExcel', async () => {
     const data = [{ id: 1 }];
     excel.exportExpensesByYearToExcel.mockResolvedValue(true);
-    const result = await callHandler('export-expenses-by-year', data);
+    const result = await callHandler(CHANNELS.excel.exportExpensesByYearToExcel, data);
     expect(excel.exportExpensesByYearToExcel).toHaveBeenCalledWith(data);
     expect(result).toBe(true);
   });
@@ -482,7 +504,7 @@ describe('Excel handlers', () => {
   it('export-students-by-active delegates with destructured studentData', async () => {
     const studentData = { students: [{ name: 'A' }], payments: [{}], years: ['2025'] };
     excel.exportStudentsByActiveToExcel.mockResolvedValue(true);
-    const result = await callHandler('export-students-by-active', studentData);
+    const result = await callHandler(CHANNELS.excel.exportStudentsByActiveToExcel, studentData);
     expect(excel.exportStudentsByActiveToExcel).toHaveBeenCalledWith(
       studentData.students,
       studentData.payments,
@@ -493,7 +515,7 @@ describe('Excel handlers', () => {
 
   it('export-students-template delegates to excel.exportTemplateStudents', async () => {
     excel.exportTemplateStudents.mockResolvedValue(true);
-    const result = await callHandler('export-students-template');
+    const result = await callHandler(CHANNELS.excel.exportTemplateStudents);
     expect(excel.exportTemplateStudents).toHaveBeenCalledOnce();
     expect(result).toBe(true);
   });
@@ -501,7 +523,7 @@ describe('Excel handlers', () => {
   it('export-historic delegates to excel.exportHistoric', async () => {
     const data = { year: '2025' };
     excel.exportHistoric.mockResolvedValue(true);
-    const result = await callHandler('export-historic', data);
+    const result = await callHandler(CHANNELS.excel.exportHistoric, data);
     expect(excel.exportHistoric).toHaveBeenCalledWith(data);
     expect(result).toBe(true);
   });
@@ -509,7 +531,7 @@ describe('Excel handlers', () => {
   it('import-student-from-excel delegates to excel.importStudentsFromExcel', async () => {
     const data = [{ nombre: 'Juan' }];
     excel.importStudentsFromExcel.mockResolvedValue({ success: true });
-    const result = await callHandler('import-student-from-excel', data);
+    const result = await callHandler(CHANNELS.excel.importStudentsFromExcel, data);
     expect(excel.importStudentsFromExcel).toHaveBeenCalledWith(data);
     expect(result).toEqual({ success: true });
   });
@@ -517,7 +539,7 @@ describe('Excel handlers', () => {
   it('export-delay-by-month-report delegates to excel.exportDelayByMonthReportToExcel', async () => {
     const data = { months: {} };
     excel.exportDelayByMonthReportToExcel.mockResolvedValue(true);
-    const result = await callHandler('export-delay-by-month-report', data);
+    const result = await callHandler(CHANNELS.excel.exportDelayByMonthReportToExcel, data);
     expect(excel.exportDelayByMonthReportToExcel).toHaveBeenCalledWith(data);
     expect(result).toBe(true);
   });
@@ -525,14 +547,14 @@ describe('Excel handlers', () => {
   it('export-delay-by-teacher-report delegates to excel.exportDelayByTeacherReportToExcel', async () => {
     const data = { teachers: [] };
     excel.exportDelayByTeacherReportToExcel.mockResolvedValue(true);
-    const result = await callHandler('export-delay-by-teacher-report', data);
+    const result = await callHandler(CHANNELS.excel.exportDelayByTeacherReportToExcel, data);
     expect(excel.exportDelayByTeacherReportToExcel).toHaveBeenCalledWith(data);
     expect(result).toBe(true);
   });
 
   it('propagates errors from excel handlers', async () => {
     excel.exportReceiptToExcel.mockRejectedValue(new Error('excel fail'));
-    await expect(callHandler('export-receipt-excel', {})).rejects.toThrow('excel fail');
+    await expect(callHandler(CHANNELS.excel.exportReceiptToExcel, {})).rejects.toThrow('excel fail');
   });
 });
 
@@ -540,44 +562,44 @@ describe('Excel handlers', () => {
 // App functionality
 // ---------------------------------------------------------------------------
 describe('App functionality handlers', () => {
-  it('add-image delegates to db.addImage', async () => {
+  it('add-image delegates to db.images.addImage', async () => {
     const imageData = { image: Buffer.from('test') };
-    db.addImage.mockResolvedValue(1);
-    const result = await callHandler('add-image', imageData);
-    expect(db.addImage).toHaveBeenCalledWith(imageData);
+    db.images.addImage.mockResolvedValue(1);
+    const result = await callHandler(CHANNELS.images.addImage, imageData);
+    expect(db.images.addImage).toHaveBeenCalledWith(imageData);
     expect(result).toBe(1);
   });
 
-  it('get-images delegates to db.getImages', async () => {
-    db.getImages.mockResolvedValue([{ id: 1 }]);
-    const result = await callHandler('get-images');
-    expect(db.getImages).toHaveBeenCalledOnce();
+  it('get-images delegates to db.images.getImages', async () => {
+    db.images.getImages.mockResolvedValue([{ id: 1 }]);
+    const result = await callHandler(CHANNELS.images.getImages);
+    expect(db.images.getImages).toHaveBeenCalledOnce();
     expect(result).toEqual([{ id: 1 }]);
   });
 
-  it('set-image delegates to db.setImage', async () => {
+  it('set-image delegates to db.images.setImage', async () => {
     const imageState = { id: 1, current_image: 1 };
-    db.setImage.mockResolvedValue(undefined);
-    await callHandler('set-image', imageState);
-    expect(db.setImage).toHaveBeenCalledWith(imageState);
+    db.images.setImage.mockResolvedValue(undefined);
+    await callHandler(CHANNELS.images.setImage, imageState);
+    expect(db.images.setImage).toHaveBeenCalledWith(imageState);
   });
 
-  it('get-current-image delegates to db.getCurrentImage', async () => {
-    db.getCurrentImage.mockResolvedValue({ id: 1, image: Buffer.from('x') });
-    const result = await callHandler('get-current-image');
-    expect(db.getCurrentImage).toHaveBeenCalledOnce();
+  it('get-current-image delegates to db.images.getCurrentImage', async () => {
+    db.images.getCurrentImage.mockResolvedValue({ id: 1, image: Buffer.from('x') });
+    const result = await callHandler(CHANNELS.images.getCurrentImage);
+    expect(db.images.getCurrentImage).toHaveBeenCalledOnce();
     expect(result).toEqual({ id: 1, image: Buffer.from('x') });
   });
 
-  it('delete-image-by-id delegates to db.deleteImageById', async () => {
-    db.deleteImageById.mockResolvedValue(undefined);
-    await callHandler('delete-image-by-id', 3);
-    expect(db.deleteImageById).toHaveBeenCalledWith(3);
+  it('delete-image-by-id delegates to db.images.deleteImageById', async () => {
+    db.images.deleteImageById.mockResolvedValue(undefined);
+    await callHandler(CHANNELS.images.deleteImageById, 3);
+    expect(db.images.deleteImageById).toHaveBeenCalledWith(3);
   });
 
   it('app:quit calls app.quit', async () => {
     const { app } = await import('electron');
-    await callHandler('app:quit');
+    await callHandler(CHANNELS.app.quitApp);
     expect(app.quit).toHaveBeenCalledOnce();
   });
 });

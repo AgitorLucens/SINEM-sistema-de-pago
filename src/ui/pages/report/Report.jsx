@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import ReportSelection from "../../components/report/ReportSelection.jsx";
 import IncomeReport from "../../components/report/IncomeReport.jsx";
 import CashRegisterReport from "../../components/report/CashRegisterReport.jsx";

@@ -1,7 +1,6 @@
 // @vitest-environment jsdom
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen } from '@testing-library/react';
-import { act } from 'react';
 
 vi.mock('../../constant/DBFunctions.jsx', () => ({
   getAllExpenses: vi.fn().mockResolvedValue([]),
@@ -74,9 +73,11 @@ vi.mock('@radix-ui/react-icons', () => ({
 
 beforeEach(() => {
   window.api = {
-    getAllExpenses: vi.fn().mockResolvedValue([]),
-    addExpense: vi.fn().mockResolvedValue({ success: true }),
-    deleteExpenseById: vi.fn().mockResolvedValue({ success: true }),
+    expenses: {
+      getAllExpenses: vi.fn().mockResolvedValue([]),
+      addExpense: vi.fn().mockResolvedValue({ success: true }),
+      deleteExpenseById: vi.fn().mockResolvedValue({ success: true }),
+    },
   };
 });
 

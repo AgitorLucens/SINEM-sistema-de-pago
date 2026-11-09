@@ -15,8 +15,6 @@ import { useEntityDelete } from '../../hooks/useEntityDelete.js';
 import { PlusCircledIcon } from "@radix-ui/react-icons";
 import { useCallback, useEffect, useState } from 'react';
 
-import './teachers.css';
-
 const Teachers = () => {
     const { formData, handleChange, resetForm } = useForm({
         name: '', division: '', amount: '',
@@ -26,7 +24,7 @@ const Teachers = () => {
     const [teachers, setTeachers] = useState([]);
     const [divisions, setDivisions] = useState([]);
     const [isModalOpen, setIsModalOpen] = useState(false);
-    const [isLoading, setIsLoading] = useState(false);
+    const [isLoading] = useState(false);
 
     const fetchTeachers = useCallback(async () => {
         getAllTeachers().then((data) => {

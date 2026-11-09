@@ -84,7 +84,7 @@ describe('createWorksheet', () => {
   });
 
   it('uses default name "sheet" when no name given', () => {
-    const sheet = createWorksheet(mockWorkbook, 2025, mockFuncColumn);
+    createWorksheet(mockWorkbook, 2025, mockFuncColumn);
     expect(mockWorkbook.addWorksheet).toHaveBeenCalledWith('sheet', {
       views: [{ showGridLines: false }],
     });
@@ -112,7 +112,7 @@ describe('createWorksheet', () => {
   });
 
   it('works with string year', () => {
-    const sheet = createWorksheet(mockWorkbook, '2025', mockFuncColumn);
+    createWorksheet(mockWorkbook, '2025', mockFuncColumn);
     expect(mockFuncColumn).toHaveBeenCalledWith('2025');
   });
 

@@ -7,8 +7,6 @@ vi.mock('../../../constant/DBFunctions.jsx', () => ({
   getCurrentImage: vi.fn().mockResolvedValue({ image: null }),
 }));
 
-const MockPage = ({ testId, text }) => <div data-testid={testId}>{text}</div>;
-
 vi.mock('../../../pages/payments/Payments.jsx', () => ({
   default: () => <div data-testid="page-payments">Payments</div>,
 }));
@@ -37,7 +35,7 @@ vi.mock('../../../pages/settings/Settings.jsx', () => ({
 vi.mock('../../../assets/SINEM_home.png', () => ({ default: 'sinem-home.png' }));
 
 beforeEach(() => {
-  window.api = { getCurrentImage: vi.fn().mockResolvedValue({ image: null }) };
+  window.api = { images: { getCurrentImage: vi.fn().mockResolvedValue({ image: null }) } };
 });
 
 import Content from './Content.jsx';

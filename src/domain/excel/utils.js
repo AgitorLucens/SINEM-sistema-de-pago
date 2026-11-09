@@ -1,7 +1,7 @@
 import ExcelJS from "exceljs";
-import { dialog } from "electron";
+import { dialog, app  } from "electron";
 import path from "path";
-import { app } from 'electron';
+
 /*
   Helper Functions
 */

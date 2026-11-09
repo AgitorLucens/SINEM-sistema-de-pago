@@ -6,13 +6,13 @@ import PricingForm from "../../components/pricing/PricingForm";
 import PricingTable from "../../components/pricing/PricingTable";
 import SuccessMessage from "../../components/generic/message/SuccessMessage.jsx"; // Fixed typos in import if any, original had Messaage/SuccessMessaage usage
 import ErrorMessage from "../../components/generic/message/ErrorMessage.jsx";
-import { getPaymentConcepts, getPaymentDivisions, updatePriceConcept, updatePriceDivision } from "../../constant/DBFunctions.jsx"
+import { getPaymentConcepts, getPaymentDivisions, updatePriceConcept } from "../../constant/DBFunctions.jsx"
 import './pricing.css';
 
 const Pricing = () => {
 
     const [concepts, setConcepts] = useState([]);
-    const [divisions, setDivisions] = useState([]);
+    const [, setDivisions] = useState([]);
     const [selectedPrice, setSelectedPrice] = useState(null);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [error, setError] = useState("");
@@ -70,10 +70,6 @@ const Pricing = () => {
     }
 
     const otrosConcept = concepts.find(c => c.name === 'Otros');
-    const salesDivisions = divisions.filter(d =>
-        d.name === 'Ventas Accesorios' ||
-        d.name === 'Ventas Varias'
-    );
 
     return (
         <div className="container">

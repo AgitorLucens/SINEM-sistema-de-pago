@@ -1,10 +1,10 @@
 import { useState, useEffect, useMemo } from 'react';
 import { DownloadIcon, InfoCircledIcon, ChevronLeftIcon } from "@radix-ui/react-icons";
-import { getAllTeachers, getAllStudents, getAllPayments, getYearsOfPayments } from '../../constant/DBFunctions.jsx';
+import { getAllTeachers, getAllStudents, getAllPayments, getYearsOfPayments, exportDelayByTeacherReportToExcel  } from '../../constant/DBFunctions.jsx';
 import SelectRadix from '../generic/select/SelectRadix.jsx';
 import MultiSelectRadix from "../generic/multiselect/MultiSelectRadix.jsx";
 import { formatMonth } from '../generic/function/Function.jsx';
-import { exportDelayByTeacherReportToExcel } from '../../constant/DBFunctions.jsx';
+
 import './delaybyteacherreport.css';
 
 const DelayByTeacherReport = ({ onBack }) => {

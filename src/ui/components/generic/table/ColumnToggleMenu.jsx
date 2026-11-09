@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState, memo } from 'react';
+import { useEffect, useRef, useState, memo } from 'react';
 import { ArchiveIcon, ChevronDownIcon, ChevronUpIcon } from "@radix-ui/react-icons";
 
 import './columntogglemenu.css';

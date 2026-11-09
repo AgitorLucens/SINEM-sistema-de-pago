@@ -1,11 +1,10 @@
-import { formatDate, formatMonth } from "../generic/function/Function.jsx";
-import { exportReceiptToExcel } from "../../constant/DBFunctions.jsx";
-import { updatePayment } from "../../constant/DBFunctions.jsx";
+import { formatMonth } from "../generic/function/Function.jsx";
+import { exportReceiptToExcel, updatePayment  } from "../../constant/DBFunctions.jsx";
+
 import EditableCellInput from "../generic/table/EditableCellInput.jsx";
 import EditableCellDropdown from "../generic/table/EditableCellDropdown.jsx";
 import EditableCellDate from "../generic/table/EditableCellDate.jsx";
 import EditableCellSearchDropdown from "../generic/table/EditableCellSearchDropdown.jsx";
-import EditableCellPhone from "../generic/table/EditableCellPhone.jsx";
 import { CalendarIcon, DownloadIcon } from "@radix-ui/react-icons";
 import { CreditCard, CashIcon } from "../icons/Icons.jsx";
 

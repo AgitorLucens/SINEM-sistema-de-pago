@@ -1,9 +1,9 @@
 
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import ImageSelector from "../../components/settings/ImageSelector.jsx";
 import ErrorrMessage from "../../components/generic/message/ErrorMessage.jsx";
 import sinemLogo from '../../assets/SINEM.png';
-import { addImage, getImages, setImage, getCurrentImage } from '../../constant/DBFunctions.jsx';
+import { addImage, getImages, setImage, deleteImageById } from '../../constant/DBFunctions.jsx';
 
 import './settings.css';
 const Settings = () => {
@@ -59,7 +59,7 @@ const Settings = () => {
 
     const handleDeleteImages = async (imageIds) => {
         for (const id of imageIds) {
-            await window.api.deleteImageById(id);
+            await deleteImageById(id);
         }
         loadImages();
         window.dispatchEvent(new Event("logo-updated"));

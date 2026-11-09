@@ -1,8 +1,8 @@
 import { useState } from "react";
 import DatePicker from "../generic/datepicker/DatePicker.jsx";
 import SelectRadix from "../generic/select/SelectRadix.jsx";
-import {handleFieldChange, onRadixChange} from "../generic/function/Function.jsx"
-import { formatCRC } from "../generic/function/Function.jsx";
+import {handleFieldChange, onRadixChange, formatCRC } from "../generic/function/Function.jsx"
+
 
 const ExpensesForm = ({ formData, handleChange, onSubmit, isLoading }) => {
     const [value, setValue] = useState("");

@@ -8,8 +8,9 @@ import SuccessMessage from '../../components/generic/message/SuccessMessage.jsx'
 import ErrorMessage from '../../components/generic/message/ErrorMessage.jsx';
 import {
     addPaymentWithConsecutive, deletePaymentById,
-    getPaymentAmount, getNextConsecutiveByYear, exportReceiptToExcel,
+    getNextConsecutiveByYear, exportReceiptToExcel,
 } from "../../constant/DBFunctions.jsx";
+import { paymentMethods } from '../../constant/paymentMethods.js';
 import { usePaymentsData } from '../../hooks/usePaymentsData.js';
 import { usePaymentFilters } from '../../hooks/usePaymentFilters.js';
 import { useForm } from '../../hooks/useForm.js';
@@ -34,11 +35,6 @@ const initialFormState = {
     consecutive: 0,
     receipt: '',
 };
-
-const paymentMethods = [
-    { label: "Efectivo", value: "Efectivo" },
-    { label: "Transferencia", value: "Transferencia" },
-];
 
 const Payments = () => {
     const { message, setMessage, error, setError } = useStatusMessages();
@@ -81,15 +77,6 @@ const Payments = () => {
     const handleDivisionChange = useCallback(async (divisionId) => {
         setFormData(prev => ({ ...prev, division: divisionId }));
     }, [setFormData]);
-
-    const fetchAndSetAmount = useCallback(async (divisionId, conceptId) => {
-        const selectedStudent = students.find(s => String(s.id) === String(formData.student_id));
-        if (selectedStudent && selectedStudent.scholarship === 1) {
-            return;
-        }
-        const amount = await getPaymentAmount(divisionId, conceptId);
-        setFormData(prev => ({ ...prev, amount: amount ?? "" }));
-    }, [students, formData.student_id, setFormData]);
 
     const handleAmountChange = useCallback((e) => {
         handleChange(e);
@@ -238,7 +225,7 @@ const Payments = () => {
             )}
 
             {isTotalLoading && (
-                <div className="p-4 text-center text-indigo-600 font-semibold">
+                <div className="payments-loading">
                     Cargando datos... Por favor, espera.
                 </div>
             )}

@@ -1,11 +1,7 @@
 // @vitest-environment jsdom
 import { describe, it, expect, vi } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
-import ExpensesPagination from '../expenses/ExpensesPagination.jsx';
-
-function Pagination(props) {
-  return <ExpensesPagination {...props} />;
-}
+import Pagination from './pagination/Pagination.jsx';
 
 describe('Pagination', () => {
   it('renders page numbers', () => {

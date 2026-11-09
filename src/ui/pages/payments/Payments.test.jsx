@@ -107,18 +107,30 @@ vi.mock('@radix-ui/react-icons', () => ({
 
 beforeEach(() => {
   window.api = {
-    getAllPayments: vi.fn().mockResolvedValue([]),
-    getAllExpenses: vi.fn().mockResolvedValue([]),
-    getAllStudents: vi.fn().mockResolvedValue([]),
-    getAllTeachers: vi.fn().mockResolvedValue([]),
-    getPaymentConcepts: vi.fn().mockResolvedValue([]),
-    getPaymentDivisions: vi.fn().mockResolvedValue([]),
-    getYearsOfPayments: vi.fn().mockResolvedValue([]),
-    addPaymentWithConsecutive: vi.fn().mockResolvedValue({ success: true, payment: {} }),
-    deletePaymentById: vi.fn().mockResolvedValue({ success: true }),
-    getPaymentAmount: vi.fn().mockResolvedValue(0),
-    getNextConsecutiveByYear: vi.fn().mockResolvedValue(1),
-    exportReceiptToExcel: vi.fn().mockResolvedValue({ success: true }),
+    payments: {
+      getAllPayments: vi.fn().mockResolvedValue([]),
+      getYearsOfPayments: vi.fn().mockResolvedValue([]),
+      addPaymentWithConsecutive: vi.fn().mockResolvedValue({ success: true, payment: {} }),
+      deletePaymentById: vi.fn().mockResolvedValue({ success: true }),
+      getNextConsecutiveByYear: vi.fn().mockResolvedValue(1),
+    },
+    expenses: {
+      getAllExpenses: vi.fn().mockResolvedValue([]),
+    },
+    students: {
+      getAllStudents: vi.fn().mockResolvedValue([]),
+    },
+    teachers: {
+      getAllTeachers: vi.fn().mockResolvedValue([]),
+    },
+    pricing: {
+      getPaymentConcepts: vi.fn().mockResolvedValue([]),
+      getPaymentDivisions: vi.fn().mockResolvedValue([]),
+      getPaymentAmount: vi.fn().mockResolvedValue(0),
+    },
+    excel: {
+      exportReceiptToExcel: vi.fn().mockResolvedValue({ success: true }),
+    },
   };
 });
 

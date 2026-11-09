@@ -7,7 +7,7 @@ import {
   styleStudentSheet,
   styleStudentSheetTemplate,
   addSheetTitle,
-  paseStudentFile,
+  parseStudentFile,
 } from './students.js';
 
 /* ───── mock sheet factory ───── */
@@ -480,7 +480,7 @@ describe('addSheetTitle', () => {
   });
 });
 
-describe('paseStudentFile', () => {
+describe('parseStudentFile', () => {
   it('parses students from workbook with correct fields', async () => {
     const headerMap = {
       'NOMBRE MATRICULADO': 1,
@@ -545,7 +545,7 @@ describe('paseStudentFile', () => {
 
     const uint8 = new Uint8Array([1, 2, 3]);
     const buffer = { buffer: uint8.buffer };
-    const result = await paseStudentFile(buffer, workbook);
+    const result = await parseStudentFile(buffer, workbook);
 
     expect(result).toHaveLength(1);
     expect(result[0].nombre).toBe('Ana Torres');
@@ -603,7 +603,7 @@ describe('paseStudentFile', () => {
 
     const uint8 = new Uint8Array([1, 2, 3]);
     const buffer = { buffer: uint8.buffer };
-    const result = await paseStudentFile(buffer, workbook);
+    const result = await parseStudentFile(buffer, workbook);
     expect(result).toHaveLength(0);
   });
 
@@ -659,7 +659,7 @@ describe('paseStudentFile', () => {
 
     const uint8 = new Uint8Array([1, 2, 3]);
     const buffer = { buffer: uint8.buffer };
-    const result = await paseStudentFile(buffer, workbook);
+    const result = await parseStudentFile(buffer, workbook);
     expect(result[0].correo).toBe('luis@mail.com');
   });
 
@@ -715,7 +715,7 @@ describe('paseStudentFile', () => {
 
     const uint8 = new Uint8Array([1, 2, 3]);
     const buffer = { buffer: uint8.buffer };
-    const result = await paseStudentFile(buffer, workbook);
+    const result = await parseStudentFile(buffer, workbook);
     expect(result[0].activo).toBe('Si');
     expect(result[0].scholarship).toBe('No');
     expect(result[0].scholarship_amount).toBe(0);

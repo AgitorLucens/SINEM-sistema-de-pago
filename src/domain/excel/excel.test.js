@@ -7,17 +7,17 @@ vi.mock('./utils.js', () => {
   const _w = { addWorksheet() { return _s; }, addImage() { return 1; }, xlsx: { writeFile() {}, load() {} }, worksheets: [] };
   return { createWorkbook: vi.fn(() => _w), createWorksheet: vi.fn(() => _s), saveWorkbook: vi.fn(async () => 'C:\\o.xlsx'), getAssetPath: vi.fn(() => 'C:\\a\\g.exe') };
 });
-vi.mock('./students.js', () => ({ groupPaymentsByStudentAndYear: vi.fn(), buildStudentRow: vi.fn(), getStudentColumns: vi.fn(), getStudentColumnsTemplate: vi.fn(), styleStudentSheet: vi.fn(), styleStudentSheetTemplate: vi.fn(), addSheetTitle: vi.fn(), paseStudentFile: vi.fn() }));
+vi.mock('./students.js', () => ({ groupPaymentsByStudentAndYear: vi.fn(), buildStudentRow: vi.fn(), getStudentColumns: vi.fn(), getStudentColumnsTemplate: vi.fn(), styleStudentSheet: vi.fn(), styleStudentSheetTemplate: vi.fn(), addSheetTitle: vi.fn(), parseStudentFile: vi.fn() }));
 vi.mock('./expenses.js', () => ({ getExpensesColumns: vi.fn(), styleExpensesSheet: vi.fn() }));
 vi.mock('./payments.js', () => ({ getPaymentsColumns: vi.fn(), buildPaymentRow: vi.fn(), stylePaymentSheet: vi.fn() }));
 vi.mock('./receipt.js', () => ({ styleReceiptSheet: vi.fn() }));
-vi.mock('./reports.js', () => ({ exportDelayByMonthReport: vi.fn(), exportDelayByTeacherReport: vi.fn() }));
+vi.mock('./reports.js', () => ({ exportDelayByMonthReport: vi.fn(), exportDelayByTeacherReport: vi.fn(), exportCashRegisterReportToExcel: vi.fn() }));
 import { saveWorkbook, getAssetPath } from './utils.js';
-import { styleStudentSheet, styleStudentSheetTemplate, paseStudentFile, groupPaymentsByStudentAndYear, buildStudentRow } from './students.js';
+import { styleStudentSheet, styleStudentSheetTemplate, parseStudentFile, groupPaymentsByStudentAndYear, buildStudentRow } from './students.js';
 import { styleExpensesSheet } from './expenses.js';
 import { stylePaymentSheet } from './payments.js';
 import { styleReceiptSheet } from './receipt.js';
-import { exportDelayByMonthReport, exportDelayByTeacherReport } from './reports.js';
+import { exportDelayByMonthReport, exportDelayByTeacherReport, exportCashRegisterReportToExcel } from './reports.js';
 import { dialog } from 'electron';
 import { execFile } from 'child_process';
 import AppExcel from './excel.js';
@@ -50,7 +50,7 @@ it('all', async () => {
   await a.exportTemplateStudents();
   expect(styleStudentSheetTemplate).toHaveBeenCalled();
   await expect(a.importStudentsFromExcel(null)).rejects.toThrow('Falta archivo Excel.');
-  paseStudentFile.mockResolvedValue([{ nombre: 'Juan' }]);
+  parseStudentFile.mockResolvedValue([{ nombre: 'Juan' }]);
   expect(await a.importStudentsFromExcel({ buffer: [1, 2, 3] })).toEqual({ success: true, students: [{ nombre: 'Juan' }] });
   saveWorkbook.mockResolvedValue(null);
   expect(await a.exportHistoric({ payments: null, years: null, students: null, expenses: null })).toEqual({ success: false });
@@ -63,4 +63,7 @@ it('all', async () => {
   expect(await a.exportDelayByMonthReportToExcel({})).toEqual({ success: true });
   exportDelayByTeacherReport.mockResolvedValue({ success: false, error: 'x' });
   expect(await a.exportDelayByTeacherReportToExcel({})).toEqual({ success: false, error: 'x' });
+  exportCashRegisterReportToExcel.mockResolvedValue({ success: true, path: 'C:\\c.xlsx' });
+  expect(await a.exportCashRegisterReportToExcel({ transactions: [], initialBalance: 0 })).toEqual({ success: true, path: 'C:\\c.xlsx' });
+  expect(exportCashRegisterReportToExcel).toHaveBeenCalledWith({ transactions: [], initialBalance: 0 });
 });

@@ -1,4 +1,4 @@
-import { createWorkbook, createWorksheet, saveWorkbook } from "./utils.js";
+import { createWorkbook, saveWorkbook } from "./utils.js";
 
 function getCashRegisterColumns() {
     return [

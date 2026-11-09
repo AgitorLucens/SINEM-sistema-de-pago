@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { ArrowLeftIcon, PlusIcon,PlusCircledIcon } from "@radix-ui/react-icons";
+import { ArrowLeftIcon, PlusCircledIcon } from "@radix-ui/react-icons";
 import { getAllDivisionPaymentConcepts, updateDivisionPaymentConcept, addDivision, deleteDivision, updateDivision } from "../../constant/DBFunctions";
 import Modal from "../../components/generic/modal/Modal";
 import SuccessMessage from '../../components/generic/message/SuccessMessage.jsx';

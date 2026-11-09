@@ -34,27 +34,6 @@ export function stylePaymentSheet(sheet){
   applyPaymentHeaderStyle(sheet);
 }
 
-function alignColumns(sheet){
-    sheet.getColumn("amount").numFmt = '"₡"#,##0.00';
-    sheet.getColumn("amount").alignment = { horizontal: "right" };
-    sheet.getColumn("date").alignment = { horizontal: "center" };
-    sheet.getColumn("consecutive").alignment = { horizontal: "center" };
-
-    sheet.getRow(1).alignment = { horizontal: "center" };
-}
-
-function addPaymentsTotal(sheet){
-    const totalRow = sheet.addRow({
-        concept: "TOTAL",
-        amount: {
-            formula: `SUM(G2:G${sheet.rowCount})`,
-        },
-    });
-
-    totalRow.font = { bold: true };
-    totalRow.getCell("amount").numFmt = '"₡"#,##0.00';
-}
-
 function applyPaymentBorders(sheet) {
   const tableBorder = {
     top: { style: "thin" },

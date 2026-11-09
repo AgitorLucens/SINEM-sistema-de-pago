@@ -356,7 +356,7 @@ function addExample(sheet){
   })
 }
 
-export async function paseStudentFile(buffer,workbook){
+export async function parseStudentFile(buffer,workbook){
     const realBuffer = Buffer.from(Uint8Array.from(buffer.buffer));
 
     await workbook.xlsx.load(realBuffer);

@@ -4,7 +4,7 @@ import EditableCellPhone from "../generic/table/EditableCellPhone.jsx";
 import { updateStudent } from "../../constant/DBFunctions.jsx";
 
 import { PersonIcon } from "@radix-ui/react-icons";
-import { CreditCard, MensualidadIcon, MatriculaIcon, OtrosIcon } from "../icons/Icons.jsx";
+import { MensualidadIcon, MatriculaIcon, OtrosIcon } from "../icons/Icons.jsx";
 import { formatDate, formatMonth } from "../generic/function/Function.jsx";
 
 import './studentdetail.css';
@@ -52,7 +52,7 @@ const StudentDetail = ({
               }}
             />
           </h2>
-          <span className={`student-badge student-badge-${student.active === 1 ? "ACTIVE" : "INACTIVE" || "default"}`}>
+          <span className={`student-badge student-badge-${student.active === 1 ? "ACTIVE" : "INACTIVE"}`}>
             {/*student.active ? "Activo" : "Inactivo"*/}
             <EditableCellDropdown
               options={[

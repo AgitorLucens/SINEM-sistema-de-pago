@@ -1,8 +1,8 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { ChevronLeftIcon, ChevronRightIcon } from "@radix-ui/react-icons";
-import './teacherstable.css';
+import './pagination.css';
 
-const TeachersPaginationInput = ({ currentPage, totalPages, onPageChange }) => {
+const PaginationInput = ({ currentPage, totalPages, onPageChange }) => {
     const [inputVal, setInputVal] = useState(currentPage);
 
     useEffect(() => {
@@ -65,4 +65,4 @@ const TeachersPaginationInput = ({ currentPage, totalPages, onPageChange }) => {
     );
 };
 
-export default TeachersPaginationInput;
+export default PaginationInput;

@@ -23,11 +23,13 @@ vi.mock('../../assets/SINEM.png', () => ({ default: 'sinem-logo.png' }));
 
 beforeEach(() => {
   window.api = {
-    addImage: vi.fn().mockResolvedValue({ success: true }),
-    getImages: vi.fn().mockResolvedValue([]),
-    setImage: vi.fn().mockResolvedValue({ success: true }),
-    getCurrentImage: vi.fn().mockResolvedValue({}),
-    deleteImageById: vi.fn().mockResolvedValue({ success: true }),
+    images: {
+      addImage: vi.fn().mockResolvedValue({ success: true }),
+      getImages: vi.fn().mockResolvedValue([]),
+      setImage: vi.fn().mockResolvedValue({ success: true }),
+      getCurrentImage: vi.fn().mockResolvedValue({}),
+      deleteImageById: vi.fn().mockResolvedValue({ success: true }),
+    },
   };
 });
 

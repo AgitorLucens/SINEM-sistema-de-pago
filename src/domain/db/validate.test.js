@@ -33,15 +33,20 @@ describe('validatePaymentsUpdate', () => {
     expect(result).not.toContain('invalidField');
   });
 
-  it('returns error for empty fields object', () => {
+  it('returns null for empty fields object', () => {
     const result = validatePaymentsUpdate({ fields: {} });
-    expect(result).toBeInstanceOf(Error);
-    expect(result.message).toBe('Intento de cambiar campo invalido');
+    expect(result).toBeNull();
   });
 
-  it('returns error when no allowed fields provided', () => {
+  it('returns null when no allowed fields provided', () => {
     const result = validatePaymentsUpdate({ fields: { bad: 'value' } });
-    expect(result).toBeInstanceOf(Error);
+    expect(result).toBeNull();
+  });
+
+  it('returns null when fields is missing', () => {
+    expect(validatePaymentsUpdate({})).toBeNull();
+    expect(validatePaymentsUpdate(null)).toBeNull();
+    expect(validatePaymentsUpdate({ fields: 'not-an-object' })).toBeNull();
   });
 });
 
@@ -53,9 +58,8 @@ describe('validateExpensesUpdate', () => {
     expect(result).toEqual(['date', 'description']);
   });
 
-  it('returns error for invalid fields only', () => {
-    const result = validateExpensesUpdate({ fields: { bad: 'value' } });
-    expect(result).toBeInstanceOf(Error);
+  it('returns null for invalid fields only', () => {
+    expect(validateExpensesUpdate({ fields: { bad: 'value' } })).toBeNull();
   });
 });
 
@@ -67,9 +71,8 @@ describe('validateStudentsUpdate', () => {
     expect(result).toEqual(['name', 'phone', 'active']);
   });
 
-  it('returns error for invalid fields', () => {
-    const result = validateStudentsUpdate({ fields: { unknown: 'x' } });
-    expect(result).toBeInstanceOf(Error);
+  it('returns null for invalid fields', () => {
+    expect(validateStudentsUpdate({ fields: { unknown: 'x' } })).toBeNull();
   });
 });
 
@@ -81,8 +84,7 @@ describe('validateTeachersUpdate', () => {
     expect(result).toEqual(['name', 'amount']);
   });
 
-  it('returns error for invalid fields', () => {
-    const result = validateTeachersUpdate({ fields: { unknown: 'x' } });
-    expect(result).toBeInstanceOf(Error);
+  it('returns null for invalid fields', () => {
+    expect(validateTeachersUpdate({ fields: { unknown: 'x' } })).toBeNull();
   });
 });

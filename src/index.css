@@ -1,7 +1,7 @@
 /*
- * Este CSS está diseñado para ser totalmente offline.
- * Reemplaza el CDN de Tailwind CSS con estilos directos y auto-suficientes.
-*/
+ * Estilos base auto-suficientes — toda la app usa CSS propio,
+ * sin frameworks ni dependencias externas de estilos.
+ */
 
 /* Estilos base (similar al reset y layout principal) */
 body { margin: 0; padding: 0; font-family: 'Inter', sans-serif; }

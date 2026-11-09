@@ -1,11 +1,12 @@
 import NavLink from "../navlink/NavLink.jsx";
 import { Page } from '../../../constant/Pages.jsx';
-import { HomeIcon, IconArrowDownLeft, TeacherIcon, TrendingUp} from "../../icons/Icons.jsx";
+import { HomeIcon, TeacherIcon } from "../../icons/Icons.jsx";
 import { ClipboardIcon, PersonIcon, ExitIcon, FileTextIcon, ArrowBottomLeftIcon,
          ChevronLeftIcon, ChevronRightIcon, Pencil2Icon,
          ReaderIcon, GearIcon  } from "@radix-ui/react-icons";
 
 import {useState, useCallback, useMemo, useEffect} from "react";
+import { quitApp } from '../../../constant/DBFunctions.jsx';
 import './sidebar.css';
 const Sidebar = ({ currentPage, setCurrentPage, isOpen: externalIsOpen, setIsOpen: externalSetIsOpen }) => {
     const [localIsOpen, setLocalIsOpen] = useState(true);
@@ -44,7 +45,7 @@ const Sidebar = ({ currentPage, setCurrentPage, isOpen: externalIsOpen, setIsOpe
 
     const footerItems = useMemo(() => [
         { icon: GearIcon, title: "Configuración", page: Page.SETTINGS_REGISTRY, onClick: setCurrentPage },
-        { icon: ExitIcon, title: "Salir", page: Page.SETTINGS, onClick: () => { window.api.quitApp(); } },
+        { icon: ExitIcon, title: "Salir", page: Page.SETTINGS, onClick: () => { quitApp(); } },
     ], [setCurrentPage]);
 
     return (
@@ -53,9 +54,9 @@ const Sidebar = ({ currentPage, setCurrentPage, isOpen: externalIsOpen, setIsOpe
                 {isOpen ? <ChevronLeftIcon /> : <ChevronRightIcon />}
             </button>
 
-            <div className={`flex items-center mb-6 ${isOpen ? 'px-2' : 'justify-center'}`}>
+            <div className={`sidebar-header ${isOpen ? 'is-open' : 'is-collapsed'}`}>
                 {isOpen && (
-                    <span className="ml-3 font-bold text-indigo-600 text-lg">SINEM</span>
+                    <span className="sidebar-title">SINEM</span>
                 )}
             </div>
 
@@ -74,7 +75,7 @@ const Sidebar = ({ currentPage, setCurrentPage, isOpen: externalIsOpen, setIsOpe
                 ))}
             </ul>
 
-            <div className="mt-auto border-t pt-4">
+            <div className="sidebar-footer">
                 {footerItems.map(({ icon, title, page, onClick }) => (
                     <NavLink
                         key={page}

@@ -1,47 +1,32 @@
-import { useState, useEffect, useRef, useMemo } from 'react';
 import { formatPhone } from "../generic/function/Function.jsx"
 import { updateStudent } from "../../constant/DBFunctions.jsx"
 import { PersonIcon } from "@radix-ui/react-icons";
 import EditableCellDropdown from '../generic/table/EditableCellDropdown';
 import EditableCellInput from '../generic/table/EditableCellInput.jsx';
 import ColumnToggleMenu from '../generic/table/ColumnToggleMenu';
-import StudentsPagination from './StudentsPagination';
-import StudentsPaginationInput from './StudentsPaginationInput';
+import Pagination from '../generic/pagination/Pagination';
+import PaginationInput from '../generic/pagination/PaginationInput';
+import useTableControls from '../../hooks/useTableControls';
+import useResizableTable from '../../hooks/useResizableTable';
+import DeleteButton from '../generic/table/DeleteButton';
 
 import './studentstable.css';
+
+const COLUMN_KEYS = ['details', 'name', 'reference', 'phone', 'email', 'active', 'scholarship', 'scholarship_amount'];
+
 const StudentsTable = ({ students, loadStudent, minTableWidth = '700px', handleTableUpdate, onDeleteStudent, modalDetailOpen, onRowClick, confirmingId }) => {
+    const { tableWidth, handleMouseDown } = useResizableTable("studentsTableWidth", parseInt(minTableWidth, 10) || 600);
 
-    const minWidthValue = parseInt(minTableWidth, 10) || 600;
-    
-    const [tableWidth, setTableWidth] = useState(() => {
-        const saved = localStorage.getItem("studentsTableWidth");
-        return saved ? Number(saved) : minWidthValue;
-    });
-
-    const [visibleColumns, setVisibleColumns] = useState({
-        details: true,
-        name: true,
-        reference: true,
-        phone: true,
-        email: true,
-        active: true,
-        scholarship: true,
-        scholarship_amount: true,
-    });
-
-    // Pagination State
-    const [currentPage, setCurrentPage] = useState(1);
-    const [itemsPerPage] = useState(5);
-
-    // Sorting State
-    const [sortConfig, setSortConfig] = useState({ key: null, direction: 'default' });
-
-    const toggleColumn = (column) => {
-        setVisibleColumns(prev => ({
-            ...prev,
-            [column]: !prev[column]
-        }));
-    };
+    const {
+        visibleColumns,
+        toggleColumn,
+        requestSort,
+        getSortIndicator,
+        currentPage,
+        totalPages,
+        currentItems,
+        paginate,
+    } = useTableControls(students, COLUMN_KEYS);
 
     const studentColumns = [
         { key: 'details', label: 'Detalles' },
@@ -53,121 +38,6 @@ const StudentsTable = ({ students, loadStudent, minTableWidth = '700px', handleT
         { key: 'scholarship', label: 'Beca' },
         { key: 'scholarship_amount', label: 'Monto Beca' },
     ];
-
-    // Sorting Logic
-    const sortedStudents = useMemo(() => {
-        let sortableItems = [...(students || [])];
-        if (sortConfig.direction !== 'default' && sortConfig.key) {
-            sortableItems.sort((a, b) => {
-                let aValue = a[sortConfig.key];
-                let bValue = b[sortConfig.key];
-
-                // Handle active specifically if needed (assuming 1/0)
-                // Handle null/undefined values safely
-                if (aValue === null || aValue === undefined) aValue = '';
-                if (bValue === null || bValue === undefined) bValue = '';
-
-                if (aValue < bValue) {
-                    return sortConfig.direction === 'ascending' ? -1 : 1;
-                }
-                if (aValue > bValue) {
-                    return sortConfig.direction === 'ascending' ? 1 : -1;
-                }
-                return 0;
-            });
-        }
-        return sortableItems;
-    }, [students, sortConfig]);
-
-    const requestSort = (key) => {
-        let direction = 'ascending';
-        if (sortConfig.key === key && sortConfig.direction === 'ascending') {
-            direction = 'descending';
-        } else if (sortConfig.key === key && sortConfig.direction === 'descending') {
-            direction = 'default';
-        }
-        setSortConfig({ key, direction });
-    };
-
-    const getSortIndicator = (name) => {
-        if (sortConfig.key !== name) {
-            return null;
-        }
-        if (sortConfig.direction === 'ascending') {
-            return <span>&uarr;</span>;
-        }
-        if (sortConfig.direction === 'descending') {
-            return <span>&darr;</span>;
-        }
-        return null;
-    };
-
-    // Pagination Logic
-    const indexOfLastItem = currentPage * itemsPerPage;
-    const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-    const currentItems = sortedStudents.slice(indexOfFirstItem, indexOfLastItem);
-    const totalPages = sortedStudents.length ? Math.ceil(sortedStudents.length / itemsPerPage) : 0;
-
-    const paginate = (pageNumber) => setCurrentPage(pageNumber);
-
-    const dragState = useRef(null);
-    const handleMouseDown = (e) => {
-        e.preventDefault(); 
-        
-        // Almacenar el estado inicial para el cálculo de movimiento
-        dragState.current = {
-            startX: e.clientX,
-            startWidth: tableWidth,
-        };
-        
-        // Adjuntar listeners globales al objeto window para capturar el movimiento
-        // incluso si el cursor se sale del resizer.
-        window.addEventListener('mousemove', handleMouseMove);
-        window.addEventListener('mouseup', handleMouseUp);
-        
-        // Evitar la selección de texto durante el arrastre
-        document.body.style.userSelect = 'none';
-        document.body.style.cursor = 'col-resize';
-    };
-
-    // Actualiza el ancho de la tabla mientras se arrastra
-    const handleMouseMove = (e) => {
-        if (!dragState.current) return;
-        
-        const deltaX = e.clientX - dragState.current.startX;
-        let newWidth = dragState.current.startWidth + deltaX;
-
-        // Aplicar la restricción de ancho mínimo
-        if (newWidth < minWidthValue) {
-            newWidth = minWidthValue;
-        }
-
-        // Aplicar la restricción de ancho máximo (no exceder el ancho del viewport)
-        const maxAllowedWidth = window.innerWidth * 0.95; // 95% del ancho de la ventana
-        if (newWidth > maxAllowedWidth) {
-             newWidth = maxAllowedWidth;
-        }
-
-        setTableWidth(newWidth);
-        localStorage.setItem("studentsTableWidth", newWidth);
-    };
-
-    // Finaliza el proceso de redimensionamiento
-    const handleMouseUp = () => {
-        window.removeEventListener('mousemove', handleMouseMove);
-        window.removeEventListener('mouseup', handleMouseUp);
-        dragState.current = null;
-        document.body.style.userSelect = '';
-        document.body.style.cursor = '';
-    };
-
-    // Limpieza de listeners al desmontar el componente (CRUCIAL)
-    useEffect(() => {
-        return () => {
-            window.removeEventListener('mousemove', handleMouseMove);
-            window.removeEventListener('mouseup', handleMouseUp);
-        };
-    }, []); 
 
     return (
         <div 
@@ -185,7 +55,7 @@ const StudentsTable = ({ students, loadStudent, minTableWidth = '700px', handleT
                 />
 
                 {students && students.length > 0 && (
-                    <StudentsPaginationInput
+                    <PaginationInput
                         currentPage={currentPage}
                         totalPages={totalPages}
                         onPageChange={paginate}
@@ -384,28 +254,17 @@ const StudentsTable = ({ students, loadStudent, minTableWidth = '700px', handleT
                                     )}
                                     {/* Boton Borrado  */}
                                     <td className="payments-td" style={{ textAlign: 'center' }}>
-                                        <button 
-                                            onClick={(e) => onDeleteStudent(e, s.id)}
-                                            className={`delete-btn ${confirmingId === s.id ? 'confirming' : ''}`}
-                                        >
-                                            {confirmingId === s.id ? (
-                                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
-                                                    <polyline points="20 6 9 17 4 12"></polyline>
-                                                </svg>
-                                            ) : (
-                                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                                                    <path d="M3 6h18"></path>
-                                                    <path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"></path>
-                                                    <path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"></path>
-                                                </svg>
-                                            )}
-                                        </button>
+                                        <DeleteButton
+                                            id={s.id}
+                                            confirmingId={confirmingId}
+                                            onDelete={onDeleteStudent}
+                                        />
                                     </td>
                                 </tr>
                             ))}
                             {students.length === 0 && (
                                 <tr>
-                                    <td colSpan="6" style={{ padding: '1rem', textAlign: 'center', color: '#9ca3af' }}>No hay gastos registrados.</td>
+<td colSpan={Object.values(visibleColumns).filter(Boolean).length + 1} style={{ padding: '1rem', textAlign: 'center', color: '#9ca3af' }}>No hay estudiantes registrados.</td>
                                 </tr>
                             )}
                         </tbody>
@@ -431,7 +290,7 @@ const StudentsTable = ({ students, loadStudent, minTableWidth = '700px', handleT
             </div>
             {/* Pagination Controls */}
             {students && students.length > 0 && (
-                <StudentsPagination 
+                <Pagination 
                     currentPage={currentPage}
                     totalPages={totalPages}
                     onPageChange={paginate}

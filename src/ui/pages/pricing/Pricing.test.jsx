@@ -39,11 +39,15 @@ vi.mock('@radix-ui/react-icons', () => ({
 
 beforeEach(() => {
   window.api = {
-    getAllPayments: vi.fn().mockResolvedValue([]),
-    getPaymentConcepts: vi.fn().mockResolvedValue([]),
-    getPaymentDivisions: vi.fn().mockResolvedValue([]),
-    updatePriceConcept: vi.fn().mockResolvedValue({ success: true }),
-    updatePriceDivision: vi.fn().mockResolvedValue({ success: true }),
+    payments: {
+      getAllPayments: vi.fn().mockResolvedValue([]),
+    },
+    pricing: {
+      getPaymentConcepts: vi.fn().mockResolvedValue([]),
+      getPaymentDivisions: vi.fn().mockResolvedValue([]),
+      updatePriceConcept: vi.fn().mockResolvedValue({ success: true }),
+      updatePriceDivision: vi.fn().mockResolvedValue({ success: true }),
+    },
   };
 });
 

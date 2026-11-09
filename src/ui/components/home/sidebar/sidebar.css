@@ -103,3 +103,30 @@
     flex-direction: column;
     gap: 0.25rem;
 }
+
+.sidebar-header {
+    display: flex;
+    align-items: center;
+    margin-bottom: 1.5rem;
+}
+
+.sidebar-header.is-open {
+    padding-left: 0.5rem;
+}
+
+.sidebar-header.is-collapsed {
+    justify-content: center;
+}
+
+.sidebar-title {
+    margin-left: 0.75rem;
+    font-weight: 700;
+    font-size: 1.125rem;
+    color: var(--color-indigo-600);
+}
+
+.sidebar-footer {
+    margin-top: auto;
+    border-top: 1px solid var(--color-border-light);
+    padding-top: 1rem;
+}

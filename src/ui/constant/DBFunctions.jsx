@@ -3,7 +3,7 @@
 */
 export async function getAllPayments() {
     try {
-        return await window.api.getAllPayments();
+        return await window.api.payments.getAllPayments();
     } catch (error) {
         console.error('Error al cargar datos:', error.message);
         return {
@@ -14,7 +14,7 @@ export async function getAllPayments() {
 
 export async function addPayment(payment) {
     try {
-        return await window.api.addPayment(payment);;
+        return await window.api.payments.addPayment(payment);
     } catch (error) {
         console.error('Error al agregar pago:', error.message);
         return {
@@ -25,7 +25,7 @@ export async function addPayment(payment) {
 
 export async function addPaymentWithConsecutive(payment) {
     try {
-        return await window.api.addPaymentWithConsecutive(payment);;
+        return await window.api.payments.addPaymentWithConsecutive(payment);
     } catch (error) {
         console.error('Error al agregar pago:', error.message);
         return {
@@ -36,7 +36,7 @@ export async function addPaymentWithConsecutive(payment) {
 
 export async function updatePayment(payment) {
     try {
-        return await window.api.updatePayment(payment);;
+        return await window.api.payments.updatePayment(payment);
     } catch (error) {
         console.error('Error al agregar pago:', error.message);
         return {
@@ -47,7 +47,7 @@ export async function updatePayment(payment) {
 
 export async function getNextConsecutiveByYear(year){
     try {
-        return await window.api.getNextConsecutiveByYear(year);
+        return await window.api.payments.getNextConsecutiveByYear(year);
     } catch (error) {
         console.error('Error al obtener consecutivo:', error.message);
         return {
@@ -58,7 +58,7 @@ export async function getNextConsecutiveByYear(year){
 
 export async function getPaymentsByYear(year) {
     try {
-        return await window.api.getPaymentsByYear(year);
+        return await window.api.payments.getPaymentsByYear(year);
     } catch (error) {
         console.error('Error al obtener pagos por año:', error.message);
         return []; 
@@ -67,7 +67,7 @@ export async function getPaymentsByYear(year) {
 
 export async function getYearsOfPayments() {
     try {
-        return await window.api.getYearsOfPayments();
+        return await window.api.payments.getYearsOfPayments();
     } catch (error) {
         console.error('Error al obtener año de pagos:', error.message);
         return []; 
@@ -76,7 +76,7 @@ export async function getYearsOfPayments() {
 
 export async function getDateOfPayments() {
     try {
-        return await window.api.getDateOfPayments();
+        return await window.api.payments.getDateOfPayments();
     } catch (error) {
         console.error('Error al obtener año de pagos:', error.message);
         return []; 
@@ -85,7 +85,7 @@ export async function getDateOfPayments() {
 
 export async function getPaymentByStudentId(id) {
     try {
-        return await window.api.getPaymentByStudentId(id);
+        return await window.api.payments.getPaymentByStudentId(id);
     }
     catch (error) {
         console.error('Error al obtener pago por ID de estudiante:', error.message);
@@ -97,7 +97,7 @@ export async function getPaymentByStudentId(id) {
 
 export async function deletePaymentById(paymentId) {
     try {
-        return await window.api.deletePaymentById(paymentId);
+        return await window.api.payments.deletePaymentById(paymentId);
     }
     catch (error) {
         console.error('Error al eliminar pago por ID:', error.message);
@@ -107,7 +107,7 @@ export async function deletePaymentById(paymentId) {
 
 export async function getPaymentConcepts() {
     try {
-        return await window.api.getPaymentConcepts();
+        return await window.api.pricing.getPaymentConcepts();
     } catch (error) {
         console.error('Error al obtener conceptos de pago:', error.message);
         return []; 
@@ -116,7 +116,7 @@ export async function getPaymentConcepts() {
 
 export async function getExpectedIncome(years) {
     try {
-        return await window.api.getExpectedIncome(years);
+        return await window.api.reports.getExpectedIncome(years);
     } catch (error) {
         console.error('Error al obtener ingreso esperado:', error.message);
         return { matricula: 0, monthly: 0 };
@@ -125,7 +125,7 @@ export async function getExpectedIncome(years) {
 
 export async function getPaymentAmount(divisionId, conceptId) {
     try {
-        return await window.api.getPaymentAmount({ divisionId, conceptId });
+        return await window.api.pricing.getPaymentAmount({ divisionId, conceptId });
     } catch (error) {
         console.error('Error al obtener monto de pago:', error.message);
         return 0;
@@ -134,7 +134,7 @@ export async function getPaymentAmount(divisionId, conceptId) {
 
 export async function getPaymentDivisions() {
     try {
-        return await window.api.getPaymentDivisions();
+        return await window.api.pricing.getPaymentDivisions();
     } catch (error) {
         console.error('Error al obtener conceptos de pago:', error.message);
         return []; 
@@ -143,7 +143,7 @@ export async function getPaymentDivisions() {
 
 export async function getDelayPayments(year) {
     try {
-        return await window.api.getDelayPayments(year);
+        return await window.api.reports.getDelayPayments(year);
     } catch (error) {
         console.error('Error al morosidad por mes:', error.message);
         return []; 
@@ -155,7 +155,7 @@ export async function getDelayPayments(year) {
 */
 export async function getAllExpenses() {
     try {
-        return await window.api.getAllExpenses();
+        return await window.api.expenses.getAllExpenses();
     } catch (error) {
         console.error('Error al obtener egresos:', error.message);
         return []; 
@@ -164,7 +164,7 @@ export async function getAllExpenses() {
 
 export async function getExpensesByYear(year) {
     try {
-        return await window.api.getExpensesByYear(year);
+        return await window.api.expenses.getExpensesByYear(year);
     } catch (error) {
         console.error('Error al obtener gastos por año:', error.message);
         return []; 
@@ -173,7 +173,7 @@ export async function getExpensesByYear(year) {
 
 export async function getYearsOfExpenses() {
     try {
-        return await window.api.getYearsOfExpenses();
+        return await window.api.expenses.getYearsOfExpenses();
     } catch (error) {
         console.error('Error al obtener año de gastos:', error.message);
         return []; 
@@ -182,7 +182,7 @@ export async function getYearsOfExpenses() {
 
 export async function addExpense(expenseData) {
     try {
-        return await window.api.addExpense(expenseData);
+        return await window.api.expenses.addExpense(expenseData);
     } catch (error) {
         return {
             error: error.message,
@@ -192,7 +192,7 @@ export async function addExpense(expenseData) {
 
 export async function updateExpense(expense) {
     try {
-        return await window.api.updateExpense(expense);
+        return await window.api.expenses.updateExpense(expense);
     } catch (error) {
         console.error('Error al cambiar gasto:', error.message);
         return {
@@ -203,7 +203,7 @@ export async function updateExpense(expense) {
 
 export async function deleteExpenseById(expenseId) {
     try {
-        return await window.api.deleteExpenseById(expenseId);
+        return await window.api.expenses.deleteExpenseById(expenseId);
     }
     catch (error) {
         console.error('Error al eliminar egreso por ID:', error.message);
@@ -216,7 +216,7 @@ export async function deleteExpenseById(expenseId) {
 */
 export async function getAllStudents() {
     try {
-        return await window.api.getAllStudents();
+        return await window.api.students.getAllStudents();
     } catch (error) {
         console.error('Error al obtener estudiantes:', error.message);
         return []; 
@@ -225,7 +225,7 @@ export async function getAllStudents() {
 
 export async function getStudentsByActive(active) {
     try {
-        return await window.api.getStudentsByActive(active);
+        return await window.api.students.getStudentsByActive(active);
     } catch (error) {
         console.error('Error al obtener estudiantes por estado:', error.message);
         return []; 
@@ -234,7 +234,7 @@ export async function getStudentsByActive(active) {
 
 export async function getStudentsActive() {
     try {
-        return await window.api.getStudentsActive();
+        return await window.api.students.getStudentsActive();
     } catch (error) {
         console.error('Error al obtener estado de estudiantes:', error.message);
         return []; 
@@ -243,7 +243,7 @@ export async function getStudentsActive() {
 
 export async function getStudentCount() {
     try {
-        return await window.api.getStudentCount();
+        return await window.api.students.getStudentCount();
     } catch (error) {
         console.error('Error al obtener cantidad de estudiantes:', error.message);
         return []; 
@@ -252,7 +252,7 @@ export async function getStudentCount() {
 
 export async function addStudent(studentData) {
     try {
-        return await window.api.addStudent(studentData);
+        return await window.api.students.addStudent(studentData);
     } catch (error) {
         console.error('Error al agregar estudiante:', error.message);
         return []; 
@@ -261,7 +261,7 @@ export async function addStudent(studentData) {
 
 export async function updateStudent(student) {
     try {
-        return await window.api.updateStudent(student);;
+        return await window.api.students.updateStudent(student);
     } catch (error) {
         console.error('Error al cambiar estudiante:', error.message);
         return {
@@ -272,7 +272,7 @@ export async function updateStudent(student) {
 
 export async function deleteStudentById(studentId) {
     try {
-        return await window.api.deleteStudentById(studentId);
+        return await window.api.students.deleteStudentById(studentId);
     }
     catch (error) {
         console.error('Error al eliminar estudiante por ID:', error.message);
@@ -285,7 +285,7 @@ export async function deleteStudentById(studentId) {
 */
 export async function getAllTeachers() {
     try {
-        return await window.api.getAllTeachers();
+        return await window.api.teachers.getAllTeachers();
     } catch (error) {
         console.error('Error al obtener profesores:', error.message);
         return {
@@ -296,7 +296,7 @@ export async function getAllTeachers() {
 
 export async function addTeacher(teacherData) {
     try {
-        return await window.api.addTeacher(teacherData);
+        return await window.api.teachers.addTeacher(teacherData);
     } catch (error) {
         console.error('Error al agregar profesor:', error.message);
         return {
@@ -307,7 +307,7 @@ export async function addTeacher(teacherData) {
 
 export async function deleteTeacherById(teacherId) {
     try {
-        return await window.api.deleteTeacherById(teacherId);
+        return await window.api.teachers.deleteTeacherById(teacherId);
     } catch (error) {
         console.error('Error al eliminar profesor por ID:', error.message);
         return {
@@ -318,7 +318,7 @@ export async function deleteTeacherById(teacherId) {
 
 export async function updateTeacher(teacherData) {
     try {
-        return await window.api.updateTeacher(teacherData);
+        return await window.api.teachers.updateTeacher(teacherData);
     } catch (error) {
         console.error('Error al cambiar profesor:', error.message);
         return {
@@ -332,7 +332,7 @@ export async function updateTeacher(teacherData) {
 */
 export async function addDivision(division) {
     try {
-        return await window.api.addDivision(division);
+        return await window.api.pricing.addDivision(division);
     } catch (error) {
         console.error('Error al agregar curso:', error.message);
         return []; 
@@ -341,7 +341,7 @@ export async function addDivision(division) {
 
 export async function deleteDivision(id) {
     try {
-        return await window.api.deleteDivision(id);
+        return await window.api.pricing.deleteDivision(id);
     } catch (error) {
         console.error('Error al eliminar curso:', error.message);
         return [];
@@ -350,7 +350,7 @@ export async function deleteDivision(id) {
 
 export async function updateDivision(data) {
     try {
-        return await window.api.updateDivision(data);
+        return await window.api.pricing.updateDivision(data);
     } catch (error) {
         console.error('Error al actualizar curso:', error.message);
         return [];
@@ -359,7 +359,7 @@ export async function updateDivision(data) {
 
 export async function updatePriceConcept(paymentData) {
     try {
-        return await window.api.updatePriceConcept(paymentData);
+        return await window.api.pricing.updatePriceConcept(paymentData);
     } catch (error) {
         console.error('Error al actualizar precio:', error.message);
         return []; 
@@ -368,7 +368,7 @@ export async function updatePriceConcept(paymentData) {
 
 export async function updatePriceDivision(paymentData) {
     try {
-        return await window.api.updatePriceDivision(paymentData);
+        return await window.api.pricing.updatePriceDivision(paymentData);
     } catch (error) {
         console.error('Error al actualizar precio:', error.message);
         return [];
@@ -377,7 +377,7 @@ export async function updatePriceDivision(paymentData) {
 
 export async function getAllDivisionPaymentConcepts() {
     try {
-        return await window.api.getAllDivisionPaymentConcepts();
+        return await window.api.pricing.getAllDivisionPaymentConcepts();
     } catch (error) {
         console.error('Error al obtener conceptos de pago por división:', error.message);
         return []; 
@@ -386,7 +386,7 @@ export async function getAllDivisionPaymentConcepts() {
 
 export async function updateDivisionPaymentConcept(data) {
     try {
-        return await window.api.updateDivisionPaymentConcept(data);
+        return await window.api.pricing.updateDivisionPaymentConcept(data);
     } catch (error) {
         console.error('Error al actualizar precio por división:', error.message);
         return []; 
@@ -398,7 +398,7 @@ export async function updateDivisionPaymentConcept(data) {
 */
 export async function getCashRegister() {
     try {
-        return await window.api.getCashRegister();
+        return await window.api.reports.getCashRegister();
     } catch (error) {
         console.error('Error al adquirir estado de caja:', error.message);
         return []; 
@@ -411,7 +411,7 @@ export async function getCashRegister() {
 */
 export async function exportReceiptToExcel(payment) {
     try {
-        return await window.api.exportReceiptToExcel(payment);
+        return await window.api.excel.exportReceiptToExcel(payment);
     } catch (error) {
         console.error('Error al exportar recivo a excel:', error.message);
         return {
@@ -422,11 +422,11 @@ export async function exportReceiptToExcel(payment) {
 
 export async function exportReportToExcel(data) {
     try {
-        return await window.api.exportReportToExcel(data);
+        return await window.api.excel.exportReportToExcel(data);
     } catch (error) {
         console.error('Error al exportar reporte a excel:', error.message);
         return {
-            error: "Error al exportar reporte a excel. Revise que no tengaa el archivo con el mismo nombre abierto.",
+            error: "Error al exportar reporte a excel. Revise que no tenga el archivo con el mismo nombre abierto.",
         }; 
     }
 }
@@ -434,7 +434,7 @@ export async function exportReportToExcel(data) {
 
 export async function exportCashRegisterReportToExcel(data) {
     try {
-        return await window.api.exportCashRegisterReportToExcel(data);
+        return await window.api.excel.exportCashRegisterReportToExcel(data);
     } catch (error) {
         console.error('Error al exportar reporte de caja a excel:', error.message);
         return {
@@ -445,18 +445,18 @@ export async function exportCashRegisterReportToExcel(data) {
 
 export async function exportPaymentsByYearToExcel(paymentData) {
     try {
-        return await window.api.exportPaymentsByYearToExcel(paymentData);
+        return await window.api.excel.exportPaymentsByYearToExcel(paymentData);
     } catch (error) {
         console.error('Error al exportar pagos por año a excel:', error.message);
         return {
-            error: "Error al exportar pagos por año a excel. Revise que no tengaa el archivo con el mismo nombre abierto.",
+            error: "Error al exportar pagos por año a excel. Revise que no tenga el archivo con el mismo nombre abierto.",
         }; 
     }
 }
 
 export async function exportExpensesByYearToExcel(expenseData) {
     try {
-        return await window.api.exportExpensesByYearToExcel(expenseData);
+        return await window.api.excel.exportExpensesByYearToExcel(expenseData);
     } catch (error) {
         console.error('Error al exportar egresos por año a excel:', error.message);
         return {
@@ -467,7 +467,7 @@ export async function exportExpensesByYearToExcel(expenseData) {
 
 export async function exportStudentsByActiveToExcel(studentData) {
     try {
-        return await window.api.exportStudentsByActiveToExcel(studentData);
+        return await window.api.excel.exportStudentsByActiveToExcel(studentData);
     } catch (error) {
         console.error('Error al exportar estudiantes por estado a excel:', error.message);
         return {
@@ -478,7 +478,7 @@ export async function exportStudentsByActiveToExcel(studentData) {
 
 export async function exportTemplateStudents() {
     try {
-        return await window.api.exportTemplateStudents();
+        return await window.api.excel.exportTemplateStudents();
     } catch (error) {
         console.error('Error al generar plantilla excel estudiantes:', error.message);
         return {
@@ -489,7 +489,7 @@ export async function exportTemplateStudents() {
 
 export async function exportHistoric(data) {
     try {
-        return await window.api.exportHistoric(data);
+        return await window.api.excel.exportHistoric(data);
     } catch (error) {
         console.error('Error al exportar respaldo por estado a excel:', error.message);
         return {
@@ -500,7 +500,7 @@ export async function exportHistoric(data) {
 
 export async function exportDelayByMonthReportToExcel(data) {
     try {
-        return await window.api.exportDelayByMonthReportToExcel(data);
+        return await window.api.excel.exportDelayByMonthReportToExcel(data);
     } catch (error) {
         console.error('Error al exportar reporte de morosidad por mes a excel:', error.message);
         return {
@@ -512,7 +512,7 @@ export async function exportDelayByMonthReportToExcel(data) {
 
 export async function exportDelayByTeacherReportToExcel(data) {
     try {
-        return await window.api.exportDelayByTeacherReportToExcel(data);
+        return await window.api.excel.exportDelayByTeacherReportToExcel(data);
     } catch (error) {
         console.error('Error al exportar reporte de morosidad por profesor a excel:', error.message);
         return {
@@ -523,18 +523,18 @@ export async function exportDelayByTeacherReportToExcel(data) {
 
 export async function importStudentsFromExcel(studentsData) {
     try {
-        return await window.api.importStudentsFromExcel(studentsData);
+        return await window.api.excel.importStudentsFromExcel(studentsData);
     } catch (error) {
         console.error('Error al importar estudiantes desde el excel:', error.message);
         return {
-            error: "Error al exportar respaldo por estado a excel.",
+            error: "Error al importar estudiantes desde el excel.",
         }; 
     }
 }
 
 export async function importStudents(studentsData) {
     try {
-        return await window.api.importStudents(studentsData);
+        return await window.api.students.importStudents(studentsData);
     } catch (error) {
         console.error('Error al importar estudiantes:', error.message);
         return {
@@ -549,7 +549,7 @@ export async function importStudents(studentsData) {
 
 export async function addImage(imageData) {
     try {
-        return await window.api.addImage(imageData);
+        return await window.api.images.addImage(imageData);
     } catch (error) {
         console.error('Error al agregar imagen:', error.message);
         return {
@@ -560,7 +560,7 @@ export async function addImage(imageData) {
 
 export async function getImages() {
     try {
-        return await window.api.getImages();
+        return await window.api.images.getImages();
     } catch (error) {
         console.error('Error al obtener imagenes:', error.message);
         return {
@@ -571,7 +571,7 @@ export async function getImages() {
 
 export async function setImage(imageState) {
     try {
-        return await window.api.setImage(imageState);
+        return await window.api.images.setImage(imageState);
     } catch (error) {
         console.error('Error al establecer imagen:', error.message);
         return {
@@ -582,7 +582,7 @@ export async function setImage(imageState) {
 
 export async function getCurrentImage() {
     try {
-        return await window.api.getCurrentImage();
+        return await window.api.images.getCurrentImage();
     } catch (error) {
         console.error('Error al obtener imagen:', error.message);
         return {
@@ -593,7 +593,7 @@ export async function getCurrentImage() {
 
 export async function deleteImageById(id) {
     try {
-        return await window.api.deleteImageById(id);
+        return await window.api.images.deleteImageById(id);
     } catch (error) {
         console.error('Error al eliminar imagen:', error.message);
         return {
@@ -604,7 +604,7 @@ export async function deleteImageById(id) {
 
 export async function quitApp() {
     try {
-        return await window.api.quitApp();
+        return await window.api.app.quitApp();
     } catch (error) {
         console.error('Error al cerrar aplicación:', error.message);
         return {

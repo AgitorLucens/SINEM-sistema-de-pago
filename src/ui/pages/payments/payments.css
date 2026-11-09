@@ -97,3 +97,9 @@
         justify-content: space-between;
     }
 }
+.payments-loading {
+    padding: 1rem;
+    text-align: center;
+    color: var(--color-indigo-600);
+    font-weight: 600;
+}

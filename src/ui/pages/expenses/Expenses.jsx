@@ -15,7 +15,7 @@ import { PlusCircledIcon } from "@radix-ui/react-icons";
 import './expenses.css';
 
 const Expenses = () => {
-    const { formData, setFormData, handleChange, resetForm } = useForm({
+    const { formData, handleChange, resetForm } = useForm({
         amount: '',
         date: null,
         description: '',

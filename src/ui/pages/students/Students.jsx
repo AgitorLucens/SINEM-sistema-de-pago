@@ -114,15 +114,15 @@ const Students = () => {
             await addStudent(studentDataToSend);
             resetForm();
             setError(null);
+            setIsModalOpen(false);
             await fetchData();
+            showMessage("Estudiante registrado exitosamente");
         } catch (e) {
-            console.error("Error al guardar el pago vía IPC:", e);
-            showError("Error al guardar el pago: " + (e.message || 'Error desconocido. Verifique la consola.'));
+            console.error("Error al guardar el estudiante vía IPC:", e);
+            showError("Error al guardar el estudiante: " + (e.message || 'Error desconocido. Verifique la consola.'));
         } finally {
             setIsLoading(false);
         }
-        setIsModalOpen(false);
-        showMessage("Estudiante registrado exitosamente");
     }, [formData, fetchData, resetForm, showMessage, showError, setError]);
 
     const handleDeleteRequest = useCallback((e, studentId) => {

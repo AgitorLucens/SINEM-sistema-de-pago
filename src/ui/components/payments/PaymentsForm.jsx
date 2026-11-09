@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import SelectRadix from "../generic/select/SelectRadix.jsx";
 import DatePicker from "../generic/datepicker/DatePicker.jsx";
-import { onRadixChange, handleFieldChange, formatConsecutive, formatCRC } from "../generic/function/Function.jsx";
+import { onRadixChange, formatConsecutive, formatCRC } from "../generic/function/Function.jsx";
 
 const PaymentsForm = ({ formData, handleChange, handleStudent, handleConcept, handleDivision, handleAmount, handleDate, onSubmit, isLoading, concepts, divisions, students, months }) => {
     const [value, setValue] = useState(formData.amount);

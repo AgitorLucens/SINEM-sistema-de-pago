@@ -1,8 +1,6 @@
-import React from 'react';
-import '../teachers/teacherstable.css'; // Reuse CSS
+import './pagination.css';
 
-const PaymentsPagination = ({ currentPage, totalPages, onPageChange }) => {
-    // Generate page numbers to display
+const Pagination = ({ currentPage, totalPages, onPageChange }) => {
     const pageNumbers = [];
     for (let i = 1; i <= totalPages; i++) {
         pageNumbers.push(i);
@@ -43,4 +41,4 @@ const PaymentsPagination = ({ currentPage, totalPages, onPageChange }) => {
     );
 };
 
-export default PaymentsPagination;
+export default Pagination;

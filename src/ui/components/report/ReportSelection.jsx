@@ -1,5 +1,5 @@
 import ReportCard from "./ReportCard.jsx";
-import { Users, FileText, TrendingUp, TrendingDown, PieDiagramIcon } from "../icons/Icons.jsx";
+import { Users, FileText, TrendingUp, PieDiagramIcon } from "../icons/Icons.jsx";
 
 import './reportsection.css';
 const ReportSelection = ({ onSelectReport }) => {

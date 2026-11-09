@@ -19,7 +19,10 @@ vi.mock('../../constant/Pages.jsx', () => ({
 }));
 
 beforeEach(() => {
-  window.api = { quitApp: vi.fn(), getCurrentImage: vi.fn().mockResolvedValue({ image: null }) };
+  window.api = {
+    app: { quitApp: vi.fn() },
+    images: { getCurrentImage: vi.fn().mockResolvedValue({ image: null }) },
+  };
 });
 
 import Home from './Home.jsx';

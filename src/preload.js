@@ -1,83 +1,107 @@
 // See the Electron documentation for details on how to use preload scripts:
 // https://www.electronjs.org/docs/latest/tutorial/process-model#preload-scripts
-const { contextBridge, ipcRenderer } = require('electron');
+import { contextBridge, ipcRenderer } from 'electron';
+import { CHANNELS } from './ipc/channels.js';
 
+/*
+    The renderer's ONLY bridge to the main process: window.api.
+    Namespaced by domain — the namespaces mirror the layout of
+    src/domain/db/repositories and src/ipc/channels.js.
+
+    Channel strings are NEVER written here; they come from channels.js
+    so preload and main cannot drift apart.
+*/
 const api = {
-    // Pagina Pagos
-    addPayment: (paymentData) => ipcRenderer.invoke('add-payment', paymentData),
-    updatePayment: (paymentData) => ipcRenderer.invoke('update-payment', paymentData),
-    addPaymentWithConsecutive: (data) => ipcRenderer.invoke('add-payment-without-consecutive', data),
-    getNextConsecutiveByYear: (year) => ipcRenderer.invoke('get-consecutive', year),
-    getAllPayments: () => ipcRenderer.invoke('get-all-payments'),
-    getPaymentsByYear: (year) => ipcRenderer.invoke('get-payments-by-year', year),
-    getYearsOfPayments: () => ipcRenderer.invoke('get-year-payments'),
-    getDateOfPayments: () => ipcRenderer.invoke('get-date-payments'),
-    getPaymentByStudentId: (id) => ipcRenderer.invoke('get-payment-by-student-id', id),
-    deletePaymentById: (id) => ipcRenderer.invoke('delete-payment-by-id', id),
-    getPaymentConcepts: () => ipcRenderer.invoke('get-payment-concepts'),
-    getPaymentDivisions: () => ipcRenderer.invoke('get-payment-divisions'),
-    getDelayPayments: (year) => ipcRenderer.invoke('get-delay-payment', year),
+    // Pagos
+    payments: {
+        addPayment: (paymentData) => ipcRenderer.invoke(CHANNELS.payments.addPayment, paymentData),
+        updatePayment: (paymentData) => ipcRenderer.invoke(CHANNELS.payments.updatePayment, paymentData),
+        addPaymentWithConsecutive: (data) => ipcRenderer.invoke(CHANNELS.payments.addPaymentWithConsecutive, data),
+        getNextConsecutiveByYear: (year) => ipcRenderer.invoke(CHANNELS.payments.getNextConsecutiveByYear, year),
+        getAllPayments: () => ipcRenderer.invoke(CHANNELS.payments.getAllPayments),
+        getPaymentsByYear: (year) => ipcRenderer.invoke(CHANNELS.payments.getPaymentsByYear, year),
+        getYearsOfPayments: () => ipcRenderer.invoke(CHANNELS.payments.getYearsOfPayments),
+        getDateOfPayments: () => ipcRenderer.invoke(CHANNELS.payments.getDateOfPayments),
+        getPaymentByStudentId: (id) => ipcRenderer.invoke(CHANNELS.payments.getPaymentByStudentId, id),
+        deletePaymentById: (id) => ipcRenderer.invoke(CHANNELS.payments.deletePaymentById, id),
+    },
 
-    // Pagina Egresos
-    getAllExpenses: () => ipcRenderer.invoke('get-all-expenses'),
-    getExpensesByYear: (year) => ipcRenderer.invoke('get-expenses-by-year', year),
-    getYearsOfExpenses: () => ipcRenderer.invoke('get-year-expenses'),
-    addExpense: (expenseData) => ipcRenderer.invoke('add-expense', expenseData),
-    updateExpense: (expenseData) => ipcRenderer.invoke('update-expense', expenseData),
-    deleteExpenseById: (id) => ipcRenderer.invoke('delete-expense-by-id', id),
+    pricing: {
+        getPaymentConcepts: () => ipcRenderer.invoke(CHANNELS.pricing.getPaymentConcepts),
+        getPaymentDivisions: () => ipcRenderer.invoke(CHANNELS.pricing.getPaymentDivisions),
+        getPaymentAmount: (data) => ipcRenderer.invoke(CHANNELS.pricing.getPaymentAmount, data),
+        addDivision: (division) => ipcRenderer.invoke(CHANNELS.pricing.addDivision, division),
+        deleteDivision: (id) => ipcRenderer.invoke(CHANNELS.pricing.deleteDivision, id),
+        updateDivision: (data) => ipcRenderer.invoke(CHANNELS.pricing.updateDivision, data),
+        updatePriceConcept: (concept) => ipcRenderer.invoke(CHANNELS.pricing.updatePriceConcept, concept),
+        updatePriceDivision: (division) => ipcRenderer.invoke(CHANNELS.pricing.updatePriceDivision, division),
+        getAllDivisionPaymentConcepts: () => ipcRenderer.invoke(CHANNELS.pricing.getAllDivisionPaymentConcepts),
+        updateDivisionPaymentConcept: (data) => ipcRenderer.invoke(CHANNELS.pricing.updateDivisionPaymentConcept, data),
+    },
 
-    // Pagina Estudiantes
-    getAllStudents: () => ipcRenderer.invoke('get-all-students'),
-    getStudentsByActive: (active) => ipcRenderer.invoke('get-students-by-active', active),
-    getStudentsActive: () => ipcRenderer.invoke('get-students-active'),
-    getStudentCount: () => ipcRenderer.invoke('get-students-count'),
-    addStudent: (studentData) => ipcRenderer.invoke('add-student', studentData),
-    updateStudent: (studentData) => ipcRenderer.invoke('update-student', studentData),
-    getPaymentById: (paymentId) => ipcRenderer.invoke('get-payment-by-id', paymentId),
-    deleteStudentById: (id) => ipcRenderer.invoke('delete-student-by-id', id),
+    reports: {
+        getDelayPayments: (year) => ipcRenderer.invoke(CHANNELS.reports.getDelayPayments, year),
+        getExpectedIncome: (data) => ipcRenderer.invoke(CHANNELS.reports.getExpectedIncome, data),
+        getCashRegister: () => ipcRenderer.invoke(CHANNELS.reports.getCashRegister),
+    },
 
-    // Pagina Profesores
-    getAllTeachers: () => ipcRenderer.invoke('get-all-teachers'),
-    addTeacher: (teacherData) => ipcRenderer.invoke('add-teacher', teacherData),
-    deleteTeacherById: (id) => ipcRenderer.invoke('delete-teacher-by-id', id),
-    updateTeacher: (teacherData) => ipcRenderer.invoke('update-teacher', teacherData),
+    // Egresos
+    expenses: {
+        getAllExpenses: () => ipcRenderer.invoke(CHANNELS.expenses.getAllExpenses),
+        getExpensesByYear: (year) => ipcRenderer.invoke(CHANNELS.expenses.getExpensesByYear, year),
+        getYearsOfExpenses: () => ipcRenderer.invoke(CHANNELS.expenses.getYearsOfExpenses),
+        addExpense: (expenseData) => ipcRenderer.invoke(CHANNELS.expenses.addExpense, expenseData),
+        updateExpense: (expenseData) => ipcRenderer.invoke(CHANNELS.expenses.updateExpense, expenseData),
+        deleteExpenseById: (id) => ipcRenderer.invoke(CHANNELS.expenses.deleteExpenseById, id),
+    },
 
-    // Pagina Precios
-    addDivision: (division) => ipcRenderer.invoke('add-division', division),
-    deleteDivision: (id) => ipcRenderer.invoke('delete-division', id),
-    updateDivision: (data) => ipcRenderer.invoke('update-division', data),
-    updatePriceConcept: (concept) => ipcRenderer.invoke('update-price-concept', concept),
-    updatePriceDivision: (division) => ipcRenderer.invoke('update-price-division', division),
-    getAllDivisionPaymentConcepts: () => ipcRenderer.invoke('get-all-division-payment-concepts'),
-    updateDivisionPaymentConcept: (data) => ipcRenderer.invoke('update-division-payment-concept', data),
-    getPaymentAmount: (data) => ipcRenderer.invoke('get-payment-amount', data),
+    // Estudiantes
+    students: {
+        getAllStudents: () => ipcRenderer.invoke(CHANNELS.students.getAllStudents),
+        getStudentsByActive: (active) => ipcRenderer.invoke(CHANNELS.students.getStudentsByActive, active),
+        getStudentsActive: () => ipcRenderer.invoke(CHANNELS.students.getStudentsActive),
+        getStudentCount: () => ipcRenderer.invoke(CHANNELS.students.getStudentCount),
+        addStudent: (studentData) => ipcRenderer.invoke(CHANNELS.students.addStudent, studentData),
+        updateStudent: (studentData) => ipcRenderer.invoke(CHANNELS.students.updateStudent, studentData),
+        deleteStudentById: (id) => ipcRenderer.invoke(CHANNELS.students.deleteStudentById, id),
+        importStudents: (studentsData) => ipcRenderer.invoke(CHANNELS.students.importStudents, studentsData),
+    },
 
-    // Pagina Reporte
-    getCashRegister: () => ipcRenderer.invoke('get-cash-register'),
-    getExpectedIncome: (data) => ipcRenderer.invoke('get-expected-income',data),
+    // Profesores
+    teachers: {
+        getAllTeachers: () => ipcRenderer.invoke(CHANNELS.teachers.getAllTeachers),
+        addTeacher: (teacherData) => ipcRenderer.invoke(CHANNELS.teachers.addTeacher, teacherData),
+        deleteTeacherById: (id) => ipcRenderer.invoke(CHANNELS.teachers.deleteTeacherById, id),
+        updateTeacher: (teacherData) => ipcRenderer.invoke(CHANNELS.teachers.updateTeacher, teacherData),
+    },
 
     // Excel
-    exportReceiptToExcel: (payment) => ipcRenderer.invoke('export-receipt-excel', payment),
-    exportReportToExcel: (data) => ipcRenderer.invoke('export-report-excel', data),     
-    exportPaymentsByYearToExcel: (paymentData) => ipcRenderer.invoke('export-payments-by-year', paymentData),
-    exportExpensesByYearToExcel: (expenseData) => ipcRenderer.invoke('export-expenses-by-year', expenseData),
-    exportStudentsByActiveToExcel: (studentData) => ipcRenderer.invoke('export-students-by-active', studentData),
-    exportTemplateStudents: () => ipcRenderer.invoke('export-students-template'),
-    exportHistoric: (data) => ipcRenderer.invoke('export-historic', data),
-    exportCashRegisterReportToExcel: (data) => ipcRenderer.invoke('export-cash-register-report', data),
-    exportDelayByMonthReportToExcel: (data) => ipcRenderer.invoke('export-delay-by-month-report', data),
-    exportDelayByTeacherReportToExcel: (data) => ipcRenderer.invoke('export-delay-by-teacher-report', data),
+    excel: {
+        exportReceiptToExcel: (payment) => ipcRenderer.invoke(CHANNELS.excel.exportReceiptToExcel, payment),
+        exportReportToExcel: (data) => ipcRenderer.invoke(CHANNELS.excel.exportReportToExcel, data),
+        exportCashRegisterReportToExcel: (data) => ipcRenderer.invoke(CHANNELS.excel.exportCashRegisterReportToExcel, data),
+        exportPaymentsByYearToExcel: (paymentData) => ipcRenderer.invoke(CHANNELS.excel.exportPaymentsByYearToExcel, paymentData),
+        exportExpensesByYearToExcel: (expenseData) => ipcRenderer.invoke(CHANNELS.excel.exportExpensesByYearToExcel, expenseData),
+        exportStudentsByActiveToExcel: (studentData) => ipcRenderer.invoke(CHANNELS.excel.exportStudentsByActiveToExcel, studentData),
+        exportTemplateStudents: () => ipcRenderer.invoke(CHANNELS.excel.exportTemplateStudents),
+        exportHistoric: (data) => ipcRenderer.invoke(CHANNELS.excel.exportHistoric, data),
+        exportDelayByMonthReportToExcel: (data) => ipcRenderer.invoke(CHANNELS.excel.exportDelayByMonthReportToExcel, data),
+        exportDelayByTeacherReportToExcel: (data) => ipcRenderer.invoke(CHANNELS.excel.exportDelayByTeacherReportToExcel, data),
+        importStudentsFromExcel: (studentsData) => ipcRenderer.invoke(CHANNELS.excel.importStudentsFromExcel, studentsData),
+    },
 
-    importStudentsFromExcel: (studentsData) => ipcRenderer.invoke('import-student-from-excel', studentsData),
-    importStudents: (studentsData) => ipcRenderer.invoke('import-student', studentsData),
-    
     // App functionality
-    addImage: (imageData) => ipcRenderer.invoke('add-image', imageData),
-    getImages: () => ipcRenderer.invoke('get-images'),
-    setImage: (imageState) => ipcRenderer.invoke('set-image', imageState),
-    getCurrentImage: () => ipcRenderer.invoke('get-current-image'),
-    deleteImageById: (id) => ipcRenderer.invoke('delete-image-by-id', id),
-    quitApp: () => ipcRenderer.invoke("app:quit"),
+    images: {
+        addImage: (imageData) => ipcRenderer.invoke(CHANNELS.images.addImage, imageData),
+        getImages: () => ipcRenderer.invoke(CHANNELS.images.getImages),
+        setImage: (imageState) => ipcRenderer.invoke(CHANNELS.images.setImage, imageState),
+        getCurrentImage: () => ipcRenderer.invoke(CHANNELS.images.getCurrentImage),
+        deleteImageById: (id) => ipcRenderer.invoke(CHANNELS.images.deleteImageById, id),
+    },
+
+    app: {
+        quitApp: () => ipcRenderer.invoke(CHANNELS.app.quitApp),
+    },
 }
 
 contextBridge.exposeInMainWorld('api', api);

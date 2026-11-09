@@ -61,15 +61,25 @@ vi.mock('@radix-ui/react-icons', () => ({
 
 beforeEach(() => {
   window.api = {
-    getAllPayments: vi.fn().mockResolvedValue([]),
-    getAllExpenses: vi.fn().mockResolvedValue([]),
-    getAllStudents: vi.fn().mockResolvedValue([]),
-    getAllTeachers: vi.fn().mockResolvedValue([]),
-    getPaymentConcepts: vi.fn().mockResolvedValue([]),
-    getPaymentDivisions: vi.fn().mockResolvedValue([]),
-    getYearsOfPayments: vi.fn().mockResolvedValue([]),
-    addTeacher: vi.fn().mockResolvedValue({ success: true }),
-    deleteTeacherById: vi.fn().mockResolvedValue({ success: true }),
+    payments: {
+      getAllPayments: vi.fn().mockResolvedValue([]),
+      getYearsOfPayments: vi.fn().mockResolvedValue([]),
+    },
+    expenses: {
+      getAllExpenses: vi.fn().mockResolvedValue([]),
+    },
+    students: {
+      getAllStudents: vi.fn().mockResolvedValue([]),
+    },
+    teachers: {
+      getAllTeachers: vi.fn().mockResolvedValue([]),
+      addTeacher: vi.fn().mockResolvedValue({ success: true }),
+      deleteTeacherById: vi.fn().mockResolvedValue({ success: true }),
+    },
+    pricing: {
+      getPaymentConcepts: vi.fn().mockResolvedValue([]),
+      getPaymentDivisions: vi.fn().mockResolvedValue([]),
+    },
   };
 });
 
